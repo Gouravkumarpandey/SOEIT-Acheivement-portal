@@ -7,8 +7,9 @@ const mongoose = require('mongoose');
 // @route   GET /api/admin/dashboard
 exports.getDashboardStats = async (req, res, next) => {
     try {
-        const [totalStudents, totalAchievements, pendingCount, approvedCount, rejectedCount] = await Promise.all([
+        const [totalStudents, totalFaculties, totalAchievements, pendingCount, approvedCount, rejectedCount] = await Promise.all([
             User.countDocuments({ role: 'student' }),
+            User.countDocuments({ role: 'faculty' }),
             Achievement.countDocuments(),
             Achievement.countDocuments({ status: 'pending' }),
             Achievement.countDocuments({ status: 'approved' }),
@@ -40,7 +41,7 @@ exports.getDashboardStats = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            stats: { totalStudents, totalAchievements, pendingCount, approvedCount, rejectedCount },
+            stats: { totalStudents, totalFaculties, totalAchievements, pendingCount, approvedCount, rejectedCount },
             byCategory, byDepartment, monthlyTrend, recentAchievements,
         });
     } catch (error) {
@@ -130,15 +131,30 @@ exports.getAllAchievements = async (req, res, next) => {
 exports.getStudents = async (req, res, next) => {
     try {
         const { page = 1, limit = 10, department, search, batch, semester, section } = req.query;
+        const pageNum = Math.max(1, parseInt(page) || 1);
+        const limitNum = Math.max(1, parseInt(limit) || 10);
+
         const query = { role: 'student', isActive: true };
         if (department) query.department = department;
         if (batch) query.batch = batch;
         if (semester) query.semester = parseInt(semester);
         if (section) query.section = section;
-        if (search) query.$or = [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }, { studentId: { $regex: search, $options: 'i' } }, { enrollmentNo: { $regex: search, $options: 'i' } }];
+
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                { studentId: { $regex: search, $options: 'i' } },
+                { enrollmentNo: { $regex: search, $options: 'i' } }
+            ];
+        }
 
         const total = await User.countDocuments(query);
-        const students = await User.find(query).select('-password').sort({ name: 1 }).skip((page - 1) * limit).limit(parseInt(limit));
+        const students = await User.find(query)
+            .select('-password')
+            .sort({ name: 1 })
+            .skip((pageNum - 1) * limitNum)
+            .limit(limitNum);
 
         // Attach achievement counts
         const enriched = await Promise.all(students.map(async (student) => {

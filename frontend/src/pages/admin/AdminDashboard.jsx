@@ -1,7 +1,7 @@
 import '../../styles/AdminDashboard.css';
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
-import { Users, Trophy, Clock, CheckCircle, XCircle, TrendingUp, BarChart3, Award } from 'lucide-react';
+import { Users, Trophy, Clock, CheckCircle, XCircle, TrendingUp, BarChart3, Award, Shield } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend } from 'recharts';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -28,6 +28,7 @@ const AdminDashboard = () => {
 
     const statCards = [
         { label: 'Total Students', value: data?.stats?.totalStudents ?? 0, icon: Users, color: '#3b82f6', bg: 'rgba(59,130,246,0.1)', delta: '+12 this month' },
+        { label: 'Total Faculties', value: data?.stats?.totalFaculties ?? 0, icon: Shield, color: '#10b981', bg: 'rgba(16,185,129,0.1)', delta: 'Verified staff' },
         { label: 'Total Achievements', value: data?.stats?.totalAchievements ?? 0, icon: Trophy, color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)', delta: `${data?.stats?.approvedCount ?? 0} approved` },
         { label: 'Pending Review', value: data?.stats?.pendingCount ?? 0, icon: Clock, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', delta: 'Needs attention' },
         { label: 'Approved', value: data?.stats?.approvedCount ?? 0, icon: CheckCircle, color: '#22c55e', bg: 'rgba(34,197,94,0.1)', delta: `${data?.stats?.rejectedCount ?? 0} rejected` },
