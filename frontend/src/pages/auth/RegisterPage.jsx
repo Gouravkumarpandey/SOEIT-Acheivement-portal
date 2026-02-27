@@ -22,6 +22,27 @@ const UniversityHeader = () => (
 
 const DEPARTMENTS = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'Other'];
 
+// Field must be defined OUTSIDE RegisterPage so React sees it as the same
+// component type across re-renders. Defining it inside causes the input to
+// unmount/remount on every keystroke, losing focus after each character.
+const Field = ({ name, type = 'text', placeholder, required, form, setForm, errors, children }) => (
+    <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+        {children || (
+            <div style={{ position: 'relative' }}>
+                <input
+                    type={type}
+                    className={`form-control ${errors[name] ? 'error' : ''}`}
+                    style={{ padding: '0.875rem 1rem', background: '#f8fafc', border: 'none', height: 'auto' }}
+                    placeholder={placeholder + (required ? ' *' : '')}
+                    value={form[name] ?? ''}
+                    onChange={e => setForm(p => ({ ...p, [name]: e.target.value }))}
+                />
+            </div>
+        )}
+        {errors[name] && <div className="input-error">{errors[name]}</div>}
+    </div>
+);
+
 const RegisterPage = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
@@ -60,24 +81,6 @@ const RegisterPage = () => {
         }
     };
 
-    const Field = ({ name, type = 'text', placeholder, required, icon: Icon, children }) => (
-        <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-            {children || (
-                <div style={{ position: 'relative' }}>
-                    <input
-                        type={type}
-                        className={`form-control ${errors[name] ? 'error' : ''}`}
-                        style={{ padding: '0.875rem 1rem', background: '#f8fafc', border: 'none', height: 'auto' }}
-                        placeholder={placeholder + (required ? ' *' : '')}
-                        value={form[name]}
-                        onChange={e => setForm(p => ({ ...p, [name]: e.target.value }))}
-                    />
-                </div>
-            )}
-            {errors[name] && <div className="input-error">{errors[name]}</div>}
-        </div>
-    );
-
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fcfcfc', padding: '2rem 1.5rem', position: 'relative' }}>
             {/* Top Left Back Button */}
@@ -97,11 +100,11 @@ const RegisterPage = () => {
                 <div className="card card-body" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: 'none', borderRadius: 'var(--radius-xl)' }}>
                     <form onSubmit={handleSubmit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
-                            <Field name="name" placeholder="Full Name" required />
-                            <Field name="enrollmentNo" placeholder="Enrollment No. (e.g. AJU/221403)" />
+                            <Field name="name" placeholder="Full Name" required form={form} setForm={setForm} errors={errors} />
+                            <Field name="enrollmentNo" placeholder="Enrollment No. (e.g. AJU/221403)" form={form} setForm={setForm} errors={errors} />
                         </div>
 
-                        <Field name="email" type="email" placeholder="Email Address" required />
+                        <Field name="email" type="email" placeholder="Email Address" required form={form} setForm={setForm} errors={errors} />
 
                         <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                             <select
@@ -117,8 +120,8 @@ const RegisterPage = () => {
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
-                            <Field name="batch" placeholder="Batch Year" />
-                            <Field name="semester" placeholder="Current Semester" />
+                            <Field name="batch" placeholder="Batch Year" form={form} setForm={setForm} errors={errors} />
+                            <Field name="semester" placeholder="Current Semester" form={form} setForm={setForm} errors={errors} />
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
