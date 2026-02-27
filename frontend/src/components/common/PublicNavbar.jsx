@@ -25,18 +25,21 @@ const PublicNavbar = () => {
                         </div>
                     </Link>
 
-                    <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        {[['/', 'Home'], ['/about', 'About'], ['/features', 'Features'], ['/how-it-works', 'How It Works'], ['/contact', 'Contact']].map(([path, label]) => (
-                            <Link key={path} to={path} className="nav-item">{label}</Link>
-                        ))}
-                    </div>
+                    {/* Right side group */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
+                        <div className="nav-links">
+                            {[['/', 'Home'], ['/about', 'About'], ['/features', 'Features'], ['/how-it-works', 'How It Works'], ['/contact', 'Contact']].map(([path, label]) => (
+                                <Link key={path} to={path} className="nav-item">{label}</Link>
+                            ))}
+                        </div>
 
-                    <div className="nav-cta" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <Link to="/login" className="btn btn-secondary btn-sm" style={{ display: 'flex' }}>Sign In</Link>
-                        <Link to="/register" className="btn btn-primary btn-sm" style={{ display: 'flex' }}>Get Started</Link>
-                        <button className="btn btn-secondary btn-icon" style={{ display: 'none' }} onClick={() => setMenuOpen(!menuOpen)}>
-                            {menuOpen ? <X size={18} /> : <Menu size={18} />}
-                        </button>
+                        <div className="nav-cta">
+                            <Link to="/login" className="btn btn-secondary btn-sm">Sign In</Link>
+                            <Link to="/register" className="btn btn-primary btn-sm">Get Started</Link>
+                            <button className="btn btn-secondary btn-icon" style={{ display: 'none' }} onClick={() => setMenuOpen(!menuOpen)}>
+                                {menuOpen ? <X size={18} /> : <Menu size={18} />}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
