@@ -1,0 +1,147 @@
+/* ===== ADMIN SETTINGS PAGE ===== */
+
+.admin-settings-page {
+    animation: fadeIn 0.5s ease;
+    max-width: 860px;
+}
+
+/* Settings Tabs */
+.settings-tabs {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: 0.375rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.settings-tab {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.settings-tab:hover {
+    background: #fff;
+    color: var(--text-secondary);
+}
+
+.settings-tab.active {
+    background: #fff;
+    color: var(--primary-600);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Settings Section */
+.settings-section {
+    margin-bottom: 2rem;
+}
+
+.settings-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.375rem;
+}
+
+.settings-section-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+}
+
+/* Toggle Row */
+.settings-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    margin-bottom: 0.75rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.settings-toggle-info label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.settings-toggle-info p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* Toggle Switch */
+.settings-switch {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--gray-300);
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    transition: background var(--transition-fast);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.settings-switch.on {
+    background: var(--primary-500);
+}
+
+.settings-switch-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform var(--transition-fast);
+}
+
+.settings-switch.on .settings-switch-thumb {
+    transform: translateX(20px);
+}
+
+/* Danger Zone */
+.settings-danger-zone {
+    background: var(--error-50);
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+}
+
+.settings-danger-title {
+    color: #991b1b;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.settings-danger-desc {
+    font-size: 0.85rem;
+    color: #b91c1c;
+    margin-bottom: 1rem;
+}

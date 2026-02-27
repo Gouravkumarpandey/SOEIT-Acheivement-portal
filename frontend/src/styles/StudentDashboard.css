@@ -1,0 +1,105 @@
+/* ===== STUDENT DASHBOARD ===== */
+
+.dashboard-animate {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Welcome Banner */
+.dashboard-welcome-banner {
+    background: linear-gradient(135deg, var(--primary-50), #ede9fe);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.dashboard-welcome-name {
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-welcome-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Stat Cards Grid */
+.dashboard-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Charts Row */
+.dashboard-charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-chart-card-header h4 {
+    font-size: 1rem;
+}
+
+/* Recharts Tooltip — light theme */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+    background: #fff !important;
+    border: 1px solid var(--border-primary) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--text-primary) !important;
+    font-size: 12px !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* Recent Activity */
+.dashboard-activity-card {
+    margin-bottom: 0;
+}
+
+.dashboard-activity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dashboard-activity-link {
+    font-size: 0.85rem;
+    color: var(--primary-500);
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.dashboard-activity-link:hover {
+    color: var(--primary-700);
+}
+
+/* Skeleton loaders */
+.dashboard-skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-skeleton-charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .dashboard-charts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-skeleton-charts {
+        grid-template-columns: 1fr;
+    }
+}

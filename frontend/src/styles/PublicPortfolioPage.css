@@ -1,0 +1,125 @@
+/* ===== PUBLIC PORTFOLIO PAGE ===== */
+
+.portfolio-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
+
+/* Profile Header */
+.portfolio-header {
+    padding: 8rem 0 4rem;
+    background: linear-gradient(135deg, var(--primary-50), #ede9fe);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.portfolio-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.portfolio-avatar {
+    width: 100px;
+    height: 100px;
+    font-size: 2.5rem;
+    flex-shrink: 0;
+}
+
+.portfolio-name {
+    margin-bottom: 0.25rem;
+}
+
+.portfolio-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.portfolio-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* Stats Strip */
+.portfolio-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.portfolio-stat-box {
+    background: #fff;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.portfolio-stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-primary);
+}
+
+.portfolio-stat-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* Main Content */
+.portfolio-content {
+    padding: 4rem 0;
+}
+
+.portfolio-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Achievement Cards */
+.portfolio-achievement-card {
+    margin-bottom: 1rem;
+}
+
+.portfolio-achievement-level {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary-600);
+    margin-bottom: 0.375rem;
+}
+
+/* Sidebar */
+.portfolio-sidebar-card {
+    margin-bottom: 1.25rem;
+    position: sticky;
+    top: 80px;
+}
+
+/* Share Button */
+.portfolio-share-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+@media (max-width: 1024px) {
+    .portfolio-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .portfolio-sidebar-card {
+        position: static;
+    }
+}

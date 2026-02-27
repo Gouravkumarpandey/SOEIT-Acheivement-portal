@@ -1,0 +1,81 @@
+/* ===== ALL ACHIEVEMENTS PAGE (Admin) ===== */
+
+.all-achievements-page {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Toolbar */
+.all-achievements-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.all-achievements-search {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.all-achievements-search input {
+    padding-left: 2.5rem;
+    width: 100%;
+}
+
+.all-achievements-search-icon {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    pointer-events: none;
+}
+
+/* Table */
+.all-achievements-table-card {
+    overflow: hidden;
+}
+
+/* Detail Drawer / Modal */
+.achievement-detail-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.achievement-detail-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.achievement-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Export Bar */
+.all-achievements-export {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+@media (max-width: 768px) {
+    .achievement-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

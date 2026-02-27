@@ -1,0 +1,101 @@
+/* ===== ADMIN DASHBOARD ===== */
+
+.admin-dashboard-animate {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Stat Grid */
+.admin-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.admin-stat-delta {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+/* Charts Row */
+.admin-charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Bottom Row */
+.admin-bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+/* Pending Item */
+.admin-pending-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    transition: background var(--transition-fast);
+}
+
+.admin-pending-item:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-200);
+}
+
+.admin-pending-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-pending-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.admin-all-caught {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* Skeleton */
+.admin-skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.admin-skeleton-charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.25rem;
+}
+
+@media (max-width: 1024px) {
+    .admin-charts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-bottom-row {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-skeleton-charts {
+        grid-template-columns: 1fr;
+    }
+}

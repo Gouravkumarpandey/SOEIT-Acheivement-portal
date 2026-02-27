@@ -1,0 +1,111 @@
+/* ===== HOW IT WORKS PAGE ===== */
+
+.how-it-works-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
+
+.how-hero {
+    padding: 8rem 0 5rem;
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-50), #ede9fe);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.how-steps-section {
+    padding: 5rem 0;
+}
+
+/* Steps */
+.how-steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 720px;
+    margin: 3rem auto 0;
+}
+
+.how-step-item {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.how-step-number {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    font-family: 'Space Grotesk', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.how-step-content {
+    flex: 1;
+    padding-top: 0.5rem;
+}
+
+.how-step-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.how-step-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+/* Role Tabs */
+.how-roles-section {
+    padding: 5rem 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-primary);
+}
+
+.how-role-tabs {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    background: #fff;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-full);
+    padding: 0.375rem;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: var(--shadow-sm);
+}
+
+.how-role-tab {
+    padding: 0.625rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.how-role-tab.active {
+    background: var(--primary-500);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.how-role-tab:not(.active):hover {
+    color: var(--primary-600);
+    background: var(--primary-50);
+}

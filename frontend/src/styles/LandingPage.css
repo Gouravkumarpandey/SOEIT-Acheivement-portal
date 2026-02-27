@@ -1,0 +1,178 @@
+/* ===== LANDING PAGE ===== */
+
+.landing-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-50);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-full);
+    padding: 0.4rem 1rem;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.landing-hero-badge span {
+    font-size: 0.8rem;
+    color: var(--primary-600);
+    font-weight: 600;
+}
+
+.landing-hero-title {
+    max-width: 800px;
+    margin: 0 auto 1.5rem;
+    animation: fadeIn 0.7s ease 0.1s both;
+}
+
+.landing-hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+    animation: fadeIn 0.7s ease 0.2s both;
+}
+
+.landing-hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeIn 0.7s ease 0.3s both;
+}
+
+/* Hero preview card */
+.landing-preview-card {
+    background: #fff;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: var(--shadow-xl);
+    margin: 4rem auto 0;
+    max-width: 900px;
+    animation: fadeIn 0.8s ease 0.4s both;
+}
+
+.landing-preview-stat {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    border: 1px solid var(--border-primary);
+    text-align: left;
+}
+
+.landing-preview-stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.landing-preview-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Stats strip */
+.landing-stats-strip {
+    padding: 4rem 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-primary);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.landing-stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(135deg, #2563eb, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.landing-stat-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Features section */
+.landing-features-section {
+    padding: 6rem 0;
+}
+
+.landing-section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-50);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-full);
+    padding: 0.4rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: var(--primary-600);
+    font-weight: 600;
+}
+
+.landing-feature-card {
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.landing-feature-card:hover {
+    transform: translateY(-6px);
+}
+
+.landing-feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+/* Categories section */
+.landing-categories-section {
+    padding: 5rem 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-primary);
+}
+
+.landing-category-pill {
+    padding: 0.625rem 1.25rem;
+    background: #fff;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    cursor: default;
+    transition: all 0.2s;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+}
+
+.landing-category-pill:hover {
+    background: var(--primary-50);
+    color: var(--primary-600);
+    border-color: var(--primary-300);
+}
+
+/* CTA section */
+.landing-cta-section {
+    padding: 6rem 0;
+}
+
+.landing-cta-box {
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-50), #ede9fe);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-xl);
+    padding: 4rem 2rem;
+    box-shadow: var(--shadow-lg);
+}
