@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import { Users, Search, Mail, Shield, UserCheck, UserX } from 'lucide-react';
 import toast from 'react-hot-toast';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 const FacultyManagementPage = () => {
@@ -38,48 +38,53 @@ const FacultyManagementPage = () => {
     };
 
     const exportFacultyData = (type) => {
-        const date = new Date().toLocaleDateString().replace(/\//g, '-');
+        try {
+            const date = new Date().toLocaleDateString().replace(/\//g, '-');
 
-        if (type === 'excel') {
-            const excelData = faculty.map(f => ({
-                'Name': f.name,
-                'Employee ID': f.studentId || 'N/A',
-                'Email': f.email,
-                'Department': f.department || 'General',
-                'Status': f.isActive ? 'Active' : 'Inactive'
-            }));
+            if (type === 'excel') {
+                const excelData = faculty.map(f => ({
+                    'Name': f.name,
+                    'Employee ID': f.studentId || 'N/A',
+                    'Email': f.email,
+                    'Department': f.department || 'General',
+                    'Status': f.isActive ? 'Active' : 'Inactive'
+                }));
 
-            const ws = XLSX.utils.json_to_sheet(excelData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Faculty");
-            XLSX.writeFile(wb, `SOEIT_Faculty_List_${date}.xlsx`);
-            toast.success('Excel file downloaded');
-        } else {
-            const doc = new jsPDF();
-            doc.setFillColor(139, 92, 246);
-            doc.rect(0, 0, 210, 30, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(20);
-            doc.text('SOEIT FACULTY ROSTER', 105, 15, { align: 'center' });
-            doc.setFontSize(10);
-            doc.text(`Official Academic Record - ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
+                const ws = XLSX.utils.json_to_sheet(excelData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Faculty");
+                XLSX.writeFile(wb, `SOEIT_Faculty_List_${date}.xlsx`);
+                toast.success('Excel file downloaded');
+            } else {
+                const doc = new jsPDF();
+                doc.setFillColor(139, 92, 246);
+                doc.rect(0, 0, 210, 30, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.text('SOEIT FACULTY ROSTER', 105, 15, { align: 'center' });
+                doc.setFontSize(10);
+                doc.text(`Official Academic Record - ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
 
-            doc.autoTable({
-                startY: 40,
-                head: [['Name', 'Employee ID', 'Official Email', 'Department', 'Status']],
-                body: faculty.map(f => [
-                    f.name,
-                    f.studentId || 'N/A',
-                    f.email,
-                    f.department || 'General',
-                    f.isActive ? 'Active' : 'Inactive'
-                ]),
-                theme: 'striped',
-                headStyles: { fillColor: [139, 92, 246] }
-            });
+                autoTable(doc, {
+                    startY: 40,
+                    head: [['Name', 'Employee ID', 'Official Email', 'Department', 'Status']],
+                    body: faculty.map(f => [
+                        f.name,
+                        f.studentId || 'N/A',
+                        f.email,
+                        f.department || 'General',
+                        f.isActive ? 'Active' : 'Inactive'
+                    ]),
+                    theme: 'striped',
+                    headStyles: { fillColor: [139, 92, 246] }
+                });
 
-            doc.save(`SOEIT_Faculty_Data_${date}.pdf`);
-            toast.success('PDF roster downloaded');
+                doc.save(`SOEIT_Faculty_Data_${date}.pdf`);
+                toast.success('PDF roster downloaded');
+            }
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error('Download failed! ' + error.message);
         }
     };
 

@@ -4,8 +4,8 @@ import { adminAPI } from '../../services/api';
 import { Users, Search, Trophy, Star, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 const DEPARTMENTS = ['', 'CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE'];
@@ -38,56 +38,61 @@ const StudentManagementPage = () => {
     const getInitials = (name) => name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'S';
 
     const exportStudentData = (type) => {
-        const date = new Date().toLocaleDateString().replace(/\//g, '-');
+        try {
+            const date = new Date().toLocaleDateString().replace(/\//g, '-');
 
-        if (type === 'excel') {
-            const excelData = students.map(s => ({
-                'Name': s.name,
-                'Enrollment No': s.enrollmentNo || s.studentId,
-                'Department': s.department,
-                'Semester': s.semester || 'N/A',
-                'Section': s.section || 'X',
-                'Email': s.email,
-                'Batch': s.batch || 'N/A',
-                'Total Achievements': s.achievementCounts?.total || 0,
-                'Approved': s.achievementCounts?.approved || 0,
-                'Total Points': s.achievementCounts?.points || 0
-            }));
+            if (type === 'excel') {
+                const excelData = students.map(s => ({
+                    'Name': s.name,
+                    'Enrollment No': s.enrollmentNo || s.studentId,
+                    'Department': s.department,
+                    'Semester': s.semester || 'N/A',
+                    'Section': s.section || 'X',
+                    'Email': s.email,
+                    'Batch': s.batch || 'N/A',
+                    'Total Achievements': s.achievementCounts?.total || 0,
+                    'Approved': s.achievementCounts?.approved || 0,
+                    'Total Points': s.achievementCounts?.points || 0
+                }));
 
-            const ws = XLSX.utils.json_to_sheet(excelData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Students");
-            XLSX.writeFile(wb, `SOEIT_Students_List_${date}.xlsx`);
-            toast.success('Excel file downloaded');
-        } else {
-            const doc = new jsPDF('l', 'mm', 'a4');
-            doc.setFillColor(30, 41, 59);
-            doc.rect(0, 0, 297, 30, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(20);
-            doc.text('SOEIT STUDENT MANAGEMENT - ACADEMIC REPORT', 148, 15, { align: 'center' });
-            doc.setFontSize(10);
-            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 148, 22, { align: 'center' });
+                const ws = XLSX.utils.json_to_sheet(excelData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Students");
+                XLSX.writeFile(wb, `SOEIT_Students_List_${date}.xlsx`);
+                toast.success('Excel file downloaded');
+            } else {
+                const doc = new jsPDF('l', 'mm', 'a4');
+                doc.setFillColor(30, 41, 59);
+                doc.rect(0, 0, 297, 30, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.text('SOEIT STUDENT MANAGEMENT - ACADEMIC REPORT', 148, 15, { align: 'center' });
+                doc.setFontSize(10);
+                doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 148, 22, { align: 'center' });
 
-            doc.autoTable({
-                startY: 40,
-                head: [['Name', 'ID/Enrollment', 'Dept', 'Sem', 'Email', 'Achievements', 'Points']],
-                body: students.map(s => [
-                    s.name,
-                    s.enrollmentNo || s.studentId,
-                    s.department,
-                    `${s.semester || 'N/A'}-${s.section || 'X'}`,
-                    s.email,
-                    s.achievementCounts?.total || 0,
-                    s.achievementCounts?.points || 0
-                ]),
-                theme: 'grid',
-                headStyles: { fillColor: [59, 130, 246] },
-                alternateRowStyles: { fillColor: [245, 248, 255] }
-            });
+                autoTable(doc, {
+                    startY: 40,
+                    head: [['Name', 'ID/Enrollment', 'Dept', 'Sem', 'Email', 'Achievements', 'Points']],
+                    body: students.map(s => [
+                        s.name,
+                        s.enrollmentNo || s.studentId,
+                        s.department,
+                        `${s.semester || 'N/A'}-${s.section || 'X'}`,
+                        s.email,
+                        s.achievementCounts?.total || 0,
+                        s.achievementCounts?.points || 0
+                    ]),
+                    theme: 'grid',
+                    headStyles: { fillColor: [59, 130, 246] },
+                    alternateRowStyles: { fillColor: [245, 248, 255] }
+                });
 
-            doc.save(`SOEIT_Students_Data_${date}.pdf`);
-            toast.success('PDF report downloaded');
+                doc.save(`SOEIT_Students_Data_${date}.pdf`);
+                toast.success('PDF report downloaded');
+            }
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error('Download failed! ' + error.message);
         }
     };
 

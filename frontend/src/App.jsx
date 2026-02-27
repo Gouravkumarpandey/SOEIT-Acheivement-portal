@@ -86,15 +86,19 @@ function App() {
             <Route path="/achievements/edit/:id" element={<UploadAchievementPage />} />
           </Route>
 
-          {/* Admin / Faculty Specific Routes */}
+          {/* Admin / Faculty Shared Management Routes */}
           <Route element={<ProtectedRoute allowedRoles={['admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
             <Route path="/admin/verify" element={<VerifyAchievementsPage />} />
             <Route path="/admin/achievements" element={<AllAchievementsPage />} />
             <Route path="/admin/students" element={<StudentManagementPage />} />
-            <Route path="/admin/faculty" element={<FacultyManagementPage />} />
             <Route path="/admin/reports" element={<ReportsPage />} />
+          </Route>
+
+          {/* Admin Exclusive Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['admin']}><DashboardLayout /></ProtectedRoute>}>
+            <Route path="/admin/faculty" element={<FacultyManagementPage />} />
           </Route>
 
           {/* Catch All */}

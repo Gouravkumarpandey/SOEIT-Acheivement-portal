@@ -28,13 +28,21 @@ const Sidebar = ({ mobileOpen, onClose }) => {
     const navigate = useNavigate();
     const links = isStudent ? studentLinks : adminLinks;
 
-    // Faculty specific links mapping
-    const filteredLinks = links.map(link => {
-        if (user?.role === 'faculty' && link.to === '/admin/dashboard') {
-            return { ...link, to: '/faculty/dashboard' };
-        }
-        return link;
-    });
+    // Role-based link mapping
+    const filteredLinks = links
+        .filter(link => {
+            // Only admin can see Faculty Management
+            if (user?.role === 'faculty' && link.to === '/admin/faculty') {
+                return false;
+            }
+            return true;
+        })
+        .map(link => {
+            if (user?.role === 'faculty' && link.to === '/admin/dashboard') {
+                return { ...link, to: '/faculty/dashboard' };
+            }
+            return link;
+        });
 
     const handleLogout = async () => {
         await logout();

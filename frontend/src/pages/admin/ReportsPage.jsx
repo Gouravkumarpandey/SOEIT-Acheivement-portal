@@ -4,8 +4,8 @@ import { adminAPI } from '../../services/api';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, AreaChart, Area } from 'recharts';
 import { Trophy, Star, TrendingUp, Award, Download, BarChart3 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
 
@@ -34,66 +34,71 @@ const ReportsPage = () => {
     }));
 
     const exportReportsPDF = () => {
-        const doc = new jsPDF();
-        const date = new Date().toLocaleDateString();
+        try {
+            const doc = new jsPDF();
+            const date = new Date().toLocaleDateString();
 
-        // Header
-        doc.setFillColor(30, 41, 59);
-        doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(22);
-        doc.text('SOEIT ACHIEVEMENT PORTAL', 105, 18, { align: 'center' });
-        doc.setFontSize(12);
-        doc.text('Institutional Performance Report', 105, 28, { align: 'center' });
-        doc.setFontSize(10);
-        doc.text(`Generated on: ${date}`, 105, 34, { align: 'center' });
+            // Header
+            doc.setFillColor(30, 41, 59);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.text('SOEIT ACHIEVEMENT PORTAL', 105, 18, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text('Institutional Performance Report', 105, 28, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${date}`, 105, 34, { align: 'center' });
 
-        let y = 55;
+            let y = 55;
 
-        // 1. Monthly Trends Table
-        doc.setTextColor(30, 41, 59);
-        doc.setFontSize(14);
-        doc.text('1. Monthly Growth Trend', 14, y);
-        y += 8;
-        doc.autoTable({
-            startY: y,
-            head: [['Month', 'Submitted Achievements', 'Approved Achievements']],
-            body: monthlyData.map(d => [d.name, d.submitted, d.approved]),
-            theme: 'grid',
-            headStyles: { fillStyle: 'F', fillColor: [59, 130, 246] },
-        });
-        y = doc.lastAutoTable.finalY + 15;
+            // 1. Monthly Trends Table
+            doc.setTextColor(30, 41, 59);
+            doc.setFontSize(14);
+            doc.text('1. Monthly Growth Trend', 14, y);
+            y += 8;
+            autoTable(doc, {
+                startY: y,
+                head: [['Month', 'Submitted Achievements', 'Approved Achievements']],
+                body: monthlyData.map(d => [d.name, d.submitted, d.approved]),
+                theme: 'grid',
+                headStyles: { fillStyle: 'F', fillColor: [59, 130, 246] },
+            });
+            y = doc.lastAutoTable.finalY + 15;
 
-        // 2. Departmental Stats Table
-        doc.setFontSize(14);
-        doc.text('2. Department-wise Performance', 14, y);
-        y += 8;
-        doc.autoTable({
-            startY: y,
-            head: [['Department', 'Total Achievements Count']],
-            body: (data?.departmentStats || []).map(d => [d._id, d.count]),
-            theme: 'grid',
-            headStyles: { fillStyle: 'F', fillColor: [139, 92, 246] },
-        });
-        y = doc.lastAutoTable.finalY + 15;
+            // 2. Departmental Stats Table
+            doc.setFontSize(14);
+            doc.text('2. Department-wise Performance', 14, y);
+            y += 8;
+            autoTable(doc, {
+                startY: y,
+                head: [['Department', 'Total Achievements Count']],
+                body: (data?.departmentStats || []).map(d => [d._id, d.count]),
+                theme: 'grid',
+                headStyles: { fillStyle: 'F', fillColor: [139, 92, 246] },
+            });
+            y = doc.lastAutoTable.finalY + 15;
 
-        // New Page if needed
-        if (y > 220) { doc.addPage(); y = 20; }
+            // New Page if needed
+            if (y > 220) { doc.addPage(); y = 20; }
 
-        // 3. Top Performers Table
-        doc.setFontSize(14);
-        doc.text('3. University Top Performers', 14, y);
-        y += 8;
-        doc.autoTable({
-            startY: y,
-            head: [['Rank', 'Student Name', 'Department', 'Points', 'Achievements']],
-            body: (data?.topPerformers || []).map((p, i) => [i + 1, p.student?.name, p.student?.department, p.totalPoints, p.achievementCount]),
-            theme: 'grid',
-            headStyles: { fillStyle: 'F', fillColor: [245, 158, 11] },
-        });
+            // 3. Top Performers Table
+            doc.setFontSize(14);
+            doc.text('3. University Top Performers', 14, y);
+            y += 8;
+            autoTable(doc, {
+                startY: y,
+                head: [['Rank', 'Student Name', 'Department', 'Points', 'Achievements']],
+                body: (data?.topPerformers || []).map((p, i) => [i + 1, p.student?.name, p.student?.department, p.totalPoints, p.achievementCount]),
+                theme: 'grid',
+                headStyles: { fillStyle: 'F', fillColor: [245, 158, 11] },
+            });
 
-        doc.save(`SOEIT_Performance_Report_${date.replace(/\//g, '-')}.pdf`);
-        toast.success('Report downloaded successfully');
+            doc.save(`SOEIT_Performance_Report_${date.replace(/\//g, '-')}.pdf`);
+            toast.success('Report downloaded successfully');
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error('Download failed! ' + error.message);
+        }
     };
 
     return (
