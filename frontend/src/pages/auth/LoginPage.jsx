@@ -1,9 +1,24 @@
 import '../../styles/LoginPage.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { GraduationCap, Mail, Lock, Eye, EyeOff, LogIn, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, RefreshCw, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const UniversityHeader = () => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.25rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
+        <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#303657', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.5rem', fontWeight: 800, flexShrink: 0, boxShadow: '0 4px 12px rgba(48,54,87,0.2)' }}>JGi</div>
+        <div style={{ height: '60px', width: '2px', background: '#8B1E1E' }} className="hidden md:block" />
+        <div style={{ textAlign: 'left', minWidth: '180px' }}>
+            <div style={{ fontWeight: 800, fontSize: '1.4rem', lineHeight: 1.1 }}>
+                <span style={{ color: '#8B1E1E' }}>ARKA JAIN</span><br />
+                <span style={{ color: '#303657' }}>UNIVERSITY</span>
+            </div>
+            <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '4px' }}>Jharkhand</div>
+        </div>
+        <div style={{ background: '#8B1E1E', color: '#fff', fontSize: '0.7rem', fontWeight: 700, padding: '0.35rem 0.75rem', borderRadius: '4px', alignSelf: 'center', whiteSpace: 'nowrap' }}>NAAC GRADE A</div>
+    </div>
+);
 
 const LoginPage = () => {
     const { login } = useAuth();
@@ -11,16 +26,28 @@ const LoginPage = () => {
     const location = useLocation();
     const from = location.state?.from?.pathname || null;
 
-    const [form, setForm] = useState({ email: '', password: '' });
+    const [form, setForm] = useState({ email: '', password: '', captchaInput: '' });
+    const [captcha, setCaptcha] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const generateCaptcha = () => {
+        const char = '1234567890';
+        let res = '';
+        for (let i = 0; i < 4; i++) res += char.charAt(Math.floor(Math.random() * char.length));
+        setCaptcha(res);
+    };
+
+    useEffect(() => {
+        generateCaptcha();
+    }, []);
+
     const validate = () => {
         const e = {};
-        if (!form.email) e.email = 'Email is required';
-        else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Invalid email';
+        if (!form.email) e.email = 'Email/Username is required';
         if (!form.password) e.password = 'Password is required';
+        if (form.captchaInput !== captcha) e.captchaInput = 'Invalid Captcha';
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -30,19 +57,21 @@ const LoginPage = () => {
         if (!validate()) return;
         setLoading(true);
         try {
-            const data = await login(form);
+            const data = await login({ email: form.email, password: form.password });
             toast.success(data.message || 'Welcome back!');
             const redirect = from || (data.user.role === 'student' ? '/dashboard' : '/admin/dashboard');
             navigate(redirect, { replace: true });
         } catch (err) {
             toast.error(err.response?.data?.message || 'Login failed');
+            generateCaptcha();
+            setForm(p => ({ ...p, captchaInput: '' }));
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 30% 40%, rgba(59,130,246,0.12) 0%, transparent 60%), var(--bg-primary)', padding: '1rem', position: 'relative' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fcfcfc', padding: '1.5rem', position: 'relative' }}>
             {/* Top Left Back Button */}
             <div style={{ position: 'absolute', top: '2rem', left: '2rem' }}>
                 <Link to="/" className="btn btn-secondary btn-sm" style={{ fontWeight: 600, boxShadow: 'var(--shadow-sm)' }}>
@@ -51,88 +80,88 @@ const LoginPage = () => {
             </div>
 
             <div style={{ width: '100%', maxWidth: '440px' }}>
-                {/* Logo removed from here to top-left */}
+                <UniversityHeader />
 
-
-                <div className="card card-body" style={{ boxShadow: 'var(--shadow-xl)' }}>
-                    <h2 style={{ marginBottom: '0.375rem', textAlign: 'center' }}>Welcome Back</h2>
-                    <p style={{ color: 'var(--text-muted)', textAlign: 'center', fontSize: '0.9rem', marginBottom: '2rem' }}>Sign in to your account to continue</p>
-
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label className="form-label required">Email Address</label>
+                <div className="card card-body" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: 'none', borderRadius: 'var(--radius-xl)' }}>
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
                             <div style={{ position: 'relative' }}>
-                                <Mail size={16} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                                 <input
                                     type="email"
                                     className={`form-control ${errors.email ? 'error' : ''}`}
-                                    style={{ paddingLeft: '2.5rem' }}
-                                    placeholder="your@email.com"
+                                    style={{ padding: '1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
+                                    placeholder="Username"
                                     value={form.email}
                                     onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-                                    autoComplete="email"
                                 />
                             </div>
                             {errors.email && <div className="input-error">{errors.email}</div>}
                         </div>
 
-                        <div className="form-group">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                <label className="form-label" style={{ margin: 0 }}>Password</label>
-                                <Link to="/forgot-password" style={{ fontSize: '0.8rem', color: 'var(--primary-400)' }}>Forgot password?</Link>
-                            </div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
                             <div style={{ position: 'relative' }}>
-                                <Lock size={16} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     className={`form-control ${errors.password ? 'error' : ''}`}
-                                    style={{ paddingLeft: '2.5rem', paddingRight: '2.75rem' }}
-                                    placeholder="••••••••"
+                                    style={{ padding: '1rem 3rem 1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
+                                    placeholder="Password"
                                     value={form.password}
                                     onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-                                    autoComplete="current-password"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
                                     style={{
                                         position: 'absolute',
-                                        right: '0.875rem',
+                                        right: '1rem',
                                         top: '50%',
                                         transform: 'translateY(-50%)',
                                         background: 'none',
                                         border: 'none',
-                                        color: 'var(--text-muted)',
+                                        color: '#64748b',
                                         cursor: 'pointer',
-                                        display: 'flex',
-                                        zIndex: 10
+                                        display: 'flex'
                                     }}
                                 >
-                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
                             {errors.password && <div className="input-error">{errors.password}</div>}
                         </div>
 
-                        <button type="submit" className="btn btn-primary w-full" disabled={loading} style={{ marginTop: '0.5rem', padding: '0.75rem' }}>
-                            {loading ? <><div className="spinner spinner-sm" style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} /> Signing in...</> : <><LogIn size={16} /> Sign In</>}
+                        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1 }}>
+                                <input
+                                    type="text"
+                                    className={`form-control ${errors.captchaInput ? 'error' : ''}`}
+                                    style={{ padding: '1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
+                                    placeholder="Enter Captcha"
+                                    value={form.captchaInput}
+                                    onChange={e => setForm(p => ({ ...p, captchaInput: e.target.value }))}
+                                />
+                                {errors.captchaInput && <div className="input-error">{errors.captchaInput}</div>}
+                            </div>
+                            <div className="captcha-box">
+                                {captcha}
+                            </div>
+                            <button type="button" onClick={generateCaptcha} className="btn-icon btn-secondary" style={{ padding: '0.9rem', borderRadius: 'var(--radius-sm)' }}>
+                                <RefreshCw size={18} />
+                            </button>
+                        </div>
+
+                        <button type="submit" className="btn btn-arka-jain" disabled={loading} style={{ marginTop: '0.5rem' }}>
+                            {loading ? 'Logging in...' : 'LOGIN'}
                         </button>
                     </form>
 
-                    <div className="divider" style={{ margin: '1.5rem 0' }}>
-                        <div style={{ position: 'relative', textAlign: 'center' }}>
-                            <span style={{ background: 'var(--bg-secondary)', padding: '0 0.75rem', fontSize: '0.8rem', color: 'var(--text-muted)', position: 'relative', zIndex: 1 }}>or</span>
-                        </div>
-                    </div>
-
-                    <p style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                    <p style={{ textAlign: 'center', fontSize: '0.9rem', color: '#64748b', marginTop: '2.5rem' }}>
                         Don't have an account?{' '}
-                        <Link to="/register" style={{ color: 'var(--primary-400)', fontWeight: 600 }}>Create one</Link>
+                        <Link to="/register" style={{ color: '#303657', fontWeight: 700 }}>Create User</Link>
                     </p>
                 </div>
 
-                <div className="alert alert-info" style={{ marginTop: '1rem', fontSize: '0.8rem' }}>
-                    <strong>Demo Accounts:</strong> Student: student@soeit.ac.in / Test@123 | Admin: admin@soeit.ac.in / Admin@123
+                <div className="alert alert-info" style={{ marginTop: '1.5rem', fontSize: '0.8rem', background: '#f1f5f9', border: 'none', color: '#475569' }}>
+                    <strong>Demo Accounts:</strong> student@soeit.ac.in / Test@123 | admin@soeit.ac.in / Admin@123
                 </div>
             </div>
         </div>
