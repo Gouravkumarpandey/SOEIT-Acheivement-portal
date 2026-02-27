@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { adminAPI, noticeAPI } from '../../services/api';
 import {
     Users, Trophy, Clock, CheckCircle, GraduationCap,
@@ -17,6 +18,8 @@ const FacultyDashboard = () => {
     const [search, setSearch] = useState('');
     const [showNoticeModal, setShowNoticeModal] = useState(false);
     const [noticeData, setNoticeData] = useState({ title: '', content: '', priority: 'Medium' });
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadStats = async () => {
@@ -334,10 +337,20 @@ const FacultyDashboard = () => {
                                         </div>
                                     </td>
                                     <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
-                                        <button className="btn btn-icon btn-secondary" style={{ padding: '0.5rem' }} title="View Details">
+                                        <button
+                                            className="btn btn-icon btn-secondary"
+                                            style={{ padding: '0.5rem' }}
+                                            title="View Quick Stats"
+                                            onClick={() => setSelectedStudent(student)}
+                                        >
                                             <Eye size={18} />
                                         </button>
-                                        <button className="btn btn-icon btn-secondary" style={{ padding: '0.5rem', marginLeft: '0.5rem' }}>
+                                        <button
+                                            className="btn btn-icon btn-secondary"
+                                            style={{ padding: '0.5rem', marginLeft: '0.5rem' }}
+                                            title="View Full Portfolio"
+                                            onClick={() => navigate(`/portfolio/${student._id}`)}
+                                        >
                                             <ChevronRight size={18} />
                                         </button>
                                     </td>
@@ -410,6 +423,54 @@ const FacultyDashboard = () => {
                                     Broadcast Notice & Send Emails
                                 </button>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Student Insight Modal */}
+            {selectedStudent && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1001, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div className="card" style={{ width: '100%', maxWidth: '450px', overflow: 'hidden', animation: 'fadeIn 0.2s ease' }}>
+                        <div style={{ background: 'linear-gradient(135deg, #303657, #1e293b)', padding: '2rem', textAlign: 'center', color: 'white' }}>
+                            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', margin: '0 auto 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 800, border: '2px solid rgba(255,255,255,0.2)' }}>
+                                {selectedStudent.name.charAt(0)}
+                            </div>
+                            <h3 style={{ margin: 0, fontSize: '1.3rem' }}>{selectedStudent.name}</h3>
+                            <p style={{ margin: '0.25rem 0 0', opacity: 0.8, fontSize: '0.9rem' }}>{selectedStudent.enrollmentNo || 'No Enrollment No.'}</p>
+                        </div>
+                        <div className="card-body" style={{ padding: '1.5rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                                <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '0.75rem', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Academic Info</div>
+                                    <div style={{ fontWeight: 700, color: '#303657' }}>Sem {selectedStudent.semester} • {selectedStudent.section}</div>
+                                </div>
+                                <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '0.75rem', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Department</div>
+                                    <div style={{ fontWeight: 700, color: '#303657' }}>{selectedStudent.department}</div>
+                                </div>
+                            </div>
+
+                            <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', marginBottom: '1rem', textTransform: 'uppercase', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>Achievement Summary</h4>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                                <div>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#22c55e' }}>{selectedStudent.achievementCounts?.approved || 0}</div>
+                                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>Approved</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>{selectedStudent.achievementCounts?.pending || 0}</div>
+                                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>In Review</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#8b5cf6' }}>{selectedStudent.achievementCounts?.points || 0}</div>
+                                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>Points</div>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setSelectedStudent(null)}>Close</button>
+                                <button className="btn btn-primary" style={{ flex: 1, background: '#303657', border: 'none' }} onClick={() => navigate(`/portfolio/${selectedStudent._id}`)}>Full Portfolio</button>
+                            </div>
                         </div>
                     </div>
                 </div>
