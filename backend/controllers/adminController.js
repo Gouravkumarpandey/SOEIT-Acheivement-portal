@@ -129,11 +129,12 @@ exports.getAllAchievements = async (req, res, next) => {
 // @route   GET /api/admin/students
 exports.getStudents = async (req, res, next) => {
     try {
-        const { page = 1, limit = 10, department, search, batch } = req.query;
+        const { page = 1, limit = 10, department, search, batch, semester } = req.query;
         const query = { role: 'student', isActive: true };
         if (department) query.department = department;
         if (batch) query.batch = batch;
-        if (search) query.$or = [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }, { studentId: { $regex: search, $options: 'i' } }];
+        if (semester) query.semester = parseInt(semester);
+        if (search) query.$or = [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }, { studentId: { $regex: search, $options: 'i' } }, { enrollmentNo: { $regex: search, $options: 'i' } }];
 
         const total = await User.countDocuments(query);
         const students = await User.find(query).select('-password').sort({ name: 1 }).skip((page - 1) * limit).limit(parseInt(limit));

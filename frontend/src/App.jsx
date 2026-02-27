@@ -60,7 +60,7 @@ function App() {
 
         <Routes>
           {/* Public Marketing Routes */}
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />

@@ -4,13 +4,24 @@ import { authAPI } from '../services/api';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem('soeit_user');
+        try {
+            return saved ? JSON.parse(saved) : null;
+        } catch {
+            return null;
+        }
+    });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const loadUser = useCallback(async () => {
         const token = localStorage.getItem('soeit_token');
-        if (!token) { setLoading(false); return; }
+        if (!token) {
+            setUser(null);
+            setLoading(false);
+            return;
+        }
         try {
             const { data } = await authAPI.getProfile();
             setUser(data.user);

@@ -23,9 +23,17 @@ const adminLinks = [
 ];
 
 const Sidebar = ({ mobileOpen, onClose }) => {
-    const { user, logout, isStudent } = useAuth();
+    const { user, logout, isStudent, isStaff } = useAuth();
     const navigate = useNavigate();
     const links = isStudent ? studentLinks : adminLinks;
+
+    // Faculty specific links mapping
+    const filteredLinks = links.map(link => {
+        if (user?.role === 'faculty' && link.to === '/admin/dashboard') {
+            return { ...link, to: '/faculty/dashboard' };
+        }
+        return link;
+    });
 
     const handleLogout = async () => {
         await logout();
@@ -83,9 +91,9 @@ const Sidebar = ({ mobileOpen, onClose }) => {
                 {/* Navigation */}
                 <nav style={{ flex: 1, padding: '1rem 0.75rem', overflowY: 'auto' }}>
                     <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', margin: '0 0.25rem 0.75rem', paddingLeft: '0.75rem' }}>
-                        {isStudent ? 'Student Menu' : 'Admin Menu'}
+                        {isStudent ? 'Student Menu' : (user?.role === 'faculty' ? 'Faculty Menu' : 'Admin Menu')}
                     </div>
-                    {links.map(({ to, icon: Icon, label }) => (
+                    {filteredLinks.map(({ to, icon: Icon, label }) => (
                         <NavLink key={to} to={to} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} style={{ marginBottom: '0.25rem' }}>
                             <Icon size={18} />
                             <span>{label}</span>
