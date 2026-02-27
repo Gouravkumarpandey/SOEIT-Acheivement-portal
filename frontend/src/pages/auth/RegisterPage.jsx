@@ -87,7 +87,7 @@ const RegisterPage = () => {
                 </Link>
             </div>
 
-            <div style={{ width: '100%', maxWidth: '560px' }}>
+            <div style={{ width: '100%', maxWidth: '650px' }}>
                 <UniversityHeader />
 
                 <h1 style={{ textAlign: 'center', color: '#303657', fontSize: '2.25rem', fontWeight: 800, marginBottom: '2.5rem', fontFamily: 'Space Grotesk' }}>
@@ -98,7 +98,7 @@ const RegisterPage = () => {
                     <form onSubmit={handleSubmit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
                             <Field name="name" placeholder="Full Name" required />
-                            <Field name="studentId" placeholder="Student ID (e.g. 21CSE001)" />
+                            <Field name="enrollmentNo" placeholder="Enrollment No. (e.g. AJU/221403)" />
                         </div>
 
                         <Field name="email" type="email" placeholder="Email Address" required />

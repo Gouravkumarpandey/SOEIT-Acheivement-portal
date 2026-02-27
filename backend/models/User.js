@@ -5,10 +5,11 @@ const crypto = require('crypto');
 const userSchema = new mongoose.Schema(
     {
         name: { type: String, required: [true, 'Name is required'], trim: true, maxlength: [100, 'Name cannot exceed 100 characters'] },
-        email: { type: String, required: [true, 'Email is required'], unique: true, lowercase: true, match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'] },
+        email: { type: String, required: [true, 'Email is required'], unique: true, lowercase: true },
         password: { type: String, required: [true, 'Password is required'], minlength: [6, 'Password must be at least 6 characters'], select: false },
         role: { type: String, enum: ['student', 'faculty', 'admin'], default: 'student' },
         department: { type: String, required: [true, 'Department is required'], enum: ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'Other'] },
+        enrollmentNo: { type: String, unique: true, sparse: true },
         studentId: { type: String, sparse: true },
         phone: { type: String },
         bio: { type: String, maxlength: [500, 'Bio cannot exceed 500 characters'] },

@@ -9,17 +9,18 @@ const seedDemoUsers = async () => {
       {
         name: 'Demo Student',
         email: 'student@soeit.ac.in',
+        enrollmentNo: 'AJU/221403',
         password: 'Test@123',
         role: 'student',
         department: 'CSE',
-        studentId: '21CSE001',
-        batch: '2021',
-        semester: 5,
+        batch: '2022',
+        semester: 4,
         isActive: true
       },
       {
         name: 'System Admin',
         email: 'admin@soeit.ac.in',
+        enrollmentNo: 'AJU/ADMIN',
         password: 'Admin@123',
         role: 'admin',
         department: 'Other',

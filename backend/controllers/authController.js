@@ -17,11 +17,13 @@ const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
 // @route   POST /api/auth/register
 exports.register = async (req, res, next) => {
     try {
-        const { name, email, password, department, studentId, batch, semester, section } = req.body;
-        const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ success: false, message: 'Email already registered' });
+        const { name, email, password, department, studentId, enrollmentNo, batch, semester, section } = req.body;
+        const existingUser = await User.findOne({
+            $or: [{ email }, { enrollmentNo: enrollmentNo || 'NOT_PROVIDED' }]
+        });
+        if (existingUser) return res.status(400).json({ success: false, message: 'Email or Enrollment No. already registered' });
 
-        const user = await User.create({ name, email, password, department, studentId, batch, semester, section, role: 'student' });
+        const user = await User.create({ name, email, password, department, studentId, enrollmentNo, batch, semester, section, role: 'student' });
         sendTokenResponse(user, 201, res, 'Registration successful! Welcome to SOEIT Portal.');
     } catch (error) {
         next(error);
@@ -32,10 +34,17 @@ exports.register = async (req, res, next) => {
 // @route   POST /api/auth/login
 exports.login = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
-        if (!email || !password) return res.status(400).json({ success: false, message: 'Please provide email and password' });
+        const { email, password } = req.body; // email field here acts as "Username" (email or enrollmentNo)
+        if (!email || !password) return res.status(400).json({ success: false, message: 'Please provide username and password' });
 
-        const user = await User.findOne({ email }).select('+password');
+        // Find user by email OR enrollmentNo
+        const user = await User.findOne({
+            $or: [
+                { email: email.toLowerCase() },
+                { enrollmentNo: email }
+            ]
+        }).select('+password');
+
         if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
         if (!user.isActive) return res.status(401).json({ success: false, message: 'Account is deactivated. Contact admin.' });
 

@@ -161,7 +161,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className="alert alert-info" style={{ marginTop: '1.5rem', fontSize: '0.8rem', background: '#f1f5f9', border: 'none', color: '#475569' }}>
-                    <strong>Demo Accounts:</strong> student@soeit.ac.in / Test@123 | admin@soeit.ac.in / Admin@123
+                    <strong>Demo Accounts:</strong> AJU/221403 / Test@123 | AJU/ADMIN / Admin@123
                 </div>
             </div>
         </div>

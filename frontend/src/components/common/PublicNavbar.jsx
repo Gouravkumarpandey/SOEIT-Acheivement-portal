@@ -15,24 +15,28 @@ const PublicNavbar = () => {
 
     return (
         <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} style={{ background: scrolled ? undefined : 'rgba(248,250,252,0.85)', backdropFilter: scrolled ? undefined : 'blur(12px)', borderBottom: scrolled ? undefined : '1px solid var(--border-primary)' }}>
-            <div className="container">
-                <div className="navbar-inner">
-                    <Link to="/" className="nav-logo">
-                        <div className="nav-logo-icon"><GraduationCap size={22} color="#fff" /></div>
-                        <div>
-                            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}>SOEIT Portal</div>
-                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Achievements</div>
-                        </div>
-                    </Link>
+            <div className="container-lg">
+                <div className="navbar-inner" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', width: '100%' }}>
+                    {/* Left corner: Logo */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <Link to="/" className="nav-logo">
+                            <div className="nav-logo-icon"><GraduationCap size={22} color="#fff" /></div>
+                            <div>
+                                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}>SOEIT Portal</div>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Achievements</div>
+                            </div>
+                        </Link>
+                    </div>
 
-                    {/* Right side group */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
-                        <div className="nav-links">
-                            {[['/', 'Home'], ['/about', 'About'], ['/features', 'Features'], ['/how-it-works', 'How It Works'], ['/contact', 'Contact']].map(([path, label]) => (
-                                <Link key={path} to={path} className="nav-item">{label}</Link>
-                            ))}
-                        </div>
+                    {/* Middle: Links */}
+                    <div className="nav-links" style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
+                        {[['/', 'Home'], ['/about', 'About'], ['/features', 'Features'], ['/how-it-works', 'How It Works'], ['/contact', 'Contact']].map(([path, label]) => (
+                            <Link key={path} to={path} className="nav-item">{label}</Link>
+                        ))}
+                    </div>
 
+                    {/* Right corner: Buttons */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <div className="nav-cta">
                             <Link to="/login" className="btn btn-secondary btn-sm">Sign In</Link>
                             <Link to="/register" className="btn btn-primary btn-sm">Get Started</Link>
