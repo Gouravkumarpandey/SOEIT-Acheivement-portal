@@ -12,6 +12,7 @@ const RegisterPage = () => {
     const navigate = useNavigate();
     const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', department: '', studentId: '', batch: '', semester: '' });
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -117,8 +118,22 @@ const RegisterPage = () => {
                                     value={form.password}
                                     onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                                 />
-                                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                                    style={{ position: 'absolute', right: '0.875rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'var(--text-muted)',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        zIndex: 10
+                                    }}
+                                >
                                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
                             </div>
@@ -130,13 +145,31 @@ const RegisterPage = () => {
                             <div style={{ position: 'relative' }}>
                                 <Lock size={16} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                                 <input
-                                    type="password"
+                                    type={showConfirmPassword ? 'text' : 'password'}
                                     className={`form-control ${errors.confirmPassword ? 'error' : ''}`}
-                                    style={{ paddingLeft: '2.5rem' }}
+                                    style={{ paddingLeft: '2.5rem', paddingRight: '2.75rem' }}
                                     placeholder="Re-enter password"
                                     value={form.confirmPassword}
                                     onChange={e => setForm(p => ({ ...p, confirmPassword: e.target.value }))}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'var(--text-muted)',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        zIndex: 10
+                                    }}
+                                >
+                                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
                             </div>
                             {errors.confirmPassword && <div className="input-error">{errors.confirmPassword}</div>}
                         </div>

@@ -10,7 +10,7 @@ const AdminSettingsPage = () => {
     const [tab, setTab] = useState('profile');
     const [form, setForm] = useState({ name: user?.name || '', phone: user?.phone || '', bio: user?.bio || '' });
     const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    const [showPw, setShowPw] = useState(false);
+    const [showPw, setShowPw] = useState({ current: false, new: false, confirm: false });
     const [loading, setLoading] = useState(false);
     const [pwLoading, setPwLoading] = useState(false);
 
@@ -122,12 +122,36 @@ const AdminSettingsPage = () => {
                         <div key={field} className="form-group">
                             <label className="form-label">{label}</label>
                             <div style={{ position: 'relative' }}>
-                                <input type={showPw ? 'text' : 'password'} className="form-control" style={{ paddingRight: field !== 'confirmPassword' ? '2.75rem' : '1rem' }} placeholder="••••••••" value={pwForm[field]} onChange={e => setPwForm(p => ({ ...p, [field]: e.target.value }))} required />
-                                {field === 'newPassword' && (
-                                    <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: 'absolute', right: '0.875rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
-                                        {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                                    </button>
-                                )}
+                                <input
+                                    type={showPw[field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm'] ? 'text' : 'password'}
+                                    className="form-control"
+                                    style={{ paddingRight: '2.75rem' }}
+                                    placeholder="••••••••"
+                                    value={pwForm[field]}
+                                    onChange={e => setPwForm(p => ({ ...p, [field]: e.target.value }))}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const type = field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm';
+                                        setShowPw(p => ({ ...p, [type]: !p[type] }));
+                                    }}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '0.875rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'var(--text-muted)',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        zIndex: 10
+                                    }}
+                                >
+                                    {showPw[field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm'] ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
                             </div>
                         </div>
                     ))}
