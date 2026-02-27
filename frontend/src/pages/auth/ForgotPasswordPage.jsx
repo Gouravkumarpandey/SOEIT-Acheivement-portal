@@ -27,12 +27,9 @@ const ForgotPasswordPage = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: '1rem' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', padding: '1rem', position: 'relative' }}>
             <div style={{ width: '100%', maxWidth: '440px' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{ width: 56, height: 56, background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                        <GraduationCap size={28} color="#fff" />
-                    </div>
                     <h2>Forgot Password?</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Enter your email and we'll send reset instructions</p>
                 </div>

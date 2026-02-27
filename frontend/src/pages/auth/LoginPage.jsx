@@ -43,18 +43,9 @@ const LoginPage = () => {
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 30% 40%, rgba(59,130,246,0.12) 0%, transparent 60%), var(--bg-primary)', padding: '1rem', position: 'relative' }}>
-            {/* Top Left Logo & Back Button */}
-            <div style={{ position: 'absolute', top: '2rem', left: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-                    <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <GraduationCap size={24} color="#fff" />
-                    </div>
-                    <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)', fontFamily: 'Space Grotesk' }}>SOEIT Portal</div>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Achievements Platform</div>
-                    </div>
-                </Link>
-                <Link to="/" className="btn btn-secondary btn-sm" style={{ width: 'fit-content', fontSize: '0.75rem', padding: '0.4rem 0.8rem' }}>
+            {/* Top Left Back Button */}
+            <div style={{ position: 'absolute', top: '2rem', left: '2rem' }}>
+                <Link to="/" className="btn btn-secondary btn-sm" style={{ fontWeight: 600, boxShadow: 'var(--shadow-sm)' }}>
                     <ArrowLeft size={14} /> Back to Home
                 </Link>
             </div>
