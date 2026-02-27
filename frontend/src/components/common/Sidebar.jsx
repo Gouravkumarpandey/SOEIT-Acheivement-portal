@@ -18,6 +18,7 @@ const adminLinks = [
     { to: '/admin/verify', icon: CheckCircle, label: 'Verify Achievements' },
     { to: '/admin/achievements', icon: Trophy, label: 'All Achievements' },
     { to: '/admin/students', icon: Users, label: 'Students' },
+    { to: '/admin/faculty', icon: Shield, label: 'Faculty' },
     { to: '/admin/reports', icon: BarChart3, label: 'Reports & Analytics' },
     { to: '/profile', icon: User, label: 'My Profile' },
 ];

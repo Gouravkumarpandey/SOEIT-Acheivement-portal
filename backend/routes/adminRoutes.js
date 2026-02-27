@@ -6,6 +6,7 @@ const {
     verifyAchievement,
     getAllAchievements,
     getStudents,
+    getFaculty,
     getReports,
     manageUser,
 } = require('../controllers/adminController');
@@ -16,6 +17,7 @@ router.use(protect, authorize('admin', 'faculty'));
 router.get('/dashboard', getDashboardStats);
 router.get('/achievements/pending', getPendingAchievements);
 router.get('/achievements', getAllAchievements);
+router.get('/faculty', authorize('admin'), getFaculty);
 router.put('/achievements/:id/verify', verifyAchievement);
 router.get('/students', getStudents);
 router.get('/reports', getReports);

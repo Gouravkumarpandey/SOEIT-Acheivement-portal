@@ -29,6 +29,7 @@ import VerifyAchievementsPage from './pages/admin/VerifyAchievementsPage';
 import AllAchievementsPage from './pages/admin/AllAchievementsPage';
 import StudentManagementPage from './pages/admin/StudentManagementPage';
 import ReportsPage from './pages/admin/ReportsPage';
+import FacultyManagementPage from './pages/admin/FacultyManagementPage';
 
 // Faculty Pages
 import FacultyDashboard from './pages/faculty/FacultyDashboard';
@@ -92,6 +93,7 @@ function App() {
             <Route path="/admin/verify" element={<VerifyAchievementsPage />} />
             <Route path="/admin/achievements" element={<AllAchievementsPage />} />
             <Route path="/admin/students" element={<StudentManagementPage />} />
+            <Route path="/admin/faculty" element={<FacultyManagementPage />} />
             <Route path="/admin/reports" element={<ReportsPage />} />
           </Route>
 

@@ -12,6 +12,7 @@ const pageTitles = {
     '/admin/verify': 'Verify Achievements',
     '/admin/achievements': 'All Achievements',
     '/admin/students': 'Student Management',
+    '/admin/faculty': 'Faculty Management',
     '/admin/reports': 'Reports & Analytics',
 };
 

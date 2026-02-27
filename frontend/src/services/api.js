@@ -58,6 +58,7 @@ export const adminAPI = {
     getAll: (params) => API.get('/admin/achievements', { params }),
     verify: (id, data) => API.put(`/admin/achievements/${id}/verify`, data),
     getStudents: (params) => API.get('/admin/students', { params }),
+    getFaculty: (params) => API.get('/admin/faculty', { params }),
     getReports: () => API.get('/admin/reports'),
     manageUser: (id, data) => API.put(`/admin/users/${id}`, data),
 };

@@ -157,6 +157,28 @@ exports.getStudents = async (req, res, next) => {
     }
 };
 
+// @desc    Get all faculty members
+// @route   GET /api/admin/faculty
+exports.getFaculty = async (req, res, next) => {
+    try {
+        const { search } = req.query;
+        const query = { role: 'faculty' };
+
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                { studentId: { $regex: search, $options: 'i' } } // faculty id is stored in studentId field for now
+            ];
+        }
+
+        const faculty = await User.find(query).select('-password').sort({ name: 1 });
+        res.status(200).json({ success: true, count: faculty.length, data: faculty });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Get reports and analytics
 // @route   GET /api/admin/reports
 exports.getReports = async (req, res, next) => {
