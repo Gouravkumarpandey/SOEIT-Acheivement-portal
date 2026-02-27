@@ -71,4 +71,11 @@ export const eventAPI = {
     delete: (id) => API.delete(`/events/${id}`),
 };
 
+// Notice APIs
+export const noticeAPI = {
+    create: (data) => API.post('/notices', data),
+    getAll: () => API.get('/notices'),
+    delete: (id) => API.delete(`/notices/${id}`),
+};
+
 export default API;

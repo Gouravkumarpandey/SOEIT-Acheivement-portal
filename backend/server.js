@@ -13,6 +13,7 @@ const authRoutes = require('./routes/authRoutes');
 const achievementRoutes = require('./routes/achievementRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const noticeRoutes = require('./routes/noticeRoutes');
 
 // Connect to Database
 connectDB();
@@ -53,6 +54,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/notices', noticeRoutes);
 
 // 404 handler (Catch-all)
 app.use((req, res) => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { adminAPI } from '../../services/api';
+import { adminAPI, noticeAPI } from '../../services/api';
 import {
     Users, Trophy, Clock, CheckCircle, GraduationCap,
     Search, Filter, ChevronRight, Eye, Download, UsersRound
@@ -15,6 +15,8 @@ const FacultyDashboard = () => {
     const [semester, setSemester] = useState('all');
     const [section, setSection] = useState('all');
     const [search, setSearch] = useState('');
+    const [showNoticeModal, setShowNoticeModal] = useState(false);
+    const [noticeData, setNoticeData] = useState({ title: '', content: '', priority: 'Medium' });
 
     useEffect(() => {
         const loadStats = async () => {
@@ -106,6 +108,19 @@ const FacultyDashboard = () => {
         toast.success('Report exported successfully');
     };
 
+    const handlePostNotice = async (e) => {
+        e.preventDefault();
+        const toastId = toast.loading('Posting notice and notifying students...');
+        try {
+            await noticeAPI.create(noticeData);
+            toast.success('Notice posted successfully!', { id: toastId });
+            setShowNoticeModal(false);
+            setNoticeData({ title: '', content: '', priority: 'Medium' });
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to post notice', { id: toastId });
+        }
+    };
+
     const statCards = [
         { label: 'Total Students', value: stats?.stats?.totalStudents ?? 0, icon: Users, color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
         { label: 'Pending Review', value: stats?.stats?.pendingCount ?? 0, icon: Clock, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
@@ -140,7 +155,11 @@ const FacultyDashboard = () => {
                     >
                         <Download size={18} /> Export Results
                     </button>
-                    <button className="btn btn-primary" style={{ background: '#8B1E1E', border: 'none' }}>
+                    <button
+                        className="btn btn-primary"
+                        style={{ background: '#8B1E1E', border: 'none' }}
+                        onClick={() => setShowNoticeModal(true)}
+                    >
                         Post Notice
                     </button>
                 </div>
@@ -328,6 +347,73 @@ const FacultyDashboard = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Post Notice Modal */}
+            {showNoticeModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div className="card" style={{ width: '100%', maxWidth: '500px', animation: 'slideUp 0.3s ease' }}>
+                        <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#303657', color: 'white' }}>
+                            <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Post Official Notice</h3>
+                            <button onClick={() => setShowNoticeModal(false)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                        </div>
+                        <div className="card-body" style={{ padding: '1.5rem' }}>
+                            <form onSubmit={handlePostNotice} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 700 }}>Notice Title</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        required
+                                        placeholder="e.g. Schedule Change for Mid-Sem Exams"
+                                        value={noticeData.title}
+                                        onChange={e => setNoticeData({ ...noticeData, title: e.target.value })}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 700 }}>Priority Level</label>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        {['Low', 'Medium', 'High', 'Urgent'].map(p => (
+                                            <button
+                                                key={p}
+                                                type="button"
+                                                onClick={() => setNoticeData({ ...noticeData, priority: p })}
+                                                style={{
+                                                    flex: 1, padding: '0.5rem', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: 600,
+                                                    background: noticeData.priority === p ? (p === 'Urgent' ? '#ef4444' : '#303657') : '#f1f5f9',
+                                                    color: noticeData.priority === p ? 'white' : '#64748b',
+                                                    border: 'none', cursor: 'pointer', transition: 'all 0.2s'
+                                                }}
+                                            >
+                                                {p}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 700 }}>Notice Content</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="6"
+                                        required
+                                        placeholder="Type the detailed notice here..."
+                                        style={{ resize: 'none' }}
+                                        value={noticeData.content}
+                                        onChange={e => setNoticeData({ ...noticeData, content: e.target.value })}
+                                    ></textarea>
+                                </div>
+                                <div style={{ background: '#fef2f2', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #fee2e2' }}>
+                                    <p style={{ margin: 0, fontSize: '0.75rem', color: '#991b1b', fontWeight: 600 }}>
+                                        ⚠️ This notice will be sent to ALL active students via email instantly.
+                                    </p>
+                                </div>
+                                <button type="submit" className="btn btn-primary" style={{ background: '#8B1E1E', border: 'none', padding: '1rem', fontWeight: 700 }}>
+                                    Broadcast Notice & Send Emails
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
