@@ -1,34 +1,82 @@
 const mongoose = require('mongoose');
+const User = require('../models/User');
 
 let mongoServer = null;
 
+const seedDemoUsers = async () => {
+  try {
+    const demoUsers = [
+      {
+        name: 'Demo Student',
+        email: 'student@soeit.ac.in',
+        password: 'Test@123',
+        role: 'student',
+        department: 'CSE',
+        studentId: '21CSE001',
+        batch: '2021',
+        semester: 5,
+        isActive: true
+      },
+      {
+        name: 'System Admin',
+        email: 'admin@soeit.ac.in',
+        password: 'Admin@123',
+        role: 'admin',
+        department: 'Other',
+        isActive: true
+      }
+    ];
+
+    for (const user of demoUsers) {
+      const exists = await User.findOne({ email: user.email });
+      if (!exists) {
+        await User.create(user);
+        console.log(`👤 Demo ${user.role} created (${user.email})`);
+      }
+    }
+  } catch (err) {
+    console.error('❌ Seeding error:', err.message);
+  }
+};
+
 const connectDB = async () => {
   try {
+    // 1. Try connecting to the URI in .env if it exists
     let uri = process.env.MONGODB_URI;
+    let connected = false;
 
-    // In development, spin up an in-memory MongoDB automatically
-    // so no local MongoDB installation is needed
-    if (process.env.NODE_ENV !== 'production') {
+    if (uri) {
+      try {
+        // Short timeout for the first attempt to local DB
+        await mongoose.connect(uri, { serverSelectionTimeoutMS: 3000 });
+        console.log(`✅ MongoDB Connected to: ${uri}`);
+        connected = true;
+      } catch (err) {
+        console.log('⚠️  Local MongoDB not found, attempting in-memory database...');
+      }
+    }
+
+    // 2. If not connected and we're in dev, use MongoMemoryServer
+    if (!connected && process.env.NODE_ENV !== 'production') {
       const { MongoMemoryServer } = require('mongodb-memory-server');
       if (!mongoServer) {
+        // Note: This might take a while on first run to download the binary
         mongoServer = await MongoMemoryServer.create({
           instance: { dbName: 'soeit_achievements' },
         });
-        console.log('🗄️  In-memory MongoDB started (dev mode — no install required)');
       }
       uri = mongoServer.getUri();
+      await mongoose.connect(uri);
+      console.log('🗄️  In-memory MongoDB connected (Dev Mode)');
+      connected = true;
     }
 
-    // Fallback if MONGODB_URI is not set and not dev
-    if (!uri) {
-      uri = 'mongodb://localhost:27017/soeit_achievements';
+    if (!connected) {
+      throw new Error('Could not connect to any MongoDB instance');
     }
 
-    const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 10000,
-    });
-
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    // 3. Seed demo data
+    await seedDemoUsers();
 
     mongoose.connection.on('error', (err) => {
       console.error('❌ MongoDB runtime error:', err.message);
@@ -41,15 +89,12 @@ const connectDB = async () => {
   }
 };
 
-// Clean up on exit
 process.on('SIGINT', async () => {
   try {
     await mongoose.connection.close();
     if (mongoServer) await mongoServer.stop();
-    console.log('\n✅ MongoDB shut down cleanly.');
-  } catch (e) {
-    // ignore
-  }
+    console.log('\n✅ DB shut down cleanly.');
+  } catch (e) { }
   process.exit(0);
 });
 

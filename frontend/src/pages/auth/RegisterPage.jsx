@@ -2,7 +2,7 @@ import '../../styles/RegisterPage.css';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { GraduationCap, User, Mail, Lock, Eye, EyeOff, UserPlus, BookOpen } from 'lucide-react';
+import { GraduationCap, User, Mail, Lock, Eye, EyeOff, UserPlus, BookOpen, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const DEPARTMENTS = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'Other'];
@@ -66,19 +66,26 @@ const RegisterPage = () => {
     );
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 70% 30%, rgba(99,102,241,0.1) 0%, transparent 60%), var(--bg-primary)', padding: '2rem 1rem' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 70% 30%, rgba(99,102,241,0.1) 0%, transparent 60%), var(--bg-primary)', padding: '2rem 1rem', position: 'relative' }}>
+            {/* Top Left Logo & Back Button */}
+            <div style={{ position: 'absolute', top: '2rem', left: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+                    <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <GraduationCap size={24} color="#fff" />
+                    </div>
+                    <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)', fontFamily: 'Space Grotesk' }}>SOEIT Portal</div>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Student Registration</div>
+                    </div>
+                </Link>
+                <Link to="/" className="btn btn-secondary btn-sm" style={{ width: 'fit-content', fontSize: '0.75rem', padding: '0.4rem 0.8rem' }}>
+                    <ArrowLeft size={14} /> Back to Home
+                </Link>
+            </div>
+
             <div style={{ width: '100%', maxWidth: '520px' }}>
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{ width: 48, height: 48, background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <GraduationCap size={26} color="#fff" />
-                        </div>
-                        <div style={{ textAlign: 'left' }}>
-                            <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)', fontFamily: 'Space Grotesk' }}>SOEIT Portal</div>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Student Registration</div>
-                        </div>
-                    </Link>
-                </div>
+                {/* Logo removed from here to top-left */}
+
 
                 <div className="card card-body" style={{ boxShadow: 'var(--shadow-xl)' }}>
                     <h2 style={{ marginBottom: '0.375rem', textAlign: 'center' }}>Create Account</h2>

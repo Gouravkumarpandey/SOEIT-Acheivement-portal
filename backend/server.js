@@ -52,8 +52,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('/api/admin', adminRoutes);
 
-// 404 handler
-app.use('/{*path}', (req, res) => {
+// 404 handler (Catch-all)
+app.use((req, res) => {
     res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
 });
 
