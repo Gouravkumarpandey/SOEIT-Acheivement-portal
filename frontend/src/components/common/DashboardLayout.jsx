@@ -13,7 +13,6 @@ const pageTitles = {
     '/admin/achievements': 'All Achievements',
     '/admin/students': 'Student Management',
     '/admin/reports': 'Reports & Analytics',
-    '/admin/settings': 'Settings',
 };
 
 const DashboardLayout = () => {

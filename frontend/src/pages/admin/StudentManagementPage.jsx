@@ -48,13 +48,17 @@ const StudentManagementPage = () => {
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
                     <div style={{ flex: 1, minWidth: 200, position: 'relative' }}>
                         <Search size={16} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', zIndex: 1 }} />
-                        <input className="form-control" style={{ paddingLeft: '2.5rem' }} placeholder="Search by name, email, or student ID..." value={filters.search} onChange={e => setFilters(p => ({ ...p, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && load()} />
+                        <input className="form-control" style={{ paddingLeft: '2.5rem' }} placeholder="Search by name, enrollment no, or ID..." value={filters.search} onChange={e => setFilters(p => ({ ...p, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && load()} />
                     </div>
                     <select className="filter-select" value={filters.department} onChange={e => setFilters(p => ({ ...p, department: e.target.value, page: 1 }))}>
                         <option value="">All Departments</option>
-                        {DEPARTMENTS.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
+                        {['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE'].map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
-                    <button className="btn btn-primary btn-sm" onClick={load}><Search size={14} /> Search</button>
+                    <select className="filter-select" value={filters.semester} onChange={e => setFilters(p => ({ ...p, semester: e.target.value, page: 1 }))}>
+                        <option value="">All Semesters</option>
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Sem {s}</option>)}
+                    </select>
+                    <button className="btn btn-primary" onClick={load}><Search size={14} /> Search</button>
                 </div>
             </div>
 
@@ -79,13 +83,14 @@ const StudentManagementPage = () => {
                                     )}
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{ fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '0.2rem' }}>{s.name}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.email}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.enrollmentNo || s.studentId}</div>
                                     </div>
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.875rem', flexWrap: 'wrap' }}>
                                     <span className="badge badge-primary">{s.department}</span>
-                                    {s.batch && <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-full)', padding: '0.15rem 0.5rem' }}>Batch {s.batch}</span>}
+                                    {s.semester && <span className="badge badge-purple" style={{ fontSize: '0.65rem' }}>Sem {s.semester}-{s.section || 'X'}</span>}
+                                    {s.batch && <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-full)', padding: '0.15rem 0.5rem' }}>{s.batch}</span>}
                                 </div>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>

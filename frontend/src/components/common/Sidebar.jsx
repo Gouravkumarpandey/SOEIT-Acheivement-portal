@@ -19,7 +19,7 @@ const adminLinks = [
     { to: '/admin/achievements', icon: Trophy, label: 'All Achievements' },
     { to: '/admin/students', icon: Users, label: 'Students' },
     { to: '/admin/reports', icon: BarChart3, label: 'Reports & Analytics' },
-    { to: '/admin/settings', icon: Settings, label: 'Settings' },
+    { to: '/profile', icon: User, label: 'My Profile' },
 ];
 
 const Sidebar = ({ mobileOpen, onClose }) => {
@@ -73,7 +73,7 @@ const Sidebar = ({ mobileOpen, onClose }) => {
                 <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-primary)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         {user?.profileImage ? (
-                            <img src={user.profileImage} alt={user.name} className="avatar avatar-md" />
+                            <img src={`${import.meta.env.VITE_UPLOADS_URL || ''}${user.profileImage}`} alt={user.name} className="avatar avatar-md" />
                         ) : (
                             <div className="avatar avatar-md" style={{ fontSize: '0.85rem' }}>{getInitials(user?.name)}</div>
                         )}

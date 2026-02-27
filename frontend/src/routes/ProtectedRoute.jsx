@@ -12,18 +12,29 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
     const { user, loading } = useAuth();
     const location = useLocation();
 
+    const getDashboardPath = (role) => {
+        if (role === 'student') return '/dashboard';
+        if (role === 'faculty') return '/faculty/dashboard';
+        return '/admin/dashboard';
+    };
+
     if (loading) return <LoadingScreen />;
     if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
     if (allowedRoles && !allowedRoles.includes(user.role)) {
-        return <Navigate to={user.role === 'student' ? '/dashboard' : '/admin/dashboard'} replace />;
+        return <Navigate to={getDashboardPath(user.role)} replace />;
     }
     return children;
 };
 
 export const PublicRoute = ({ children }) => {
     const { user, loading } = useAuth();
+    const getDashboardPath = (role) => {
+        if (role === 'student') return '/dashboard';
+        if (role === 'faculty') return '/faculty/dashboard';
+        return '/admin/dashboard';
+    };
     if (loading) return <LoadingScreen />;
-    if (user) return <Navigate to={user.role === 'student' ? '/dashboard' : '/admin/dashboard'} replace />;
+    if (user) return <Navigate to={getDashboardPath(user.role)} replace />;
     return children;
 };
 

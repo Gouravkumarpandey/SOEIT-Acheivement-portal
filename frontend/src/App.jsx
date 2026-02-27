@@ -21,7 +21,7 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import StudentDashboard from './pages/student/StudentDashboard';
 import MyAchievementsPage from './pages/student/MyAchievementsPage';
 import UploadAchievementPage from './pages/student/UploadAchievementPage';
-import StudentProfilePage from './pages/student/StudentProfilePage';
+import ProfilePage from './pages/student/ProfilePage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -29,7 +29,6 @@ import VerifyAchievementsPage from './pages/admin/VerifyAchievementsPage';
 import AllAchievementsPage from './pages/admin/AllAchievementsPage';
 import StudentManagementPage from './pages/admin/StudentManagementPage';
 import ReportsPage from './pages/admin/ReportsPage';
-import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 
 // Faculty Pages
 import FacultyDashboard from './pages/faculty/FacultyDashboard';
@@ -73,16 +72,20 @@ function App() {
           <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
           <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
 
-          {/* Student Routes */}
+          {/* Shared Authenticated Routes (All Roles) */}
+          <Route element={<ProtectedRoute allowedRoles={['student', 'admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Student Specific Routes */}
           <Route element={<ProtectedRoute allowedRoles={['student']}><DashboardLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<StudentDashboard />} />
             <Route path="/achievements" element={<MyAchievementsPage />} />
             <Route path="/achievements/upload" element={<UploadAchievementPage />} />
             <Route path="/achievements/edit/:id" element={<UploadAchievementPage />} />
-            <Route path="/profile" element={<StudentProfilePage />} />
           </Route>
 
-          {/* Admin / Faculty Routes */}
+          {/* Admin / Faculty Specific Routes */}
           <Route element={<ProtectedRoute allowedRoles={['admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
@@ -90,7 +93,6 @@ function App() {
             <Route path="/admin/achievements" element={<AllAchievementsPage />} />
             <Route path="/admin/students" element={<StudentManagementPage />} />
             <Route path="/admin/reports" element={<ReportsPage />} />
-            <Route path="/admin/settings" element={<AdminSettingsPage />} />
           </Route>
 
           {/* Catch All */}
