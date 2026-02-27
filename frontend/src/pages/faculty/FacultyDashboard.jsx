@@ -5,13 +5,15 @@ import {
     Search, Filter, ChevronRight, Eye, Download, UsersRound
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const FacultyDashboard = () => {
     const [stats, setStats] = useState(null);
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('all'); // all, pending, approved
     const [semester, setSemester] = useState('all');
+    const [section, setSection] = useState('all');
     const [search, setSearch] = useState('');
 
     useEffect(() => {
@@ -32,6 +34,7 @@ const FacultyDashboard = () => {
             try {
                 const params = {
                     semester: semester === 'all' ? undefined : semester,
+                    section: section === 'all' ? undefined : section,
                     search: search || undefined,
                     limit: 100
                 };
@@ -44,7 +47,64 @@ const FacultyDashboard = () => {
             }
         };
         loadStudents();
-    }, [semester, search]);
+    }, [semester, section, search]);
+
+    const exportToPDF = () => {
+        if (students.length === 0) {
+            toast.error('No data available to export');
+            return;
+        }
+
+        const doc = new jsPDF();
+        const timestamp = new Date().toLocaleString();
+
+        // Header
+        doc.setFontSize(22);
+        doc.setTextColor(48, 54, 87); // #303657
+        doc.text('ARKA JAIN UNIVERSITY', 105, 20, { align: 'center' });
+
+        doc.setFontSize(14);
+        doc.setTextColor(139, 30, 30); // #8B1E1E
+        doc.text('SOEIT Student Achievement Report', 105, 30, { align: 'center' });
+
+        doc.setFontSize(10);
+        doc.setTextColor(100, 116, 139); // #64748b
+        doc.text(`Generated on: ${timestamp}`, 105, 38, { align: 'center' });
+
+        // Filters Info
+        doc.setDrawColor(226, 232, 240);
+        doc.line(20, 45, 190, 45);
+        doc.setFontSize(11);
+        doc.setTextColor(48, 54, 87);
+        doc.text(`Semester: ${semester === 'all' ? 'All' : semester}`, 20, 52);
+        doc.text(`Section: ${section === 'all' ? 'All' : section}`, 70, 52);
+        doc.text(`Department: CSE`, 120, 52); // Example Dept
+
+        // Table
+        const tableData = students.map((s, i) => [
+            i + 1,
+            s.name,
+            s.enrollmentNo || 'N/A',
+            `Sem ${s.semester || 'N/A'} - ${s.section || 'N/A'}`,
+            s.achievementCounts?.total || 0,
+            s.achievementCounts?.approved || 0,
+            s.achievementCounts?.points || 0
+        ]);
+
+        doc.autoTable({
+            startY: 60,
+            head: [['#', 'Student Name', 'Enrollment No.', 'Academic Info', 'Total', 'Valid', 'Points']],
+            body: tableData,
+            headStyles: { fillColor: [48, 54, 87], textColor: [255, 255, 255], fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [248, 250, 252] },
+            styles: { fontSize: 9, cellPadding: 3 },
+            margin: { left: 15, right: 15 }
+        });
+
+        const filename = `SOEIT_Report_Sem${semester}_Sec${section}_${new Date().getTime()}.pdf`;
+        doc.save(filename);
+        toast.success('Report exported successfully');
+    };
 
     const statCards = [
         { label: 'Total Students', value: stats?.stats?.totalStudents ?? 0, icon: Users, color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
@@ -73,7 +133,11 @@ const FacultyDashboard = () => {
                     <p style={{ color: '#64748b' }}>Comprehensive student achievement monitoring & academic oversight</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
-                    <button className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <button
+                        className="btn btn-secondary"
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                        onClick={exportToPDF}
+                    >
                         <Download size={18} /> Export Results
                     </button>
                     <button className="btn btn-primary" style={{ background: '#8B1E1E', border: 'none' }}>
@@ -103,9 +167,9 @@ const FacultyDashboard = () => {
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#303657', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <GraduationCap size={22} color="#8B1E1E" /> Academic Progress Tracking
                 </h3>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
                     <button
-                        onClick={() => setSemester('all')}
+                        onClick={() => { setSemester('all'); setSection('all'); }}
                         style={{
                             padding: '0.75rem 1.5rem', borderRadius: 'var(--radius-md)',
                             background: semester === 'all' ? '#303657' : '#fff',
@@ -119,7 +183,7 @@ const FacultyDashboard = () => {
                     {semesters.map(sem => (
                         <button
                             key={sem.id}
-                            onClick={() => setSemester(sem.id)}
+                            onClick={() => { setSemester(sem.id); setSection('all'); }}
                             style={{
                                 padding: '0.75rem 1.5rem', borderRadius: 'var(--radius-md)',
                                 background: semester === sem.id ? '#303657' : '#fff',
@@ -132,12 +196,52 @@ const FacultyDashboard = () => {
                         </button>
                     ))}
                 </div>
+
+                {/* Section Selection - Dynamic based on semester */}
+                {semester !== 'all' && (
+                    <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '1rem', border: '1px solid #e2e8f0', marginBottom: '2rem', animation: 'fadeIn 0.3s ease' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Filter by Section:</span>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <button
+                                    onClick={() => setSection('all')}
+                                    style={{
+                                        padding: '0.5rem 1rem', borderRadius: '0.5rem', fontSize: '0.85rem',
+                                        background: section === 'all' ? '#8B1E1E' : '#fff',
+                                        color: section === 'all' ? '#fff' : '#64748b',
+                                        border: '1px solid ' + (section === 'all' ? '#8B1E1E' : '#e2e8f0'),
+                                        fontWeight: 600, cursor: 'pointer'
+                                    }}
+                                >
+                                    All
+                                </button>
+                                {(semester === '1' || semester === '2' ? ['A', 'B', 'C', 'D', 'E', 'F', 'G'] : ['A', 'B', 'C', 'D', 'E', 'F']).map(s => (
+                                    <button
+                                        key={s}
+                                        onClick={() => setSection(s)}
+                                        style={{
+                                            padding: '0.5rem 1.25rem', borderRadius: '0.5rem', fontSize: '0.85rem',
+                                            background: section === s ? '#8B1E1E' : '#fff',
+                                            color: section === s ? '#fff' : '#64748b',
+                                            border: '1px solid ' + (section === s ? '#8B1E1E' : '#e2e8f0'),
+                                            fontWeight: 700, cursor: 'pointer'
+                                        }}
+                                    >
+                                        Section {s}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Student List Section */}
             <div style={{ background: '#fff', borderRadius: '1.25rem', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
                 <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h4 style={{ fontWeight: 800, color: '#303657', fontSize: '1.1rem' }}>Student Directory — {semester === 'all' ? 'All Years' : `Semester ${semester}`}</h4>
+                    <h4 style={{ fontWeight: 800, color: '#303657', fontSize: '1.1rem' }}>
+                        Student Directory — {semester === 'all' ? 'All Years' : `Semester ${semester}`} {section !== 'all' ? `(Section ${section})` : '(All Sections)'}
+                    </h4>
                     <div style={{ position: 'relative', width: '300px' }}>
                         <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
                         <input
