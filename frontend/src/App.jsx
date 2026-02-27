@@ -13,6 +13,7 @@ import PublicPortfolioPage from './pages/public/PublicPortfolioPage';
 
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
+import AdminLoginPage from './pages/auth/AdminLoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 
@@ -29,6 +30,9 @@ import AllAchievementsPage from './pages/admin/AllAchievementsPage';
 import StudentManagementPage from './pages/admin/StudentManagementPage';
 import ReportsPage from './pages/admin/ReportsPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+
+// Faculty Pages
+import FacultyDashboard from './pages/faculty/FacultyDashboard';
 
 // Features page (inline)
 import FeaturesPage from './pages/public/FeaturesPage';
@@ -65,6 +69,7 @@ function App() {
 
           {/* Auth Routes (redirect if logged in) */}
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/admin-login" element={<PublicRoute><AdminLoginPage /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
           <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
 
@@ -80,6 +85,7 @@ function App() {
           {/* Admin / Faculty Routes */}
           <Route element={<ProtectedRoute allowedRoles={['admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
             <Route path="/admin/verify" element={<VerifyAchievementsPage />} />
             <Route path="/admin/achievements" element={<AllAchievementsPage />} />
             <Route path="/admin/students" element={<StudentManagementPage />} />

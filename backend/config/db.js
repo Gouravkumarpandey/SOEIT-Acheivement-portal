@@ -18,6 +18,15 @@ const seedDemoUsers = async () => {
         isActive: true
       },
       {
+        name: 'Demo Faculty',
+        email: 'faculty@soeit.ac.in',
+        enrollmentNo: 'AJU/FACULTY',
+        password: 'Faculty@123',
+        role: 'faculty',
+        department: 'CSE',
+        isActive: true
+      },
+      {
         name: 'System Admin',
         email: 'admin@soeit.ac.in',
         enrollmentNo: 'AJU/ADMIN',
@@ -32,7 +41,13 @@ const seedDemoUsers = async () => {
       const exists = await User.findOne({ email: user.email });
       if (!exists) {
         await User.create(user);
-        console.log(`👤 Demo ${user.role} created (${user.email})`);
+        console.log(`👤 Demo ${user.role} created (${user.enrollmentNo})`);
+      } else {
+        // Update existing demo users to have the correct enrollmentNo
+        exists.enrollmentNo = user.enrollmentNo;
+        exists.role = user.role; // Ensure roles are correct
+        await exists.save();
+        console.log(`🔄 Demo ${user.role} updated (${user.enrollmentNo})`);
       }
     }
   } catch (err) {

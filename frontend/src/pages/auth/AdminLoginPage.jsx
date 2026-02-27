@@ -2,13 +2,13 @@ import '../../styles/LoginPage.css';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, Eye, EyeOff, RefreshCw, ArrowLeft } from 'lucide-react';
+import { ShieldAlert, Lock, Eye, EyeOff, RefreshCw, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const UniversityHeader = () => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.25rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
-        <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#303657', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.5rem', fontWeight: 800, flexShrink: 0, boxShadow: '0 4px 12px rgba(48,54,87,0.2)' }}>JGi</div>
-        <div style={{ height: '60px', width: '2px', background: '#8B1E1E' }} className="hidden md:block" />
+        <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#8B1E1E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.5rem', fontWeight: 800, flexShrink: 0, boxShadow: '0 4px 12px rgba(139,30,30,0.2)' }}>JGi</div>
+        <div style={{ height: '60px', width: '2px', background: '#303657' }} className="hidden md:block" />
         <div style={{ textAlign: 'left', minWidth: '180px' }}>
             <div style={{ fontWeight: 800, fontSize: '1.4rem', lineHeight: 1.1 }}>
                 <span style={{ color: '#8B1E1E' }}>ARKA JAIN</span><br />
@@ -16,11 +16,11 @@ const UniversityHeader = () => (
             </div>
             <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '4px' }}>Jharkhand</div>
         </div>
-        <div style={{ background: '#8B1E1E', color: '#fff', fontSize: '0.7rem', fontWeight: 700, padding: '0.35rem 0.75rem', borderRadius: '4px', alignSelf: 'center', whiteSpace: 'nowrap' }}>NAAC GRADE A</div>
+        <div style={{ background: '#303657', color: '#fff', fontSize: '0.7rem', fontWeight: 700, padding: '0.35rem 0.75rem', borderRadius: '4px', alignSelf: 'center', whiteSpace: 'nowrap' }}>ADMIN PORTAL</div>
     </div>
 );
 
-const LoginPage = () => {
+const AdminLoginPage = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -45,7 +45,7 @@ const LoginPage = () => {
 
     const validate = () => {
         const e = {};
-        if (!form.email) e.email = 'Email/Username is required';
+        if (!form.email) e.email = 'Admin ID is required';
         if (!form.password) e.password = 'Password is required';
         if (form.captchaInput !== captcha) e.captchaInput = 'Invalid Captcha';
         setErrors(e);
@@ -58,15 +58,12 @@ const LoginPage = () => {
         setLoading(true);
         try {
             const data = await login({ email: form.email, password: form.password });
-            toast.success(data.message || 'Welcome back!');
-
-            let redirect = from;
-            if (!redirect) {
-                if (data.user.role === 'admin') redirect = '/admin/dashboard';
-                else if (data.user.role === 'faculty') redirect = '/faculty/dashboard';
-                else redirect = '/dashboard';
+            if (data.user.role !== 'admin' && data.user.role !== 'faculty') {
+                toast.error('Unauthorized access. Only admins/faculty can enter here.');
+                return;
             }
-
+            toast.success('Admin access granted');
+            const redirect = from || '/admin/dashboard';
             navigate(redirect, { replace: true });
         } catch (err) {
             toast.error(err.response?.data?.message || 'Login failed');
@@ -78,7 +75,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fcfcfc', padding: '1.5rem', position: 'relative' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', padding: '1.5rem', position: 'relative' }}>
             {/* Top Left Back Button */}
             <div style={{ position: 'absolute', top: '2rem', left: '2rem' }}>
                 <Link to="/" className="btn btn-secondary btn-sm" style={{ fontWeight: 600, boxShadow: 'var(--shadow-sm)' }}>
@@ -89,15 +86,23 @@ const LoginPage = () => {
             <div style={{ width: '100%', maxWidth: '440px' }}>
                 <UniversityHeader />
 
-                <div className="card card-body" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: 'none', borderRadius: 'var(--radius-xl)' }}>
+                <div className="card card-body" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.06)', border: '1px solid rgba(139,30,30,0.1)', borderRadius: 'var(--radius-xl)' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                        <div style={{ display: 'inline-flex', padding: '1rem', background: 'rgba(139,30,30,0.05)', borderRadius: '50%', color: '#8B1E1E', marginBottom: '1rem' }}>
+                            <ShieldAlert size={32} />
+                        </div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#303657' }}>Administrative Sign In</h2>
+                        <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Secure access for faculty and administrators</p>
+                    </div>
+
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                         <div className="form-group" style={{ marginBottom: 0 }}>
                             <div style={{ position: 'relative' }}>
                                 <input
                                     type="text"
                                     className={`form-control ${errors.email ? 'error' : ''}`}
-                                    style={{ padding: '1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
-                                    placeholder="Username"
+                                    style={{ padding: '1rem 1.25rem', height: 'auto', background: '#fff', border: '1px solid #e2e8f0' }}
+                                    placeholder="Admin/Faculty ID"
                                     value={form.email}
                                     onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                                 />
@@ -110,7 +115,7 @@ const LoginPage = () => {
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     className={`form-control ${errors.password ? 'error' : ''}`}
-                                    style={{ padding: '1rem 3rem 1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
+                                    style={{ padding: '1rem 3rem 1rem 1.25rem', height: 'auto', background: '#fff', border: '1px solid #e2e8f0' }}
                                     placeholder="Password"
                                     value={form.password}
                                     onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
@@ -141,14 +146,14 @@ const LoginPage = () => {
                                 <input
                                     type="text"
                                     className={`form-control ${errors.captchaInput ? 'error' : ''}`}
-                                    style={{ padding: '1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
-                                    placeholder="Enter Captcha"
+                                    style={{ padding: '1rem 1.25rem', height: 'auto', background: '#fff', border: '1px solid #e2e8f0' }}
+                                    placeholder="Captcha"
                                     value={form.captchaInput}
                                     onChange={e => setForm(p => ({ ...p, captchaInput: e.target.value }))}
                                 />
                                 {errors.captchaInput && <div className="input-error">{errors.captchaInput}</div>}
                             </div>
-                            <div className="captcha-box">
+                            <div className="captcha-box" style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}>
                                 {captcha}
                             </div>
                             <button type="button" onClick={generateCaptcha} className="btn-icon btn-secondary" style={{ padding: '0.9rem', borderRadius: 'var(--radius-sm)' }}>
@@ -156,23 +161,18 @@ const LoginPage = () => {
                             </button>
                         </div>
 
-                        <button type="submit" className="btn btn-arka-jain" disabled={loading} style={{ marginTop: '0.5rem' }}>
-                            {loading ? 'Logging in...' : 'LOGIN'}
+                        <button type="submit" className="btn btn-arka-jain" disabled={loading} style={{ marginTop: '0.5rem', background: '#303657' }}>
+                            {loading ? 'Authorizing...' : 'SECURE LOGIN'}
                         </button>
                     </form>
-
-                    <p style={{ textAlign: 'center', fontSize: '0.9rem', color: '#64748b', marginTop: '2.5rem' }}>
-                        Don't have an account?{' '}
-                        <Link to="/register" style={{ color: '#303657', fontWeight: 700 }}>Create User</Link>
-                    </p>
                 </div>
 
                 <div className="alert alert-info" style={{ marginTop: '1.5rem', fontSize: '0.8rem', background: '#f1f5f9', border: 'none', color: '#475569' }}>
-                    <strong>Demo Accounts:</strong> AJU/221403 (Student) | AJU/FACULTY (Faculty) | AJU/ADMIN (Admin) | <br /> <strong>Pass:</strong> Test@123 / Faculty@123 / Admin@123
+                    <strong>Access Only:</strong> Institutional ID starting with AJU/ required for administrative login.
                 </div>
             </div>
         </div>
     );
 };
 
-export default LoginPage;
+export default AdminLoginPage;
