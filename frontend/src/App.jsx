@@ -34,6 +34,9 @@ import FacultyManagementPage from './pages/admin/FacultyManagementPage';
 // Faculty Pages
 import FacultyDashboard from './pages/faculty/FacultyDashboard';
 
+// Shared Pages
+import EventsPage from './pages/shared/EventsPage';
+
 // Features page (inline)
 import FeaturesPage from './pages/public/FeaturesPage';
 
@@ -76,6 +79,7 @@ function App() {
           {/* Shared Authenticated Routes (All Roles) */}
           <Route element={<ProtectedRoute allowedRoles={['student', 'admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/events" element={<EventsPage />} />
           </Route>
 
           {/* Student Specific Routes */}

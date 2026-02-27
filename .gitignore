@@ -1,54 +1,40 @@
-# ===== Dependencies =====
+# Dependencies
 node_modules/
-.pnp
-.pnp.js
+backend/node_modules/
+frontend/node_modules/
 
-# ===== Environment Variables (NEVER commit these) =====
+# Environment Variables (CRITICAL: Never commit these)
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.production
+.env.*.local
+backend/.env
+frontend/.env
+frontend/.env.local
 
-# ===== Build Outputs =====
+# Build Outputs
 dist/
 build/
-out/
+frontend/dist/
+frontend/build/
 
-# ===== Logs =====
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-*.log
 
-# ===== Runtime & OS =====
-.DS_Store
-Thumbs.db
-*.pid
-*.seed
-*.pid.lock
-
-# ===== Uploads (user data — store separately) =====
+# Uploads & Data
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-# ===== MongoDB memory server binary cache =====
-.cache/
-mongodb-binaries/
-
-# ===== IDE =====
+# IDE & OS
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.DS_Store
+Thumbs.db
+*.swp
 
-# ===== Testing =====
+# Testing
 coverage/
-
-# ===== Vite =====
-.vite/
+.cache/
+mongodb-binaries/

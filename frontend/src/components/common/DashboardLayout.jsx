@@ -8,6 +8,7 @@ const pageTitles = {
     '/achievements': 'My Achievements',
     '/achievements/upload': 'Upload Achievement',
     '/profile': 'My Profile',
+    '/events': 'Campus Events',
     '/admin/dashboard': 'Admin Dashboard',
     '/admin/verify': 'Verify Achievements',
     '/admin/achievements': 'All Achievements',

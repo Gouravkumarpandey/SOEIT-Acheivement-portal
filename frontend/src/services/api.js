@@ -63,4 +63,12 @@ export const adminAPI = {
     manageUser: (id, data) => API.put(`/admin/users/${id}`, data),
 };
 
+// Event APIs
+export const eventAPI = {
+    create: (data) => API.post('/events', data),
+    getAll: (params) => API.get('/events', { params }),
+    update: (id, data) => API.put(`/events/${id}`, data),
+    delete: (id) => API.delete(`/events/${id}`),
+};
+
 export default API;

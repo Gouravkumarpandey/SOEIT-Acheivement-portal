@@ -3,11 +3,12 @@ import { useAuth } from '../../context/AuthContext';
 import {
     LayoutDashboard, Trophy, Upload, User, BarChart3,
     CheckCircle, Users, Settings, LogOut, GraduationCap,
-    FileText, X, Shield, Star
+    FileText, X, Shield, Star, Calendar
 } from 'lucide-react';
 
 const studentLinks = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/events', icon: Calendar, label: 'Campus Events' },
     { to: '/achievements', icon: Trophy, label: 'My Achievements' },
     { to: '/achievements/upload', icon: Upload, label: 'Upload Achievement' },
     { to: '/profile', icon: User, label: 'My Profile' },
@@ -15,6 +16,7 @@ const studentLinks = [
 
 const adminLinks = [
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/events', icon: Calendar, label: 'Campus Events' },
     { to: '/admin/verify', icon: CheckCircle, label: 'Verify Achievements' },
     { to: '/admin/achievements', icon: Trophy, label: 'All Achievements' },
     { to: '/admin/students', icon: Users, label: 'Students' },
