@@ -45,7 +45,7 @@ const LoginPage = () => {
 
     const validate = () => {
         const e = {};
-        if (!form.email) e.email = 'Email/Username is required';
+        if (!form.email) e.email = 'Username is required';
         if (!form.password) e.password = 'Password is required';
         if (form.captchaInput !== captcha) e.captchaInput = 'Invalid Captcha';
         setErrors(e);
@@ -79,7 +79,6 @@ const LoginPage = () => {
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fcfcfc', padding: '1.5rem', position: 'relative' }}>
-            {/* Top Left Back Button */}
             <div style={{ position: 'absolute', top: '2rem', left: '2rem' }}>
                 <Link to="/" className="btn btn-secondary btn-sm" style={{ fontWeight: 600, boxShadow: 'var(--shadow-sm)' }}>
                     <ArrowLeft size={14} /> Back to Home
@@ -91,27 +90,46 @@ const LoginPage = () => {
 
                 <div className="card card-body" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: 'none', borderRadius: 'var(--radius-xl)' }}>
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
                         <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label" style={{ fontWeight: 600, color: '#303657', marginBottom: '0.4rem', display: 'block', fontSize: '0.85rem' }}>Username / Enrollment No.</label>
                             <div style={{ position: 'relative' }}>
                                 <input
                                     type="text"
                                     className={`form-control ${errors.email ? 'error' : ''}`}
-                                    style={{ padding: '1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
-                                    placeholder="Username"
+                                    style={{
+                                        padding: '1rem 1.25rem',
+                                        height: 'auto',
+                                        background: '#f8fafc',
+                                        border: '1px solid #e2e8f0',
+                                        color: '#1e293b',
+                                        fontSize: '1rem',
+                                        borderRadius: '8px'
+                                    }}
+                                    placeholder="e.g. AJU/221403"
                                     value={form.email}
                                     onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                                 />
                             </div>
-                            {errors.email && <div className="input-error">{errors.email}</div>}
+                            {errors.email && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.email}</div>}
                         </div>
 
                         <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label" style={{ fontWeight: 600, color: '#303657', marginBottom: '0.4rem', display: 'block', fontSize: '0.85rem' }}>Password</label>
                             <div style={{ position: 'relative' }}>
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     className={`form-control ${errors.password ? 'error' : ''}`}
-                                    style={{ padding: '1rem 3rem 1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
-                                    placeholder="Password"
+                                    style={{
+                                        padding: '1rem 3rem 1rem 1.25rem',
+                                        height: 'auto',
+                                        background: '#f8fafc',
+                                        border: '1px solid #e2e8f0',
+                                        color: '#1e293b',
+                                        fontSize: '1rem',
+                                        borderRadius: '8px'
+                                    }}
+                                    placeholder="Enter your password"
                                     value={form.password}
                                     onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                                 />
@@ -133,30 +151,41 @@ const LoginPage = () => {
                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
-                            {errors.password && <div className="input-error">{errors.password}</div>}
+                            {errors.password && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.password}</div>}
                         </div>
 
-                        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                            <div style={{ flex: 1 }}>
-                                <input
-                                    type="text"
-                                    className={`form-control ${errors.captchaInput ? 'error' : ''}`}
-                                    style={{ padding: '1rem 1.25rem', height: 'auto', background: '#f8fafc', border: 'none' }}
-                                    placeholder="Enter Captcha"
-                                    value={form.captchaInput}
-                                    onChange={e => setForm(p => ({ ...p, captchaInput: e.target.value }))}
-                                />
-                                {errors.captchaInput && <div className="input-error">{errors.captchaInput}</div>}
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label" style={{ fontWeight: 600, color: '#303657', marginBottom: '0.4rem', display: 'block', fontSize: '0.85rem' }}>Security Check</label>
+                            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                                <div style={{ flex: 1 }}>
+                                    <input
+                                        type="text"
+                                        className={`form-control ${errors.captchaInput ? 'error' : ''}`}
+                                        style={{
+                                            padding: '1rem 1.25rem',
+                                            height: 'auto',
+                                            background: '#f8fafc',
+                                            border: '1px solid #e2e8f0',
+                                            color: '#1e293b',
+                                            fontSize: '1rem',
+                                            borderRadius: '8px'
+                                        }}
+                                        placeholder="Captcha code"
+                                        value={form.captchaInput}
+                                        onChange={e => setForm(p => ({ ...p, captchaInput: e.target.value }))}
+                                    />
+                                </div>
+                                <div className="captcha-box">
+                                    {captcha}
+                                </div>
+                                <button type="button" onClick={generateCaptcha} className="btn-icon btn-secondary" style={{ padding: '1rem', borderRadius: '8px' }}>
+                                    <RefreshCw size={18} />
+                                </button>
                             </div>
-                            <div className="captcha-box">
-                                {captcha}
-                            </div>
-                            <button type="button" onClick={generateCaptcha} className="btn-icon btn-secondary" style={{ padding: '0.9rem', borderRadius: 'var(--radius-sm)' }}>
-                                <RefreshCw size={18} />
-                            </button>
+                            {errors.captchaInput && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.captchaInput}</div>}
                         </div>
 
-                        <button type="submit" className="btn btn-arka-jain" disabled={loading} style={{ marginTop: '0.5rem' }}>
+                        <button type="submit" className="btn btn-arka-jain" disabled={loading} style={{ marginTop: '0.5rem', padding: '1rem' }}>
                             {loading ? 'Logging in...' : 'LOGIN'}
                         </button>
                     </form>

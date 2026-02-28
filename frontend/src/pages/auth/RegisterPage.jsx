@@ -2,7 +2,7 @@ import '../../styles/RegisterPage.css';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, BookOpen, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const UniversityHeader = () => (
@@ -22,10 +22,50 @@ const UniversityHeader = () => (
 
 const DEPARTMENTS = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'Other'];
 
+// Define Field component OUTSIDE the main component to prevent focus loss during state updates
+const Field = ({ name, label, type = 'text', placeholder, required, form, setForm, errors, children }) => (
+    <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+        {label && (
+            <label className="form-label" style={{ fontWeight: 600, color: '#303657', marginBottom: '0.4rem', display: 'block', fontSize: '0.85rem' }}>
+                {label}{required && ' *'}
+            </label>
+        )}
+        {children || (
+            <div style={{ position: 'relative' }}>
+                <input
+                    type={type}
+                    className={`form-control ${errors[name] ? 'error' : ''}`}
+                    style={{
+                        padding: '0.875rem 1rem',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        color: '#1e293b',
+                        fontSize: '1rem',
+                        borderRadius: '8px'
+                    }}
+                    placeholder={placeholder}
+                    value={form[name] || ''}
+                    onChange={e => setForm(p => ({ ...p, [name]: e.target.value }))}
+                />
+            </div>
+        )}
+        {errors[name] && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors[name]}</div>}
+    </div>
+);
+
 const RegisterPage = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
-    const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', department: '', studentId: '', batch: '', semester: '' });
+    const [form, setForm] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        department: '',
+        enrollmentNo: '',
+        batch: '',
+        semester: ''
+    });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -60,27 +100,8 @@ const RegisterPage = () => {
         }
     };
 
-    const Field = ({ name, type = 'text', placeholder, required, icon: Icon, children }) => (
-        <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-            {children || (
-                <div style={{ position: 'relative' }}>
-                    <input
-                        type={type}
-                        className={`form-control ${errors[name] ? 'error' : ''}`}
-                        style={{ padding: '0.875rem 1rem', background: '#f8fafc', border: 'none', height: 'auto' }}
-                        placeholder={placeholder + (required ? ' *' : '')}
-                        value={form[name]}
-                        onChange={e => setForm(p => ({ ...p, [name]: e.target.value }))}
-                    />
-                </div>
-            )}
-            {errors[name] && <div className="input-error">{errors[name]}</div>}
-        </div>
-    );
-
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fcfcfc', padding: '2rem 1.5rem', position: 'relative' }}>
-            {/* Top Left Back Button */}
             <div style={{ position: 'absolute', top: '2rem', left: '2rem' }}>
                 <Link to="/" className="btn btn-secondary btn-sm" style={{ fontWeight: 600, boxShadow: 'var(--shadow-sm)' }}>
                     <ArrowLeft size={14} /> Back to Home
@@ -97,38 +118,55 @@ const RegisterPage = () => {
                 <div className="card card-body" style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.04)', border: 'none', borderRadius: 'var(--radius-xl)' }}>
                     <form onSubmit={handleSubmit}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
-                            <Field name="name" placeholder="Full Name" required />
-                            <Field name="enrollmentNo" placeholder="Enrollment No. (e.g. AJU/221403)" />
+                            <Field name="name" label="Full Name" placeholder="Full name" required form={form} setForm={setForm} errors={errors} />
+                            <Field name="enrollmentNo" label="Enrollment No." placeholder="AJU/221403" form={form} setForm={setForm} errors={errors} />
                         </div>
 
-                        <Field name="email" type="email" placeholder="Email Address" required />
+                        <Field name="email" label="Email Address" type="email" placeholder="example@arkajainuniversity.ac.in" required form={form} setForm={setForm} errors={errors} />
 
                         <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                            <label className="form-label" style={{ fontWeight: 600, color: '#303657', marginBottom: '0.4rem', display: 'block', fontSize: '0.85rem' }}>Department *</label>
                             <select
                                 className={`form-control ${errors.department ? 'error' : ''}`}
-                                style={{ padding: '0.875rem 1rem', background: '#f8fafc', border: 'none', height: 'auto' }}
+                                style={{
+                                    padding: '0.875rem 1rem',
+                                    background: '#f8fafc',
+                                    border: '1px solid #e2e8f0',
+                                    color: '#1e293b',
+                                    height: 'auto',
+                                    fontSize: '1rem',
+                                    borderRadius: '8px'
+                                }}
                                 value={form.department}
                                 onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
                             >
-                                <option value="">Select Department *</option>
+                                <option value="">Select Department</option>
                                 {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
                             </select>
-                            {errors.department && <div className="input-error">{errors.department}</div>}
+                            {errors.department && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.department}</div>}
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
-                            <Field name="batch" placeholder="Batch Year" />
-                            <Field name="semester" placeholder="Current Semester" />
+                            <Field name="batch" label="Batch Year" placeholder="e.g. 2022-26" form={form} setForm={setForm} errors={errors} />
+                            <Field name="semester" label="Current Semester" placeholder="1-8" form={form} setForm={setForm} errors={errors} />
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
-                            <div className="form-group">
+                            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                                <label className="form-label" style={{ fontWeight: 600, color: '#303657', marginBottom: '0.4rem', display: 'block', fontSize: '0.85rem' }}>Password *</label>
                                 <div style={{ position: 'relative' }}>
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         className={`form-control ${errors.password ? 'error' : ''}`}
-                                        style={{ padding: '0.875rem 2.5rem 0.875rem 1rem', background: '#f8fafc', border: 'none', height: 'auto' }}
-                                        placeholder="Password *"
+                                        style={{
+                                            padding: '0.875rem 2.5rem 0.875rem 1rem',
+                                            background: '#f8fafc',
+                                            border: '1px solid #e2e8f0',
+                                            color: '#1e293b',
+                                            fontSize: '1rem',
+                                            borderRadius: '8px'
+                                        }}
+                                        placeholder="Min 6 chars"
                                         value={form.password}
                                         onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                                     />
@@ -136,16 +174,24 @@ const RegisterPage = () => {
                                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </button>
                                 </div>
-                                {errors.password && <div className="input-error">{errors.password}</div>}
+                                {errors.password && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.password}</div>}
                             </div>
 
-                            <div className="form-group">
+                            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                                <label className="form-label" style={{ fontWeight: 600, color: '#303657', marginBottom: '0.4rem', display: 'block', fontSize: '0.85rem' }}>Confirm Password *</label>
                                 <div style={{ position: 'relative' }}>
                                     <input
                                         type={showConfirmPassword ? 'text' : 'password'}
                                         className={`form-control ${errors.confirmPassword ? 'error' : ''}`}
-                                        style={{ padding: '0.875rem 2.5rem 0.875rem 1rem', background: '#f8fafc', border: 'none', height: 'auto' }}
-                                        placeholder="Confirm Password *"
+                                        style={{
+                                            padding: '0.875rem 2.5rem 0.875rem 1rem',
+                                            background: '#f8fafc',
+                                            border: '1px solid #e2e8f0',
+                                            color: '#1e293b',
+                                            fontSize: '1rem',
+                                            borderRadius: '8px'
+                                        }}
+                                        placeholder="Repeat password"
                                         value={form.confirmPassword}
                                         onChange={e => setForm(p => ({ ...p, confirmPassword: e.target.value }))}
                                     />
@@ -153,7 +199,7 @@ const RegisterPage = () => {
                                         {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </button>
                                 </div>
-                                {errors.confirmPassword && <div className="input-error">{errors.confirmPassword}</div>}
+                                {errors.confirmPassword && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.confirmPassword}</div>}
                             </div>
                         </div>
 
