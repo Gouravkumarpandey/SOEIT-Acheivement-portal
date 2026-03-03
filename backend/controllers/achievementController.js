@@ -1,12 +1,13 @@
 const Achievement = require('../models/Achievement');
 const Verification = require('../models/Verification');
 const User = require('../models/User');
+const { addAchievementToQueue } = require('../utils/queue');
 
 // @desc    Create achievement
 // @route   POST /api/achievements
 exports.createAchievement = async (req, res, next) => {
     try {
-        const { title, category, description, level, date, institution, tags, isPublic } = req.body;
+        const { title, category, description, level, date, institution, tags, visibility } = req.body;
         const proofFiles = [];
 
         if (req.files && req.files.length > 0) {
@@ -16,12 +17,22 @@ exports.createAchievement = async (req, res, next) => {
         }
 
         const achievement = await Achievement.create({
-            studentId: req.user.id, title, category, description, level, date, institution,
+            studentId: req.user.id,
+            universityId: req.user.universityId,
+            title,
+            category,
+            description,
+            level,
+            date,
+            institution,
             tags: tags ? tags.split(',').map(t => t.trim()) : [],
-            isPublic: isPublic !== undefined ? isPublic : true,
+            visibility: visibility || 'university',
             proofFiles,
             certificateUrl: proofFiles.length > 0 ? proofFiles[0].url : '',
         });
+
+        // Background Processing (BullMQ for Scalability)
+        await addAchievementToQueue({ id: achievement._id, userId: req.user.id, universityId: req.user.universityId });
 
         await achievement.populate('studentId', 'name email department studentId');
         res.status(201).json({ success: true, message: 'Achievement submitted successfully! Awaiting verification.', data: achievement });
@@ -58,12 +69,22 @@ exports.getMyAchievements = async (req, res, next) => {
 // @route   GET /api/achievements/:id
 exports.getAchievement = async (req, res, next) => {
     try {
-        const achievement = await Achievement.findById(req.params.id).populate('studentId', 'name email department studentId profileImage').populate('verifiedBy', 'name role');
+        const achievement = await Achievement.findById(req.params.id)
+            .populate('studentId', 'name email department studentId profileImage universityId')
+            .populate('verifiedBy', 'name role');
+
         if (!achievement) return res.status(404).json({ success: false, message: 'Achievement not found' });
 
-        // Only owner or admin/faculty can view
-        if (achievement.studentId._id.toString() !== req.user.id && !['admin', 'faculty'].includes(req.user.role)) {
-            return res.status(403).json({ success: false, message: 'Not authorized' });
+        const isOwner = achievement.studentId._id.toString() === req.user.id;
+        const isStaff = ['admin', 'faculty', 'super-admin'].includes(req.user.role);
+        const sameUniversity = achievement.universityId.toString() === req.user.universityId?.toString();
+
+        // 🔹 Enterprise Security & Multi-Tenancy Layer
+        if (!isOwner && !isStaff) {
+            // Public or Other student trying to view
+            if (achievement.status !== 'approved') return res.status(403).json({ success: false, message: 'Achievement unverified' });
+            if (achievement.visibility === 'private') return res.status(403).json({ success: false, message: 'Private achievement' });
+            if (achievement.visibility === 'university' && !sameUniversity) return res.status(403).json({ success: false, message: 'Access restricted to university members' });
         }
 
         res.status(200).json({ success: true, data: achievement });
@@ -118,16 +139,24 @@ exports.deleteAchievement = async (req, res, next) => {
 // @route   GET /api/achievements/portfolio/:userId
 exports.getPublicPortfolio = async (req, res, next) => {
     try {
-        const student = await User.findById(req.params.userId).select('-password -resetPasswordToken -resetPasswordExpire');
+        const { userId } = req.params; // Corrected parameter name to match route
+        const student = await User.findById(userId).select('name email department batch profileImage linkedIn github portfolio universityId');
         if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
 
-        const achievements = await Achievement.find({ studentId: req.params.userId, status: 'approved', isPublic: true }).sort({ createdAt: -1 });
+        // Only approved and 'public' achievements allowed on digital profile
+        const achievements = await Achievement.find({
+            studentId: student._id,
+            status: 'approved',
+            visibility: 'public'
+        }).sort({ date: -1 });
+
         const stats = {
             total: achievements.length,
             byCategory: {},
             byLevel: {},
             totalPoints: achievements.reduce((sum, a) => sum + (a.points || 0), 0),
         };
+
         achievements.forEach((a) => {
             stats.byCategory[a.category] = (stats.byCategory[a.category] || 0) + 1;
             stats.byLevel[a.level] = (stats.byLevel[a.level] || 0) + 1;

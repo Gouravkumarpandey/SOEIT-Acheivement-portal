@@ -7,13 +7,14 @@ const mongoose = require('mongoose');
 // @route   GET /api/admin/dashboard
 exports.getDashboardStats = async (req, res, next) => {
     try {
+        const query = { universityId: req.user.universityId };
         const [totalStudents, totalFaculties, totalAchievements, pendingCount, approvedCount, rejectedCount] = await Promise.all([
-            User.countDocuments({ role: 'student' }),
-            User.countDocuments({ role: 'faculty' }),
-            Achievement.countDocuments(),
-            Achievement.countDocuments({ status: 'pending' }),
-            Achievement.countDocuments({ status: 'approved' }),
-            Achievement.countDocuments({ status: 'rejected' }),
+            User.countDocuments({ ...query, role: 'student' }),
+            User.countDocuments({ ...query, role: 'faculty' }),
+            Achievement.countDocuments(query),
+            Achievement.countDocuments({ ...query, status: 'pending' }),
+            Achievement.countDocuments({ ...query, status: 'approved' }),
+            Achievement.countDocuments({ ...query, status: 'rejected' }),
         ]);
 
         const byCategory = await Achievement.aggregate([
@@ -34,7 +35,7 @@ exports.getDashboardStats = async (req, res, next) => {
             { $limit: 12 },
         ]);
 
-        const recentAchievements = await Achievement.find({ status: 'pending' })
+        const recentAchievements = await Achievement.find({ ...query, status: 'pending' })
             .populate('studentId', 'name department studentId profileImage')
             .sort({ createdAt: -1 })
             .limit(5);
@@ -55,7 +56,7 @@ exports.getPendingAchievements = async (req, res, next) => {
     try {
         const { page = 1, limit = 10, category, department, search } = req.query;
         let pipeline = [
-            { $match: { status: 'pending' } },
+            { $match: { universityId: mongoose.Types.ObjectId.createFromHexString(req.user.universityId.toString()), status: 'pending' } },
             { $lookup: { from: 'users', localField: 'studentId', foreignField: '_id', as: 'student' } },
             { $unwind: '$student' },
         ];
@@ -109,6 +110,7 @@ exports.getAllAchievements = async (req, res, next) => {
     try {
         const { page = 1, limit = 10, status, category, department, search } = req.query;
         let pipeline = [
+            { $match: { universityId: mongoose.Types.ObjectId.createFromHexString(req.user.universityId.toString()) } },
             { $lookup: { from: 'users', localField: 'studentId', foreignField: '_id', as: 'student' } },
             { $unwind: '$student' },
         ];
@@ -134,7 +136,7 @@ exports.getStudents = async (req, res, next) => {
         const pageNum = Math.max(1, parseInt(page) || 1);
         const limitNum = Math.max(1, parseInt(limit) || 10);
 
-        const query = { role: 'student', isActive: true };
+        const query = { role: 'student', isActive: true, universityId: req.user.universityId };
         if (department) query.department = department;
         if (batch) query.batch = batch;
         if (semester) query.semester = parseInt(semester);
@@ -178,7 +180,7 @@ exports.getStudents = async (req, res, next) => {
 exports.getFaculty = async (req, res, next) => {
     try {
         const { search } = req.query;
-        const query = { role: 'faculty' };
+        const query = { role: 'faculty', universityId: req.user.universityId };
 
         if (search) {
             query.$or = [
@@ -199,18 +201,19 @@ exports.getFaculty = async (req, res, next) => {
 // @route   GET /api/admin/reports
 exports.getReports = async (req, res, next) => {
     try {
+        const uId = mongoose.Types.ObjectId.createFromHexString(req.user.universityId.toString());
         const [categoryStats, levelStats, departmentStats, topPerformers, monthlyTrend] = await Promise.all([
-            Achievement.aggregate([{ $match: { status: 'approved' } }, { $group: { _id: '$category', count: { $sum: 1 }, points: { $sum: '$points' } } }, { $sort: { count: -1 } }]),
-            Achievement.aggregate([{ $match: { status: 'approved' } }, { $group: { _id: '$level', count: { $sum: 1 } } }, { $sort: { count: -1 } }]),
+            Achievement.aggregate([{ $match: { universityId: uId, status: 'approved' } }, { $group: { _id: '$category', count: { $sum: 1 }, points: { $sum: '$points' } } }, { $sort: { count: -1 } }]),
+            Achievement.aggregate([{ $match: { universityId: uId, status: 'approved' } }, { $group: { _id: '$level', count: { $sum: 1 } } }, { $sort: { count: -1 } }]),
             Achievement.aggregate([
-                { $match: { status: 'approved' } },
+                { $match: { universityId: uId, status: 'approved' } },
                 { $lookup: { from: 'users', localField: 'studentId', foreignField: '_id', as: 'student' } },
                 { $unwind: '$student' },
                 { $group: { _id: '$student.department', count: { $sum: 1 }, points: { $sum: '$points' } } },
                 { $sort: { count: -1 } },
             ]),
             Achievement.aggregate([
-                { $match: { status: 'approved' } },
+                { $match: { universityId: uId, status: 'approved' } },
                 { $group: { _id: '$studentId', totalPoints: { $sum: '$points' }, achievementCount: { $sum: 1 } } },
                 { $sort: { totalPoints: -1 } },
                 { $limit: 10 },
@@ -219,6 +222,7 @@ exports.getReports = async (req, res, next) => {
                 { $project: { 'student.name': 1, 'student.department': 1, 'student.profileImage': 1, 'student.studentId': 1, totalPoints: 1, achievementCount: 1 } },
             ]),
             Achievement.aggregate([
+                { $match: { universityId: uId } },
                 { $group: { _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } }, submitted: { $sum: 1 }, approved: { $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] } } } },
                 { $sort: { '_id.year': 1, '_id.month': 1 } },
                 { $limit: 12 },
@@ -238,10 +242,14 @@ exports.manageUser = async (req, res, next) => {
         const { isActive, role } = req.body;
         const updates = {};
         if (isActive !== undefined) updates.isActive = isActive;
-        if (role && req.user.role === 'admin') updates.role = role;
+        if (role && ['admin', 'super-admin'].includes(req.user.role)) updates.role = role;
 
-        const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true }).select('-password');
-        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+        const user = await User.findOneAndUpdate(
+            { _id: req.params.id, universityId: req.user.universityId },
+            updates,
+            { returnDocument: 'after' }
+        ).select('-password');
+        if (!user) return res.status(404).json({ success: false, message: 'User not found or not in your university' });
         res.status(200).json({ success: true, message: 'User updated successfully', user });
     } catch (error) {
         next(error);

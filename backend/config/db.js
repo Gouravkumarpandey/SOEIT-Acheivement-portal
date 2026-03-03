@@ -5,6 +5,21 @@ let mongoServer = null;
 
 const seedDemoUsers = async () => {
   try {
+    const University = require('../models/University');
+
+    // 1. Create Default University for demo data
+    const defaultUni = await University.findOneAndUpdate(
+      { slug: 'aju' },
+      {
+        name: 'Arka Jain University',
+        slug: 'aju',
+        primaryColor: '#1e3a8a',
+        secondaryColor: '#facc15',
+        domain: 'arkajainuniversity.ac.in'
+      },
+      { upsert: true, returnDocument: 'after' }
+    );
+
     const demoUsers = [
       {
         name: 'Demo Student',
@@ -15,6 +30,7 @@ const seedDemoUsers = async () => {
         department: 'CSE',
         batch: '2022',
         semester: 4,
+        universityId: defaultUni._id,
         isActive: true
       },
       {
@@ -24,6 +40,7 @@ const seedDemoUsers = async () => {
         password: 'Faculty@123',
         role: 'faculty',
         department: 'CSE',
+        universityId: defaultUni._id,
         isActive: true
       },
       {
@@ -33,6 +50,17 @@ const seedDemoUsers = async () => {
         password: 'Admin@123',
         role: 'admin',
         department: 'Other',
+        universityId: defaultUni._id,
+        isActive: true
+      },
+      {
+        name: 'Master Control Admin',
+        email: 'superadmin@soeit.ac.in',
+        enrollmentNo: 'MASTER/001',
+        password: 'SuperPassword@123',
+        role: 'admin',
+        department: 'Other',
+        universityId: defaultUni._id,
         isActive: true
       }
     ];
@@ -43,9 +71,10 @@ const seedDemoUsers = async () => {
         await User.create(user);
         console.log(`👤 Demo ${user.role} created (${user.enrollmentNo})`);
       } else {
-        // Update existing demo users to have the correct enrollmentNo
+        // Update existing demo users
         exists.enrollmentNo = user.enrollmentNo;
-        exists.role = user.role; // Ensure roles are correct
+        exists.role = user.role;
+        exists.universityId = defaultUni._id;
         await exists.save();
         console.log(`🔄 Demo ${user.role} updated (${user.enrollmentNo})`);
       }

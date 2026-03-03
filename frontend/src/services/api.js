@@ -22,7 +22,7 @@ API.interceptors.response.use(
         if (error.response?.status === 401) {
             localStorage.removeItem('soeit_token');
             localStorage.removeItem('soeit_user');
-            window.location.href = '/login';
+            window.location.href = '/';
         }
         return Promise.reject(error);
     }
@@ -76,6 +76,14 @@ export const noticeAPI = {
     create: (data) => API.post('/notices', data),
     getAll: () => API.get('/notices'),
     delete: (id) => API.delete(`/notices/${id}`),
+};
+
+// University APIs
+export const universityAPI = {
+    getAll: () => API.get('/universities'),
+    getOne: (id) => API.get(`/universities/${id}`),
+    create: (data) => API.post('/universities', data),
+    update: (id, data) => API.put(`/universities/${id}`, data),
 };
 
 export default API;

@@ -1,9 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useBranding } from '../../context/BrandingContext';
 import {
     LayoutDashboard, Trophy, Upload, User, BarChart3,
     CheckCircle, Users, Settings, LogOut, GraduationCap,
-    FileText, X, Shield, Star, Calendar
+    FileText, X, Shield, Star, Calendar, Globe
 } from 'lucide-react';
 
 const studentLinks = [
@@ -26,12 +27,13 @@ const adminLinks = [
 ];
 
 const Sidebar = ({ mobileOpen, onClose }) => {
-    const { user, logout, isStudent, isStaff } = useAuth();
+    const { user, logout, isStudent } = useAuth();
+    const { university } = useBranding();
     const navigate = useNavigate();
-    const links = isStudent ? studentLinks : adminLinks;
 
-    // Role-based link mapping
-    const filteredLinks = links
+    const baseLinks = isStudent ? studentLinks : adminLinks;
+
+    const finalLinks = baseLinks
         .filter(link => {
             // Only admin can see Faculty Management
             if (user?.role === 'faculty' && link.to === '/admin/faculty') {
@@ -67,11 +69,17 @@ const Sidebar = ({ mobileOpen, onClose }) => {
                 {/* Logo */}
                 <div style={{ padding: '1.5rem 1rem', borderBottom: '1px solid var(--border-primary)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0' }}>
-                        <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <GraduationCap size={22} color="#fff" />
+                        <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, var(--primary), var(--secondary))', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            {university?.logo ? (
+                                <img src={university.logo} alt="logo" style={{ width: '70%', height: '70%', objectFit: 'contain' }} />
+                            ) : (
+                                <GraduationCap size={22} color="#fff" />
+                            )}
                         </div>
                         <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>SOEIT Portal</div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {university?.name || 'SOEIT Portal'}
+                            </div>
                             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2 }}>Achievements</div>
                         </div>
                         <button onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-muted)', display: 'none' }} className="mobile-close-btn">
@@ -104,7 +112,7 @@ const Sidebar = ({ mobileOpen, onClose }) => {
                     <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', margin: '0 0.25rem 0.75rem', paddingLeft: '0.75rem' }}>
                         {isStudent ? 'Student Menu' : (user?.role === 'faculty' ? 'Faculty Menu' : 'Admin Menu')}
                     </div>
-                    {filteredLinks.map(({ to, icon: Icon, label }) => (
+                    {finalLinks.map(({ to, icon: Icon, label }) => (
                         <NavLink key={to} to={to} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} style={{ marginBottom: '0.25rem' }}>
                             <Icon size={18} />
                             <span>{label}</span>

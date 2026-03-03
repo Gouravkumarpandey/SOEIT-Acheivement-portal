@@ -8,33 +8,35 @@ const LoadingScreen = () => (
     </div>
 );
 
+const getDashboardPath = (role) => {
+    switch (role) {
+        case 'student': return '/dashboard';
+        case 'faculty': return '/faculty/dashboard';
+        case 'admin': return '/admin/dashboard';
+        default: return '/login';
+    }
+};
+
 export const ProtectedRoute = ({ children, allowedRoles }) => {
     const { user, loading } = useAuth();
     const location = useLocation();
 
-    const getDashboardPath = (role) => {
-        if (role === 'student') return '/dashboard';
-        if (role === 'faculty') return '/faculty/dashboard';
-        return '/admin/dashboard';
-    };
-
     if (loading) return <LoadingScreen />;
     if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+
     if (allowedRoles && !allowedRoles.includes(user.role)) {
         return <Navigate to={getDashboardPath(user.role)} replace />;
     }
+
     return children;
 };
 
 export const PublicRoute = ({ children }) => {
     const { user, loading } = useAuth();
-    const getDashboardPath = (role) => {
-        if (role === 'student') return '/dashboard';
-        if (role === 'faculty') return '/faculty/dashboard';
-        return '/admin/dashboard';
-    };
+
     if (loading) return <LoadingScreen />;
     if (user) return <Navigate to={getDashboardPath(user.role)} replace />;
+
     return children;
 };
 

@@ -58,10 +58,13 @@ const AdminLoginPage = () => {
         setLoading(true);
         try {
             const data = await login({ email: form.email, password: form.password });
-            if (data.user.role !== 'admin' && data.user.role !== 'faculty') {
-                toast.error('Unauthorized access. Only admins/faculty can enter here.');
+            const allowedRoles = ['admin', 'faculty', 'super-admin'];
+
+            if (!allowedRoles.includes(data.user.role)) {
+                toast.error('Unauthorized access. Only admins/faculty/super-admins can enter here.');
                 return;
             }
+
             toast.success('Admin access granted');
             const redirect = from || '/admin/dashboard';
             navigate(redirect, { replace: true });

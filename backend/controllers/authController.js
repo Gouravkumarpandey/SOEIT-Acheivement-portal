@@ -3,21 +3,46 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '15m' });
 };
 
-const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
+const generateRefreshToken = (id) => {
+    return jwt.sign({ id }, process.env.REFRESH_SECRET || 'refresh_secret_fallback', { expiresIn: '7d' });
+};
+
+const sendTokenResponse = async (user, statusCode, res, message = 'Success') => {
     const token = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // Save refresh token to user (optional but better for revocation)
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+
     const userObj = user.toObject ? user.toObject() : user;
     delete userObj.password;
-    res.status(statusCode).json({ success: true, message, token, user: userObj });
+    delete userObj.refreshToken;
+
+    const options = {
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+    };
+
+    res.status(statusCode)
+        .cookie('refreshToken', refreshToken, options)
+        .json({ success: true, message, token, user: userObj });
 };
 
 // @desc    Register student
 // @route   POST /api/auth/register
 exports.register = async (req, res, next) => {
     try {
-        const { name, email, password, department, studentId, enrollmentNo, batch, semester, section } = req.body;
+        const { name, email, password, department, studentId, enrollmentNo, batch, semester, section, universityId } = req.body;
+
+        if (!universityId) {
+            return res.status(400).json({ success: false, message: 'University ID is required' });
+        }
 
         // Build duplicate-check query — only include enrollmentNo when provided
         const orConditions = [{ email: email?.toLowerCase() }];
@@ -40,9 +65,10 @@ exports.register = async (req, res, next) => {
             batch: batch?.trim() || undefined,
             semester: !isNaN(semesterNum) ? semesterNum : undefined,
             section: section?.trim() || undefined,
+            universityId,
             role: 'student',
         });
-        sendTokenResponse(user, 201, res, 'Registration successful! Welcome to SOEIT Portal.');
+        await sendTokenResponse(user, 201, res, 'Registration successful! Welcome to the Achievements Portal.');
     } catch (error) {
         console.error('[Register Error]', error.message, error.errors ?? '');
         next(error);
@@ -72,7 +98,7 @@ exports.login = async (req, res, next) => {
 
         user.lastLogin = new Date();
         await user.save({ validateBeforeSave: false });
-        sendTokenResponse(user, 200, res, 'Login successful');
+        await sendTokenResponse(user, 200, res, 'Login successful');
     } catch (error) {
         next(error);
     }
@@ -117,7 +143,7 @@ exports.changePassword = async (req, res, next) => {
 
         user.password = newPassword;
         await user.save();
-        sendTokenResponse(user, 200, res, 'Password changed successfully');
+        await sendTokenResponse(user, 200, res, 'Password changed successfully');
     } catch (error) {
         next(error);
     }
@@ -157,7 +183,7 @@ exports.resetPassword = async (req, res, next) => {
         user.resetPasswordExpire = undefined;
         await user.save();
 
-        sendTokenResponse(user, 200, res, 'Password reset successful');
+        await sendTokenResponse(user, 200, res, 'Password reset successful');
     } catch (error) {
         next(error);
     }
@@ -165,6 +191,34 @@ exports.resetPassword = async (req, res, next) => {
 
 // @desc    Logout
 // @route   POST /api/auth/logout
-exports.logout = (req, res) => {
+exports.logout = async (req, res) => {
+    if (req.user) {
+        await User.findByIdAndUpdate(req.user.id, { refreshToken: null });
+    }
+    res.cookie('refreshToken', 'none', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+    });
     res.status(200).json({ success: true, message: 'Logged out successfully' });
+};
+
+// @desc    Refresh Token
+// @route   POST /api/auth/refresh
+exports.refreshToken = async (req, res, next) => {
+    try {
+        const token = req.cookies.refreshToken;
+        if (!token) return res.status(401).json({ success: false, message: 'No refresh token' });
+
+        const decoded = jwt.verify(token, process.env.REFRESH_SECRET || 'refresh_secret_fallback');
+        const user = await User.findById(decoded.id).select('+refreshToken');
+
+        if (!user || user.refreshToken !== token) {
+            return res.status(401).json({ success: false, message: 'Invalid refresh token' });
+        }
+
+        const newToken = generateToken(user._id);
+        res.status(200).json({ success: true, token: newToken });
+    } catch (error) {
+        next(error);
+    }
 };

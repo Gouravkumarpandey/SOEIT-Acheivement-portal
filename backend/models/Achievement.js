@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const achievementSchema = new mongoose.Schema(
     {
         studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        universityId: { type: mongoose.Schema.Types.ObjectId, ref: 'University', required: true },
         title: { type: String, required: [true, 'Achievement title is required'], trim: true, maxlength: [200, 'Title cannot exceed 200 characters'] },
         category: {
             type: String,
@@ -19,7 +20,7 @@ const achievementSchema = new mongoose.Schema(
         remarks: { type: String, maxlength: [500, 'Remarks cannot exceed 500 characters'] },
         verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         verifiedAt: Date,
-        isPublic: { type: Boolean, default: true },
+        visibility: { type: String, enum: ['private', 'university', 'public'], default: 'university' },
         tags: [{ type: String }],
         points: { type: Number, default: 0 },
     },
@@ -27,7 +28,8 @@ const achievementSchema = new mongoose.Schema(
 );
 
 // Index for faster queries
-achievementSchema.index({ studentId: 1, status: 1 });
+achievementSchema.index({ universityId: 1, studentId: 1, status: 1 });
+achievementSchema.index({ universityId: 1, visibility: 1, status: 1 });
 achievementSchema.index({ category: 1, level: 1 });
 achievementSchema.index({ status: 1, createdAt: -1 });
 
