@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import PublicNavbar from '../../components/common/PublicNavbar';
 import Footer from '../../components/common/Footer';
 import {
-    Trophy, Shield, BarChart3, CheckCircle,
+    Trophy, Shield, BarChart3, CircleCheck,
     Users, Star, ArrowRight, ArrowLeft, Zap, Globe, Award, BookOpen, Clock, GraduationCap, FileCheck, Briefcase, ChevronDown,
-    Github, Linkedin, Code, Library, Terminal, HelpCircle, MessageSquare
+    Github, Linkedin, Code, Library, Terminal, CircleHelp, MessageSquare
 } from 'lucide-react';
 
 const stats = [
@@ -423,7 +423,7 @@ const LandingPage = () => {
                                 backdropFilter: 'blur(4px)',
                                 border: '1px solid rgba(255,255,255,0.1)'
                             }}>
-                                <HelpCircle size={16} /> Need Assistance?
+                                <CircleHelp size={16} /> Need Assistance?
                             </div>
                             <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'white', marginBottom: '1.25rem' }}>
                                 New to the <span style={{ color: 'var(--brand-100)' }}>SOEIT Portal?</span>

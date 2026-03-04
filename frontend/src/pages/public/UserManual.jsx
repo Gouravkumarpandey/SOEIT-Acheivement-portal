@@ -3,17 +3,24 @@ import PublicNavbar from '../../components/common/PublicNavbar';
 import Footer from '../../components/common/Footer';
 import {
     BookOpen, UserPlus, Upload, ShieldCheck,
-    Share2, ChevronRight, CheckCircle2, AlertCircle, Info,
-    ArrowLeft, ArrowRight, GraduationCap, Users, FileCheck, Layers, Award
+    Share2, ChevronRight, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, Info,
+    ArrowLeft, ArrowRight, GraduationCap, Users, FileCheck, Layers, Award,
+    FileDown, Layout, MessageSquare, Trophy, UserCheck, FileSearch, History,
+    ClipboardList, BarChart3, Zap
 } from 'lucide-react';
 import '../../styles/UserManual.css';
 
 const UserManual = () => {
-    const [studentFlipped, setStudentFlipped] = useState([false, false, false, false]);
-    const [facultyFlipped, setFacultyFlipped] = useState([false, false, false, false]);
+    const [studentFlipped, setStudentFlipped] = useState(new Array(6).fill(false));
+    const [facultyFlipped, setFacultyFlipped] = useState(new Array(6).fill(false));
 
     const toggleStudentPage = (index) => {
         const newFlipped = [...studentFlipped];
+        if (index === studentFlipped.length - 1 && studentFlipped[index]) {
+            setStudentFlipped(new Array(6).fill(false));
+            return;
+        }
+
         if (!newFlipped[index]) {
             for (let i = 0; i <= index; i++) newFlipped[i] = true;
         } else {
@@ -24,6 +31,11 @@ const UserManual = () => {
 
     const toggleFacultyPage = (index) => {
         const newFlipped = [...facultyFlipped];
+        if (index === facultyFlipped.length - 1 && facultyFlipped[index]) {
+            setFacultyFlipped(new Array(6).fill(false));
+            return;
+        }
+
         if (!newFlipped[index]) {
             for (let i = 0; i <= index; i++) newFlipped[i] = true;
         } else {
@@ -44,25 +56,25 @@ const UserManual = () => {
                         </div>
                         <h1 style={{ fontSize: '2.5rem', fontWeight: 950, letterSpacing: '-0.02em', color: 'var(--gray-900)' }}>Portal <span className="text-gradient">Knowledge Base</span></h1>
                         <p style={{ color: 'var(--gray-500)', fontSize: '1.1rem', maxWidth: '600px', margin: '1rem auto' }}>
-                            Flip through our dedicated guides to master the SOEIT Achievement Portal workflow and maximize your portfolio potential.
+                            Flip through our dedicated guides to master the SOEIT Achievement Portal workflow.
                         </p>
                     </div>
 
                     <div className="manual-viewport">
 
-                        {/* BOOK 1: STUDENT GUIDE */}
+                        {/* BOOK 1: STUDENT MANUAL */}
                         <div className="book-wrapper">
                             <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--brand-600)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <Users size={28} /> Student Portfolio Guide
+                                <Users size={28} /> Student Manual
                             </h2>
                             <div className="book-container">
-                                {/* Page 4: Final */}
-                                <div className={`book-page ${studentFlipped[3] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[3] ? 13 : 1 }} onClick={() => toggleStudentPage(3)}>
+                                {/* Page 6: Final/Back Cover */}
+                                <div className={`book-page ${studentFlipped[5] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[5] ? 20 : 1 }} onClick={() => toggleStudentPage(5)}>
                                     <div className="page-front">
                                         <div className="page-inner-border">
                                             <div className="content-header">
-                                                <Award size={24} color="var(--brand-600)" />
-                                                <h3>Public Portfolio</h3>
+                                                <Share2 size={24} color="var(--brand-600)" />
+                                                <h3>Public Profile</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
@@ -72,26 +84,86 @@ const UserManual = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <span className="book-page-number">PAGE 07</span>
+                                        <span className="book-page-number">PAGE 11</span>
                                     </div>
                                     <div className="page-back book-cover student">
-                                        <Award size={80} style={{ opacity: 0.3 }} />
-                                        <h2 style={{ color: 'white' }}>Build Your Legend</h2>
-                                        <p style={{ opacity: 0.7 }}>SOEIT Ecosystem</p>
+                                        <Award size={60} style={{ opacity: 0.3 }} />
+                                        <h2 style={{ color: 'white', marginTop: '1rem' }}>Build Your Legend</h2>
+                                        <p style={{ opacity: 0.7, fontSize: '0.8rem' }}>SOEIT Ecosystem</p>
                                     </div>
                                 </div>
 
-                                {/* Page 3: Verification */}
-                                <div className={`book-page ${studentFlipped[2] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[2] ? 12 : 2 }} onClick={() => toggleStudentPage(2)}>
+                                {/* Page 5: Tracking & Export */}
+                                <div className={`book-page ${studentFlipped[4] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[4] ? 19 : 2 }} onClick={() => toggleStudentPage(4)}>
                                     <div className="page-front">
                                         <div className="page-inner-border">
                                             <div className="content-header">
-                                                <ShieldCheck size={24} color="var(--brand-600)" />
-                                                <h3>Tracking Status</h3>
+                                                <Trophy size={24} color="var(--brand-600)" />
+                                                <h3>Rankings</h3>
+                                                <div className="decorative-line"></div>
+                                            </div>
+                                            <div className="page-content">
+                                                <p>View your progress across technical skills through the automated skills radar chart and grading system.</p>
+                                            </div>
+                                        </div>
+                                        <span className="book-page-number">PAGE 09</span>
+                                    </div>
+                                    <div className="page-back">
+                                        <div className="page-inner-border">
+                                            <div className="content-header">
+                                                <FileDown size={24} color="var(--brand-600)" />
+                                                <h3>Export Data</h3>
+                                                <div className="decorative-line"></div>
+                                            </div>
+                                            <div className="page-content">
+                                                <p>Export your entire verified history as a professional PDF dossier for campus placement drives.</p>
+                                            </div>
+                                        </div>
+                                        <span className="book-page-number">PAGE 10</span>
+                                    </div>
+                                </div>
+
+                                {/* Page 4: Progress */}
+                                <div className={`book-page ${studentFlipped[3] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[3] ? 18 : 3 }} onClick={() => toggleStudentPage(3)}>
+                                    <div className="page-front">
+                                        <div className="page-inner-border">
+                                            <div className="content-header">
+                                                <Info size={24} color="var(--brand-600)" />
+                                                <h3>Live Status</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
                                                 <p>Monitor your submission. If rejected, faculty will provide feedback. Edit and resubmit for verification.</p>
+                                            </div>
+                                        </div>
+                                        <span className="book-page-number">PAGE 07</span>
+                                    </div>
+                                    <div className="page-back">
+                                        <div className="page-inner-border">
+                                            <div className="content-header">
+                                                <ShieldCheck size={24} color="var(--brand-600)" />
+                                                <h3>Trust Score</h3>
+                                                <div className="decorative-line"></div>
+                                            </div>
+                                            <div className="page-content">
+                                                <p>Maintain a high accuracy rate in your submissions to build a top-tier institutional trust score.</p>
+                                            </div>
+                                        </div>
+                                        <span className="book-page-number">PAGE 08</span>
+                                    </div>
+                                </div>
+
+                                {/* Page 3: Verification */}
+                                <div className={`book-page ${studentFlipped[2] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[2] ? 17 : 4 }} onClick={() => toggleStudentPage(2)}>
+                                    <div className="page-front">
+                                        <div className="page-inner-border">
+                                            <div className="content-header">
+                                                <Upload size={24} color="var(--brand-600)" />
+                                                <h3>Submission</h3>
+                                                <div className="decorative-line"></div>
+                                            </div>
+                                            <div className="page-content">
+                                                <p>Upload certificates in PDF for results. Add descriptive links to live projects or codebases.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 05</span>
@@ -99,25 +171,25 @@ const UserManual = () => {
                                     <div className="page-back">
                                         <div className="page-inner-border">
                                             <div className="content-header">
-                                                <Layers size={24} color="var(--brand-600)" />
-                                                <h3>Category Levels</h3>
+                                                <FileCheck size={24} color="var(--brand-600)" />
+                                                <h3>Data Quality</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
-                                                <p>Gold, Silver, and Bronze badges are awarded based on the impact factor of your achievement.</p>
+                                                <p>Ensure all dates and titles match your certificates. High-quality data ensures faster faculty approval.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 06</span>
                                     </div>
                                 </div>
 
-                                {/* Page 2: Upload */}
-                                <div className={`book-page ${studentFlipped[1] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[1] ? 11 : 3 }} onClick={() => toggleStudentPage(1)}>
+                                {/* Page 2: Profile */}
+                                <div className={`book-page ${studentFlipped[1] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[1] ? 16 : 5 }} onClick={() => toggleStudentPage(1)}>
                                     <div className="page-front">
                                         <div className="page-inner-border">
                                             <div className="content-header">
                                                 <UserPlus size={24} color="var(--brand-600)" />
-                                                <h3>Join the Portal</h3>
+                                                <h3>Join System</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
@@ -129,12 +201,12 @@ const UserManual = () => {
                                     <div className="page-back">
                                         <div className="page-inner-border">
                                             <div className="content-header">
-                                                <Upload size={24} color="var(--brand-600)" />
-                                                <h3>Upload Merit</h3>
+                                                <UserCheck size={24} color="var(--brand-600)" />
+                                                <h3>Portfolio Kit</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
-                                                <p>Upload certificates in portrait PDF for best results. Add descriptive links to live projects or codebases.</p>
+                                                <p>Complete your profile details. Add your department, graduation year, and professional interests.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 04</span>
@@ -142,7 +214,7 @@ const UserManual = () => {
                                 </div>
 
                                 {/* Page 1 (Cover) */}
-                                <div className={`book-page ${studentFlipped[0] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[0] ? 10 : 4 }} onClick={() => toggleStudentPage(0)}>
+                                <div className={`book-page ${studentFlipped[0] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[0] ? 15 : 6 }} onClick={() => toggleStudentPage(0)}>
                                     <div className="page-front book-cover student">
                                         <div style={{ transform: 'translateY(-10px)' }}>
                                             <GraduationCap size={50} style={{ marginBottom: '1rem', color: 'rgba(255,255,255,0.9)' }} />
@@ -153,10 +225,10 @@ const UserManual = () => {
                                     </div>
                                     <div className="page-back">
                                         <div className="page-inner-border">
-                                            <div style={{ textAlign: 'center', marginTop: '30%' }}>
-                                                <BookOpen size={48} color="var(--brand-200)" />
-                                                <h3 style={{ marginTop: '1.5rem' }}>Foreword</h3>
-                                                <p style={{ marginTop: '1rem' }}>This guide contains essential steps for building your verified digital achievement record.</p>
+                                            <div style={{ textAlign: 'center', marginTop: '25%' }}>
+                                                <BookOpen size={40} color="var(--brand-200)" />
+                                                <h3 style={{ marginTop: '1.2rem' }}>Foreword</h3>
+                                                <p style={{ marginTop: '0.8rem' }}>This guide contains 12 essential steps for building your verified digital achievement record.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 02</span>
@@ -165,45 +237,105 @@ const UserManual = () => {
                             </div>
                         </div>
 
-                        {/* BOOK 2: FACULTY GUIDE */}
+                        {/* BOOK 2: FACULTY MANUAL */}
                         <div className="book-wrapper">
                             <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#064e3b', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <ShieldCheck size={28} /> Faculty  Guide
+                                <ShieldCheck size={28} /> Faculty Manual
                             </h2>
                             <div className="book-container">
-                                {/* Page 4: Final */}
-                                <div className={`book-page ${facultyFlipped[3] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[3] ? 13 : 1 }} onClick={() => toggleFacultyPage(3)}>
+                                {/* Page 6: Final/Back Cover */}
+                                <div className={`book-page ${facultyFlipped[5] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[5] ? 20 : 1 }} onClick={() => toggleFacultyPage(5)}>
                                     <div className="page-front">
                                         <div className="page-inner-border">
                                             <div className="content-header">
                                                 <CheckCircle2 size={24} color="#064e3b" />
-                                                <h3>System Sealed</h3>
+                                                <h3>Platform Sealed</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
                                                 <p>Approved achievement is permanently added to the student's blockchain-ready ledger.</p>
                                             </div>
                                         </div>
-                                        <span className="book-page-number">PAGE 07</span>
+                                        <span className="book-page-number">PAGE 11</span>
                                     </div>
                                     <div className="page-back book-cover faculty">
-                                        <ShieldCheck size={80} style={{ opacity: 0.3 }} />
-                                        <h2 style={{ color: 'white' }}>Trust & Accuracy</h2>
-                                        <p style={{ opacity: 0.7 }}>SOEIT Coordinator Board</p>
+                                        <ShieldCheck size={60} style={{ opacity: 0.3 }} />
+                                        <h2 style={{ color: 'white', marginTop: '1rem' }}>Trust & Accuracy</h2>
+                                        <p style={{ opacity: 0.7, fontSize: '0.8rem' }}>SOEIT Coordinator Board</p>
                                     </div>
                                 </div>
 
-                                {/* Page 3: Integrity */}
-                                <div className={`book-page ${facultyFlipped[2] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[2] ? 12 : 2 }} onClick={() => toggleFacultyPage(2)}>
+                                {/* Page 5: Reporting & History */}
+                                <div className={`book-page ${facultyFlipped[4] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[4] ? 19 : 2 }} onClick={() => toggleFacultyPage(4)}>
+                                    <div className="page-front">
+                                        <div className="page-inner-border">
+                                            <div className="content-header">
+                                                <ClipboardList size={24} color="#064e3b" />
+                                                <h3>Dept. Reports</h3>
+                                                <div className="decorative-line"></div>
+                                            </div>
+                                            <div className="page-content">
+                                                <p>Generate monthly summaries for your department. Export data for NAAC or NIRF filings.</p>
+                                            </div>
+                                        </div>
+                                        <span className="book-page-number">PAGE 09</span>
+                                    </div>
+                                    <div className="page-back">
+                                        <div className="page-inner-border">
+                                            <div className="content-header">
+                                                <History size={24} color="#064e3b" />
+                                                <h3>History</h3>
+                                                <div className="decorative-line"></div>
+                                            </div>
+                                            <div className="page-content">
+                                                <p>Review the end-to-end audit trail before the system locks the record for institutional reporting.</p>
+                                            </div>
+                                        </div>
+                                        <span className="book-page-number">PAGE 10</span>
+                                    </div>
+                                </div>
+
+                                {/* Page 4: Security */}
+                                <div className={`book-page ${facultyFlipped[3] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[3] ? 18 : 3 }} onClick={() => toggleFacultyPage(3)}>
                                     <div className="page-front">
                                         <div className="page-inner-border">
                                             <div className="content-header">
                                                 <AlertCircle size={24} color="#064e3b" />
-                                                <h3>Integrity Check</h3>
+                                                <h3>Integrity</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
                                                 <p>Verify certificate serial numbers with the issuing body if authenticity is in question.</p>
+                                            </div>
+                                        </div>
+                                        <span className="book-page-number">PAGE 07</span>
+                                    </div>
+                                    <div className="page-back">
+                                        <div className="page-inner-border">
+                                            <div className="content-header">
+                                                <FileCheck size={24} color="#064e3b" />
+                                                <h3>Immutability</h3>
+                                                <div className="decorative-line"></div>
+                                            </div>
+                                            <div className="page-content">
+                                                <p>Verified records cannot be deleted, ensuring a permanent institutional source of truth.</p>
+                                            </div>
+                                        </div>
+                                        <span className="book-page-number">PAGE 08</span>
+                                    </div>
+                                </div>
+
+                                {/* Page 3: Queue */}
+                                <div className={`book-page ${facultyFlipped[2] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[2] ? 17 : 4 }} onClick={() => toggleFacultyPage(2)}>
+                                    <div className="page-front">
+                                        <div className="page-inner-border">
+                                            <div className="content-header">
+                                                <Layers size={24} color="#064e3b" />
+                                                <h3>Smart Queue</h3>
+                                                <div className="decorative-line"></div>
+                                            </div>
+                                            <div className="page-content">
+                                                <p>Filter by branch, year, or category to streamline the verification process flow.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 05</span>
@@ -211,29 +343,29 @@ const UserManual = () => {
                                     <div className="page-back">
                                         <div className="page-inner-border">
                                             <div className="content-header">
-                                                <FileCheck size={24} color="#064e3b" />
-                                                <h3>Record Locking</h3>
+                                                <BookOpen size={24} color="#064e3b" />
+                                                <h3>Evidence Lab</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
-                                                <p>Verified records cannot be deleted by students, ensuring the ultimate source of truth.</p>
+                                                <p>Examine the PDF proof. Cross-check with university participation records if necessary.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 06</span>
                                     </div>
                                 </div>
 
-                                {/* Page 2: Queue */}
-                                <div className={`book-page ${facultyFlipped[1] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[1] ? 11 : 3 }} onClick={() => toggleFacultyPage(1)}>
+                                {/* Page 2: Dashboard */}
+                                <div className={`book-page ${facultyFlipped[1] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[1] ? 16 : 5 }} onClick={() => toggleFacultyPage(1)}>
                                     <div className="page-front">
                                         <div className="page-inner-border">
                                             <div className="content-header">
-                                                <Layers size={24} color="#064e3b" />
-                                                <h3>Dashboard View</h3>
+                                                <Info size={24} color="#064e3b" />
+                                                <h3>Admin Portal</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
-                                                <p>Filter by branch, year, or achievement category to streamline the verification process.</p>
+                                                <p>Access the faculty dashboard to view pending requests from your assigned departments.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 03</span>
@@ -241,12 +373,12 @@ const UserManual = () => {
                                     <div className="page-back">
                                         <div className="page-inner-border">
                                             <div className="content-header">
-                                                <BookOpen size={24} color="#064e3b" />
-                                                <h3>Validation</h3>
+                                                <FileCheck size={24} color="#064e3b" />
+                                                <h3>Actions</h3>
                                                 <div className="decorative-line"></div>
                                             </div>
                                             <div className="page-content">
-                                                <p>Examine the PDF proof. Cross-check with university event participation records if necessary.</p>
+                                                <p>Use Approve/Reject actions. Always provide clear feedback for any rejected submissions.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 04</span>
@@ -254,7 +386,7 @@ const UserManual = () => {
                                 </div>
 
                                 {/* Page 1 (Cover) */}
-                                <div className={`book-page ${facultyFlipped[0] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[0] ? 10 : 4 }} onClick={() => toggleFacultyPage(0)}>
+                                <div className={`book-page ${facultyFlipped[0] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[0] ? 15 : 6 }} onClick={() => toggleFacultyPage(0)}>
                                     <div className="page-front book-cover faculty">
                                         <div style={{ transform: 'translateY(-10px)' }}>
                                             <ShieldCheck size={50} style={{ marginBottom: '1rem', color: 'rgba(255,255,255,0.9)' }} />
@@ -265,10 +397,10 @@ const UserManual = () => {
                                     </div>
                                     <div className="page-back">
                                         <div className="page-inner-border">
-                                            <div style={{ textAlign: 'center', marginTop: '30%' }}>
-                                                <Info size={48} color="#dcfce7" />
-                                                <h3 style={{ marginTop: '1.5rem' }}>Overview</h3>
-                                                <p style={{ marginTop: '1rem' }}>Protocol for faculty members to ensure the validity and quality of institutional records.</p>
+                                            <div style={{ textAlign: 'center', marginTop: '25%' }}>
+                                                <Info size={40} color="#dcfce7" />
+                                                <h3 style={{ marginTop: '1.2rem' }}>Core Mission</h3>
+                                                <p style={{ marginTop: '0.8rem' }}>12-step protocol for faculty to ensure validity and quality of university records.</p>
                                             </div>
                                         </div>
                                         <span className="book-page-number">PAGE 02</span>
