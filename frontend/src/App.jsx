@@ -15,6 +15,7 @@ import PublicPortfolioPage from './pages/public/PublicPortfolioPage';
 import PrivacyPolicy from './pages/public/PrivacyPolicy';
 import TermsOfService from './pages/public/TermsOfService';
 import Support from './pages/public/Support';
+import UserManual from './pages/public/UserManual';
 
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
@@ -79,6 +80,7 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/manual" element={<UserManual />} />
 
           {/* Auth Routes (redirect if logged in) */}
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />

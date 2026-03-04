@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import PublicNavbar from '../../components/common/PublicNavbar';
 import Footer from '../../components/common/Footer';
 import { HelpCircle, Mail, MessageSquare, BookOpen, ExternalLink, ArrowRight } from 'lucide-react';
@@ -68,9 +69,9 @@ const Support = () => {
                             <p style={{ color: 'var(--gray-500)', marginBottom: '2rem', flexGrow: 1 }}>
                                 Learn how to maximize your portfolio with our comprehensive portal documentation and FAQs.
                             </p>
-                            <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', borderColor: '#ea580c', color: '#ea580c' }}>
+                            <Link to="/manual" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', borderColor: '#ea580c', color: '#ea580c' }}>
                                 Read Manual <ExternalLink size={16} />
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
