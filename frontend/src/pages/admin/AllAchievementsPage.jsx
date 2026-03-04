@@ -60,8 +60,8 @@ const AllAchievementsPage = () => {
             {/* Admin Filter Center */}
             <div className="card" style={{ marginBottom: '2.5rem' }}>
                 <div className="card-body" style={{ padding: '1.5rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr auto auto', gap: '0.875rem', alignItems: 'center' }}>
-                        <div className="search-wrapper">
+                    <div className="filter-grid-container" style={{ display: 'flex', gap: '0.875rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <div className="search-wrapper filter-search">
                             <input
                                 className="form-control"
                                 placeholder="Search records or student names..."
@@ -72,27 +72,27 @@ const AllAchievementsPage = () => {
                             <Search size={18} className="search-icon" />
                         </div>
 
-                        <select className="form-control" value={filters.status} onChange={e => setFilters(p => ({ ...p, status: e.target.value, page: 1 }))}>
+                        <select className="form-control filter-select" value={filters.status} onChange={e => setFilters(p => ({ ...p, status: e.target.value, page: 1 }))}>
                             <option value="">Status: All</option>
                             {STATUSES.slice(1).map(s => <option key={s} value={s} style={{ textTransform: 'capitalize' }}>{s}</option>)}
                         </select>
 
-                        <select className="form-control" value={filters.department} onChange={e => setFilters(p => ({ ...p, department: e.target.value, page: 1 }))}>
+                        <select className="form-control filter-select" value={filters.department} onChange={e => setFilters(p => ({ ...p, department: e.target.value, page: 1 }))}>
                             <option value="">Dept: All</option>
                             {DEPARTMENTS.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
                         </select>
 
-                        <select className="form-control" value={filters.category} onChange={e => setFilters(p => ({ ...p, category: e.target.value, page: 1 }))}>
+                        <select className="form-control filter-select" value={filters.category} onChange={e => setFilters(p => ({ ...p, category: e.target.value, page: 1 }))}>
                             <option value="">Category: All</option>
                             {CATEGORIES.slice(1).map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
 
-                        <button className="btn btn-primary" style={{ padding: '0 1.5rem', height: '42px' }} onClick={load}>
+                        <button className="btn btn-primary filter-btn" style={{ padding: '0 1.5rem', height: '42px' }} onClick={load}>
                             <Filter size={16} />
                             <span>Filter</span>
                         </button>
 
-                        <button className="btn btn-ghost" style={{ height: '42px' }} onClick={() => setFilters({ status: '', category: '', department: '', search: '', page: 1 })}>
+                        <button className="btn btn-ghost filter-reset-btn" style={{ height: '42px' }} onClick={() => setFilters({ status: '', category: '', department: '', search: '', page: 1 })}>
                             Clear All
                         </button>
                     </div>
