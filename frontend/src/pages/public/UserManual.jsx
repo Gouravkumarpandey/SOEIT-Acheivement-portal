@@ -146,7 +146,7 @@ const UserManual = () => {
                                     <div className="page-front book-cover student">
                                         <div style={{ transform: 'translateY(-10px)' }}>
                                             <GraduationCap size={50} style={{ marginBottom: '1rem', color: 'rgba(255,255,255,0.9)' }} />
-                                            <h1>STUDENT <br />DOSSIER</h1>
+                                            <h1>STUDENT <br />MANUAL</h1>
                                             <div style={{ height: '3px', width: '30px', background: 'white', margin: '1rem auto', opacity: 0.5 }}></div>
                                             <p style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.15em', opacity: 0.8 }}>ACADEMIC SYSTEM</p>
                                         </div>
@@ -168,7 +168,7 @@ const UserManual = () => {
                         {/* BOOK 2: FACULTY GUIDE */}
                         <div className="book-wrapper">
                             <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#064e3b', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <ShieldCheck size={28} /> Faculty Governance Guide
+                                <ShieldCheck size={28} /> Faculty  Guide
                             </h2>
                             <div className="book-container">
                                 {/* Page 4: Final */}
@@ -258,7 +258,7 @@ const UserManual = () => {
                                     <div className="page-front book-cover faculty">
                                         <div style={{ transform: 'translateY(-10px)' }}>
                                             <ShieldCheck size={50} style={{ marginBottom: '1rem', color: 'rgba(255,255,255,0.9)' }} />
-                                            <h1>GOVERNANCE <br />MANUAL</h1>
+                                            <h1>FACULTY <br />MANUAL</h1>
                                             <div style={{ height: '3px', width: '30px', background: 'white', margin: '1rem auto', opacity: 0.5 }}></div>
                                             <p style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.15em', opacity: 0.8 }}>COORDINATOR PANEL</p>
                                         </div>
