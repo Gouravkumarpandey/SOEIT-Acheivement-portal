@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const UniversityHeader = () => (
     <div className="auth-header">
         <div className="auth-logo">JGi</div>
-        <div className="auth-divider hidden md:block" />
+        <div className="auth-divider" />
         <div className="auth-title-column">
             <div className="auth-university-name">
                 <span className="auth-name-primary">ARKA JAIN</span><br />
@@ -110,7 +110,7 @@ const RegisterPage = () => {
 
                 <div className="register-card">
                     <form onSubmit={handleSubmit}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
+                        <div className="form-row">
                             <Field name="name" label="Full Name" placeholder="Full name" required form={form} setForm={setForm} errors={errors} />
                             <Field name="enrollmentNo" label="Enrollment No." placeholder="AJU/221403" form={form} setForm={setForm} errors={errors} />
                         </div>
@@ -130,9 +130,9 @@ const RegisterPage = () => {
                             {errors.department && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.department}</div>}
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
+                        <div className="form-row">
                             <Field name="batch" label="Batch Year" placeholder="e.g. 2022-26" form={form} setForm={setForm} errors={errors} />
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 0.75rem' }}>
+                            <div className="form-row-sm">
                                 <Field name="semester" label="Semester" placeholder="1-8" form={form} setForm={setForm} errors={errors} />
                                 <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                                     <label className="form-label">Section</label>
@@ -148,7 +148,7 @@ const RegisterPage = () => {
                             </div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.25rem' }}>
+                        <div className="form-row">
                             <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                                 <label className="form-label">Password *</label>
                                 <div style={{ position: 'relative' }}>

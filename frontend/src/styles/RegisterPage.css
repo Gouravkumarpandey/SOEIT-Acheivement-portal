@@ -116,6 +116,18 @@
     text-decoration: underline;
 }
 
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 1.25rem;
+}
+
+.form-row-sm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 0.75rem;
+}
+
 @media (max-width: 640px) {
     .register-card {
         padding: 1.5rem;
@@ -123,5 +135,26 @@
 
     .register-heading {
         font-size: 1.5rem;
+    }
+
+    .form-row,
+    .form-row-sm {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .auth-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-title-column {
+        text-align: center;
+    }
+
+    .auth-divider {
+        display: none;
     }
 }

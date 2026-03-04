@@ -794,6 +794,11 @@
 }
 
 @media (max-width: 768px) {
+    .hero-section {
+        padding-top: 80px;
+        padding-bottom: 20px;
+    }
+
     .py-24 {
         padding-top: 4rem;
         padding-bottom: 4rem;

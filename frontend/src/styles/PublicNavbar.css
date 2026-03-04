@@ -130,4 +130,8 @@
     .nav-link-group {
         display: none;
     }
+
+    .nav-cta-group a.btn {
+        display: none;
+    }
 }

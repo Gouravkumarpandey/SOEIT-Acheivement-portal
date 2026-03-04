@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const UniversityHeader = () => (
     <div className="auth-header">
         <div className="auth-logo">JGi</div>
-        <div className="auth-divider hidden md:block" />
+        <div className="auth-divider" />
         <div className="auth-title-column">
             <div className="auth-university-name">
                 <span className="auth-name-primary">ARKA JAIN</span><br />
