@@ -113,16 +113,44 @@ const EventsPage = () => {
 
             {/* Categorization Controls */}
             <div className="card" style={{ padding: '1.25rem', marginBottom: '2rem', display: 'flex', gap: '0.75rem', overflowX: 'auto', border: '1px solid var(--border-primary)' }}>
-                {CATEGORIES.map(cat => (
-                    <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`btn btn-sm ${selectedCategory === cat ? 'btn-primary' : 'btn-ghost'}`}
-                        style={{ padding: '0.6rem 1.5rem', fontSize: '0.85rem', fontWeight: 700, whiteSpace: 'nowrap' }}
+                {/* Desktop Version: Button Group */}
+                <div className="category-btn-group desktop-only" style={{ display: 'flex', gap: '0.75rem' }}>
+                    {CATEGORIES.map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={`btn btn-sm ${selectedCategory === cat ? 'btn-primary' : 'btn-ghost'}`}
+                            style={{ padding: '0.6rem 1.5rem', fontSize: '0.85rem', fontWeight: 700, whiteSpace: 'nowrap' }}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Mobile Version: Dropdown */}
+                <div className="category-select-mobile mobile-only" style={{ width: '100%' }}>
+                    <select
+                        className="form-control"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        style={{
+                            fontWeight: 700,
+                            borderRadius: '12px',
+                            border: '2px solid var(--border-primary)',
+                            padding: '0.8rem',
+                            width: '100%',
+                            appearance: 'none',
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right 1rem center',
+                            backgroundSize: '1.2em'
+                        }}
                     >
-                        {cat}
-                    </button>
-                ))}
+                        {CATEGORIES.map(cat => (
+                            <option key={cat} value={cat}>{cat} Events</option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             {loading ? (

@@ -112,15 +112,46 @@ const PublicPortfolioPage = () => {
             <div className="container" style={{ padding: '3rem 1.5rem' }}>
                 {/* Category Filter */}
                 {categories.length > 1 && (
-                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-                        <button onClick={() => setSelectedCat('')} style={{ padding: '0.4rem 1rem', borderRadius: 'var(--radius-full)', border: `1px solid ${!selectedCat ? 'var(--primary-500)' : 'var(--border-primary)'}`, background: !selectedCat ? 'rgba(59,130,246,0.15)' : 'transparent', color: !selectedCat ? 'var(--primary-400)' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.2s' }}>
-                            All ({achievements.length})
-                        </button>
-                        {categories.map(cat => (
-                            <button key={cat} onClick={() => setSelectedCat(cat)} style={{ padding: '0.4rem 1rem', borderRadius: 'var(--radius-full)', border: `1px solid ${selectedCat === cat ? 'var(--primary-500)' : 'var(--border-primary)'}`, background: selectedCat === cat ? 'rgba(59,130,246,0.15)' : 'transparent', color: selectedCat === cat ? 'var(--primary-400)' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.2s' }}>
-                                {CATEGORY_ICONS[cat] || '⭐'} {cat}
+                    <div style={{ marginBottom: '2rem' }}>
+                        {/* Desktop Version: Filter Buttons */}
+                        <div className="category-filter-desktop desktop-only" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                            <button onClick={() => setSelectedCat('')} style={{ padding: '0.4rem 1rem', borderRadius: 'var(--radius-full)', border: `1px solid ${!selectedCat ? 'var(--primary-500)' : 'var(--border-primary)'}`, background: !selectedCat ? 'rgba(59,130,246,0.15)' : 'transparent', color: !selectedCat ? 'var(--primary-400)' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.2s' }}>
+                                All ({achievements.length})
                             </button>
-                        ))}
+                            {categories.map(cat => (
+                                <button key={cat} onClick={() => setSelectedCat(cat)} style={{ padding: '0.4rem 1rem', borderRadius: 'var(--radius-full)', border: `1px solid ${selectedCat === cat ? 'var(--primary-500)' : 'var(--border-primary)'}`, background: selectedCat === cat ? 'rgba(59,130,246,0.15)' : 'transparent', color: selectedCat === cat ? 'var(--primary-400)' : 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.2s' }}>
+                                    {CATEGORY_ICONS[cat] || '⭐'} {cat}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Mobile Version: Dropdown */}
+                        <div className="category-filter-mobile mobile-only" style={{ width: '100%' }}>
+                            <select
+                                className="form-control"
+                                value={selectedCat}
+                                onChange={(e) => setSelectedCat(e.target.value)}
+                                style={{
+                                    fontWeight: 700,
+                                    borderRadius: '12px',
+                                    border: '2px solid var(--border-primary)',
+                                    padding: '0.8rem',
+                                    width: '100%',
+                                    background: 'var(--bg-secondary)',
+                                    color: 'var(--text-primary)',
+                                    appearance: 'none',
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 1rem center',
+                                    backgroundSize: '1.2em'
+                                }}
+                            >
+                                <option value="">All Categories ({achievements.length})</option>
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>{CATEGORY_ICONS[cat] || '⭐'} {cat}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 )}
 

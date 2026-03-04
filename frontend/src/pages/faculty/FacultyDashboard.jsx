@@ -332,8 +332,8 @@ const FacultyDashboard = () => {
                                     <input type="checkbox" checked={students.length > 0 && selectedIds.length === students.length} onChange={toggleSelectAll} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
                                 </th>
                                 <th>Scholar Profile</th>
-                                <th>Academic Compliance</th>
-                                <th className="text-center">Verification Matrix</th>
+                                <th className="desktop-only text-center">Academic Compliance</th>
+                                <th className="desktop-only text-center">Verification Matrix</th>
                                 <th className="text-center">Cumulative Pts</th>
                                 <th className="text-right">Operations</th>
                             </tr>

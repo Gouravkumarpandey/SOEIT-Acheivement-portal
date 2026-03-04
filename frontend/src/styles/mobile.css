@@ -364,6 +364,39 @@ body {
         align-items: stretch !important;
         gap: 1rem !important;
     }
+
+    /* Faculty Dashboard Card Header Fix */
+    .card-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 1.25rem !important;
+        padding: 1.5rem 1.25rem !important;
+    }
+
+    .search-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .search-wrapper .form-control {
+        width: 100% !important;
+        padding-right: 2.5rem !important;
+    }
+
+    /* Hide non-critical table columns on mobile */
+    .table th:nth-child(3),
+    .table td:nth-child(3),
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        display: none !important;
+    }
+
+    /* Event Hub & Portfolio Filter Reset */
+    .card[style*="overflow-x: auto"],
+    .card[style*="overflowX: auto"] {
+        overflow-x: visible !important;
+    }
 }
 
 /* --- DASHBOARD PAGE HEADERS --- */
