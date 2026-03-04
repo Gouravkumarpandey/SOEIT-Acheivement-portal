@@ -206,7 +206,8 @@ const FacultyDashboard = () => {
                     </div>
 
                     <div className="semester-select-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div className="semester-btn-group" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        {/* Desktop Version: Button Group */}
+                        <div className="semester-btn-group desktop-only" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                             <button
                                 onClick={() => { setSemester('all'); setSection('all'); }}
                                 className={`btn ${semester === 'all' ? 'btn-primary' : 'btn-ghost'}`}
@@ -225,6 +226,32 @@ const FacultyDashboard = () => {
                                 </button>
                             ))}
                         </div>
+
+                        {/* Mobile Version: Dropdown */}
+                        <div className="semester-select-mobile mobile-only" style={{ width: '100%' }}>
+                            <select
+                                className="form-control"
+                                value={semester}
+                                onChange={(e) => { setSemester(e.target.value); setSection('all'); }}
+                                style={{
+                                    fontWeight: 700,
+                                    borderRadius: '12px',
+                                    border: '2px solid var(--border-primary)',
+                                    padding: '0.8rem',
+                                    width: '100%',
+                                    appearance: 'none',
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 1rem center',
+                                    backgroundSize: '1.2em'
+                                }}
+                            >
+                                <option value="all">Complete Registry</option>
+                                {semesters.map(sem => (
+                                    <option key={sem.id} value={sem.id}>{sem.label}</option>
+                                ))}
+                            </select>
+                        </div>
                         {selectedIds.length > 0 && (
                             <button className="btn btn-danger animate-fade-in" onClick={handleDeleteSelected} disabled={deleting} style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <XCircle size={16} />
@@ -234,14 +261,46 @@ const FacultyDashboard = () => {
                     </div>
 
                     {semester !== 'all' && (
-                        <div className="animate-fade-in" style={{ padding: '1rem', background: 'var(--primary-50)', borderRadius: '12px', border: '1px solid var(--primary-100)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <Filter size={16} className="text-brand" />
-                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-700)' }}>Section Resolution:</span>
-                            <div className="section-btn-group" style={{ display: 'flex', gap: '0.5rem' }}>
+                        <div className="animate-fade-in" style={{ padding: '1rem', background: 'var(--primary-50)', borderRadius: '12px', border: '1px solid var(--primary-100)', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Filter size={16} className="text-brand" />
+                                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-700)' }}>Section Resolution:</span>
+                            </div>
+
+                            {/* Desktop Version: Button Group */}
+                            <div className="section-btn-group desktop-only" style={{ display: 'flex', gap: '0.5rem' }}>
                                 <button onClick={() => setSection('all')} className={`btn btn-sm ${section === 'all' ? 'btn-primary' : 'btn-ghost'}`} style={{ fontSize: '0.75rem' }}>All Sections</button>
                                 {(semester === '1' || semester === '2' ? ['A', 'B', 'C', 'D', 'E', 'F', 'G'] : ['A', 'B', 'C', 'D', 'E', 'F']).map(s => (
                                     <button key={s} onClick={() => setSection(s)} className={`btn btn-sm ${section === s ? 'btn-primary' : 'btn-ghost'}`} style={{ fontSize: '0.75rem' }}>Section {s}</button>
                                 ))}
+                            </div>
+
+                            {/* Mobile Version: Dropdown */}
+                            <div className="section-select-mobile mobile-only" style={{ width: '100%', marginTop: '0.5rem' }}>
+                                <select
+                                    className="form-control"
+                                    value={section}
+                                    onChange={(e) => setSection(e.target.value)}
+                                    style={{
+                                        fontWeight: 700,
+                                        borderRadius: '10px',
+                                        border: '1px solid var(--primary-200)',
+                                        padding: '0.6rem',
+                                        width: '100%',
+                                        fontSize: '0.85rem',
+                                        background: 'white',
+                                        appearance: 'none',
+                                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                                        backgroundRepeat: 'no-repeat',
+                                        backgroundPosition: 'right 0.75rem center',
+                                        backgroundSize: '1.2em'
+                                    }}
+                                >
+                                    <option value="all">All Sections</option>
+                                    {(semester === '1' || semester === '2' ? ['A', 'B', 'C', 'D', 'E', 'F', 'G'] : ['A', 'B', 'C', 'D', 'E', 'F']).map(s => (
+                                        <option key={s} value={s}>Section {s}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                     )}

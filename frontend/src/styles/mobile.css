@@ -20,14 +20,22 @@ body {
     position: relative !important;
 }
 
-/* --- MOBILE ONLY VISIBILITY --- */
+/* --- VISIBILITY CONTROL --- */
 .mobile-only {
     display: none !important;
+}
+
+.desktop-only {
+    display: flex !important;
 }
 
 @media (max-width: 1024px) {
     .mobile-only {
         display: flex !important;
+    }
+
+    .desktop-only {
+        display: none !important;
     }
 }
 
@@ -330,7 +338,11 @@ body {
         -webkit-overflow-scrolling: touch !important;
         width: 100% !important;
         flex-wrap: nowrap !important;
-        mask-image: linear-gradient(to right, black 90%, transparent 100%) !important;
+    }
+
+    .semester-btn-group.desktop-only,
+    .section-btn-group.desktop-only {
+        display: none !important;
     }
 
     .semester-btn-group::-webkit-scrollbar,
