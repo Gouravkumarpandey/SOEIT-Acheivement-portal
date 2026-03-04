@@ -3,6 +3,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute, PublicRoute } from './routes/ProtectedRoute';
 import DashboardLayout from './components/common/DashboardLayout';
+import ScrollToTop from './components/common/ScrollToTop';
+import ScrollToTopButton from './components/common/ScrollToTopButton';
 
 // Public Pages
 import LandingPage from './pages/public/LandingPage';
@@ -47,6 +49,8 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ScrollToTop />
+        <ScrollToTopButton />
         <Toaster
           position="top-right"
           toastOptions={{
