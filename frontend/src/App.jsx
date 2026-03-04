@@ -10,6 +10,9 @@ import AboutPage from './pages/public/AboutPage';
 import HowItWorksPage from './pages/public/HowItWorksPage';
 import ContactPage from './pages/public/ContactPage';
 import PublicPortfolioPage from './pages/public/PublicPortfolioPage';
+import PrivacyPolicy from './pages/public/PrivacyPolicy';
+import TermsOfService from './pages/public/TermsOfService';
+import Support from './pages/public/Support';
 
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
@@ -69,6 +72,9 @@ function App() {
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/portfolio/:userId" element={<PublicPortfolioPage />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/support" element={<Support />} />
 
           {/* Auth Routes (redirect if logged in) */}
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />

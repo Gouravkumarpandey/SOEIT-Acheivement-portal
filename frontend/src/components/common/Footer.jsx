@@ -103,9 +103,9 @@ const Footer = () => {
                 <div className="footer-bottom">
                     <p>© {currentYear} SOEIT Achievements Portal. All rights reserved.</p>
                     <div className="footer-bottom-links">
-                        <a href="#" className="hover:text-brand-600 transition">Privacy Policy</a>
-                        <a href="#" className="hover:text-brand-600 transition">Terms of Service</a>
-                        <a href="#" className="hover:text-brand-600 transition">Support</a>
+                        <Link to="/privacy" className="hover:text-brand-600 transition">Privacy Policy</Link>
+                        <Link to="/terms" className="hover:text-brand-600 transition">Terms of Service</Link>
+                        <Link to="/support" className="hover:text-brand-600 transition">Support</Link>
                     </div>
                 </div>
             </div>
