@@ -1,0 +1,73 @@
+/* ===== FACULTY MANAGEMENT PAGE ===== */
+
+.faculty-header-suite {
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.faculty-header-actions {
+    display: flex;
+    gap: 0.875rem;
+}
+
+.faculty-filter-box {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-primary);
+}
+
+.faculty-filter-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.faculty-search-wrapper {
+    flex: 1;
+}
+
+.faculty-execute-btn {
+    height: 48px;
+    padding: 0 2rem;
+    font-weight: 800;
+}
+
+.faculty-action-btn {
+    height: 48px !important;
+    padding: 0 1.5rem !important;
+    font-weight: 800 !important;
+}
+
+@media (max-width: 768px) {
+    .faculty-header-suite {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+    }
+
+    .faculty-header-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .faculty-header-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .faculty-filter-box {
+        padding: 1.25rem;
+    }
+
+    .faculty-filter-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .faculty-search-wrapper,
+    .faculty-execute-btn {
+        width: 100%;
+    }
+}

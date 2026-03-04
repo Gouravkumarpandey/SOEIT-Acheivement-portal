@@ -1,3 +1,4 @@
+import '../../styles/FacultyManagementPage.css';
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import { Users, Search, Mail, Shield, UserCheck, UserX, Download } from 'lucide-react';
@@ -82,17 +83,17 @@ const FacultyManagementPage = () => {
     return (
         <div className="animate-fade-in">
             {/* Header Suite */}
-            <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div className="page-header faculty-header-suite">
                 <div>
                     <h2 className="heading-display">Faculty Administration</h2>
                     <p className="page-subtitle">Governance of institutional access, departmental roles, and authentication status for faculty associates.</p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.875rem' }}>
-                    <button className="btn btn-ghost" onClick={() => exportFacultyData('excel')} style={{ border: '1px solid var(--border-primary)', fontWeight: 800 }}>
+                <div className="faculty-header-actions">
+                    <button className="btn btn-ghost faculty-action-btn" onClick={() => exportFacultyData('excel')} style={{ border: '1px solid var(--border-primary)' }}>
                         <Download size={18} />
                         <span>Excel Archive</span>
                     </button>
-                    <button className="btn btn-primary" onClick={() => exportFacultyData('pdf')} style={{ fontWeight: 800, padding: '0 1.5rem' }}>
+                    <button className="btn btn-primary faculty-action-btn" onClick={() => exportFacultyData('pdf')}>
                         <Users size={18} />
                         <span>Generate Master Roster</span>
                     </button>
@@ -100,13 +101,13 @@ const FacultyManagementPage = () => {
             </div>
 
             {/* Advanced Filtering Intelligence */}
-            <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem', border: '1px solid var(--border-primary)' }}>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div className="search-wrapper" style={{ flex: 1 }}>
+            <div className="card faculty-filter-box">
+                <div className="faculty-filter-controls">
+                    <div className="search-wrapper faculty-search-wrapper">
                         <input className="form-control" placeholder="Search faculty nomenclature, institutional emails, or professional identifiers..." value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && loadFaculty()} />
                         <Search size={20} className="search-icon" />
                     </div>
-                    <button className="btn btn-primary" style={{ height: '48px', padding: '0 2rem', fontWeight: 800 }} onClick={loadFaculty}>
+                    <button className="btn btn-primary faculty-execute-btn" onClick={loadFaculty}>
                         Execute Query
                     </button>
                 </div>
