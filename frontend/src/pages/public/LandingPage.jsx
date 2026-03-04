@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import '../../styles/LandingPage.css';
 import { Link } from 'react-router-dom';
 import PublicNavbar from '../../components/common/PublicNavbar';
 import Footer from '../../components/common/Footer';
 import {
     Trophy, Shield, BarChart3, CheckCircle,
-    Users, Star, ArrowRight, Zap, Globe, Award, BookOpen, Clock, GraduationCap, FileCheck, Briefcase
+    Users, Star, ArrowRight, Zap, Globe, Award, BookOpen, Clock, GraduationCap, FileCheck, Briefcase, ChevronDown,
+    Github, Linkedin, Code, Library, Terminal
 } from 'lucide-react';
 
 const stats = [
@@ -34,7 +36,50 @@ const categoriesData = [
     { name: 'Team Leadership', icon: Users }
 ];
 
+const workflowSteps = [
+    {
+        title: 'Submit Achievement',
+        desc: 'Students upload their technical milestones, project documentation, and valid certificates through their dedicated portal.',
+        icon: GraduationCap
+    },
+    {
+        title: 'Faculty Verification',
+        desc: 'Appointed faculty coordinators review the submissions against institutional standards to ensure authenticity.',
+        icon: FileCheck
+    },
+    {
+        title: 'Global Recognition',
+        desc: 'Verified achievements are instantly added to the public dossier, ready for placement drives and recruiter reviews.',
+        icon: Award
+    }
+];
+
+const faqs = [
+    {
+        question: 'Who can access the SOEIT Achievement Portal?',
+        answer: 'Currently, the portal is restricted to active students and faculty members of the School of Engineering & IT. Each user is provided with unique credentials by the department.'
+    },
+    {
+        question: 'How does the verification process work?',
+        answer: 'Once a student submits a record, it enters the faculty dashboard. A designated subject matter expert reviews the attached documents and either approves or requests refinements.'
+    },
+    {
+        question: 'Are the digital certificates official?',
+        answer: 'Yes, every achievement verified on this platform carries the institutional weight of SOEIT and can be included in official university dossiers for NAAC/NIRF audits.'
+    },
+    {
+        question: 'Can I link my external profiles?',
+        answer: 'Students can link their GitHub, LinkedIn, and Portfolio sites to their profile, creating a centralized hub for their professional engineering identity.'
+    }
+];
+
 const LandingPage = () => {
+    const [activeFaq, setActiveFaq] = useState(null);
+
+    const toggleFaq = (idx) => {
+        setActiveFaq(activeFaq === idx ? null : idx);
+    };
+
     return (
         <div className="landing-page">
             <PublicNavbar />
@@ -130,6 +175,146 @@ const LandingPage = () => {
                                 </div>
                             );
                         })}
+                    </div>
+                </div>
+            </section>
+
+            {/* Workflow Section */}
+            <section className="py-24 bg-white border-y">
+                <div className="container">
+                    <div className="workflow-container">
+                        <div className="workflow-text">
+                            <h2 className="text-4xl font-extrabold mb-6 text-gray-900">A Structured Path to <span className="text-brand-600">Verification</span></h2>
+                            <p className="text-gray-500 text-lg mb-8 leading-relaxed">
+                                Our platform ensures that every achievement is more than just a line on a resume. We follow a rigorous verification cycle that maintains the integrity of the SOEIT brand while highlighting individual excellence.
+                            </p>
+                            <div className="workflow-steps">
+                                {workflowSteps.map((step, idx) => {
+                                    const StepIcon = step.icon;
+                                    return (
+                                        <div key={idx} className="workflow-step-item">
+                                            <div className="workflow-step-icon">
+                                                <StepIcon size={20} />
+                                            </div>
+                                            <div className="workflow-step-content">
+                                                <h4 className="font-bold text-gray-900 mb-1">{step.title}</h4>
+                                                <p className="text-sm text-gray-500">{step.desc}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <div className="workflow-visual">
+                            <div className="workflow-visual-inner">
+                                <div className="workflow-visual-card">
+                                    <div className="workflow-visual-icon">
+                                        <Zap size={32} />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">Automated Audit System</h3>
+                                    <p className="text-gray-500 text-sm">Real-time data synchronization with departmental databases for seamless administrative reporting.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Institutional Impact Section */}
+            <section className="impact-section">
+                <div className="impact-bg-decoration">
+                    <svg viewBox="0 0 100 100">
+                        <circle cx="100" cy="50" r="50" fill="currentColor" />
+                    </svg>
+                </div>
+                <div className="container relative z-10">
+                    <div className="impact-grid">
+                        <div className="impact-text">
+                            <h2 className="text-4xl font-extrabold mb-6 leading-tight">Driving Institutional <br /><span className="text-brand-400">Digital Transformation</span></h2>
+                            <p className="text-brand-100 text-lg mb-10 leading-relaxed">
+                                We go beyond simple record-keeping. The SOEIT Achievement Portal is a strategic asset for the university, providing data-driven insights into student performance and departmental growth.
+                            </p>
+                            <div className="impact-stats">
+                                <div className="impact-stat-item">
+                                    <h4 className="impact-stat-value">98%</h4>
+                                    <p className="impact-stat-label">Audit Data Readiness</p>
+                                </div>
+                                <div className="impact-stat-item">
+                                    <h4 className="impact-stat-value">15k+</h4>
+                                    <p className="impact-stat-label">Verified Milestone Records</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="impact-testimonial">
+                            <blockquote className="testimonial-quote">
+                                "The ability to track every technical milestone in a centralized repository has revolutionized how we prepare for accreditation and showcase our students' true potential."
+                            </blockquote>
+                            <div className="testimonial-author">
+                                <div className="testimonial-avatar">D</div>
+                                <div className="testimonial-author-info">
+                                    <div className="author-name">Dean's Office</div>
+                                    <div className="author-role">School of Engineering & IT</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Questions Section */}
+            <section className="py-24 bg-white">
+                <div className="container-small">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-4 text-gray-900">Frequently Asked <span className="text-brand-600">Questions</span></h2>
+                        <p className="text-gray-500">Everything you need to know about the portal and its operations.</p>
+                    </div>
+                    <div className="faq-grid">
+                        {faqs.map((faq, idx) => (
+                            <div key={idx} className={`faq-item ${activeFaq === idx ? 'active' : ''}`}>
+                                <button className="faq-question" onClick={() => toggleFaq(idx)}>
+                                    <span className="faq-q-prefix">Q.</span>
+                                    <span className="faq-q-text">{faq.question}</span>
+                                    <ChevronDown className="faq-chevron" size={20} />
+                                </button>
+                                <div className="faq-answer-wrapper">
+                                    <p className="faq-answer">
+                                        {faq.answer}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Ecosystem Section */}
+            <section className="ecosystem-section py-24 bg-gray-50 border-t">
+                <div className="container">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-4 text-gray-900">Connected to the <span className="text-brand-600">Global Tech Ecosystem</span></h2>
+                        <p className="text-gray-500 max-w-2xl mx-auto">We integrate with industry-leading platforms to ensure your achievements are recognized beyond the university campus.</p>
+                    </div>
+                    <div className="ecosystem-grid">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="ecosystem-item text-github">
+                            <Github size={24} />
+                            <span>GitHub</span>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="ecosystem-item text-linkedin">
+                            <Linkedin size={24} />
+                            <span>LinkedIn</span>
+                        </a>
+                        <a href="https://leetcode.com" target="_blank" rel="noopener noreferrer" className="ecosystem-item text-leetcode">
+                            <Code size={24} />
+                            <span>LeetCode</span>
+                        </a>
+                        <a href="https://coursera.org" target="_blank" rel="noopener noreferrer" className="ecosystem-item text-coursera">
+                            <GraduationCap size={24} />
+                            <span>Coursera</span>
+                        </a>
+                        <a href="https://hackerrank.com" target="_blank" rel="noopener noreferrer" className="ecosystem-item text-hackerrank">
+                            <Terminal size={24} />
+                            <span>HackerRank</span>
+                        </a>
                     </div>
                 </div>
             </section>
