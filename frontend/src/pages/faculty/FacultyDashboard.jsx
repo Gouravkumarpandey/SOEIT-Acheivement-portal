@@ -16,6 +16,8 @@ const FacultyDashboard = () => {
     const [semester, setSemester] = useState('all');
     const [section, setSection] = useState('all');
     const [search, setSearch] = useState('');
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [deleting, setDeleting] = useState(false);
     const [showNoticeModal, setShowNoticeModal] = useState(false);
     const [noticeData, setNoticeData] = useState({ title: '', content: '', priority: 'Medium' });
     const [selectedStudent, setSelectedStudent] = useState(null);
@@ -106,15 +108,39 @@ const FacultyDashboard = () => {
 
     const handlePostNotice = async (e) => {
         e.preventDefault();
-        const toastId = toast.loading('Executing broadcast protocol...');
         try {
             await noticeAPI.create(noticeData);
-            toast.success('Institutional notice published successfully', { id: toastId });
+            toast.success('Official notification broadcast successfully!');
             setShowNoticeModal(false);
             setNoticeData({ title: '', content: '', priority: 'Medium' });
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Broadcast protocol failed', { id: toastId });
+        } catch {
+            toast.error('Strategic communication failure');
         }
+    };
+
+    const handleDeleteSelected = async () => {
+        if (selectedIds.length === 0) return;
+        if (!window.confirm(`Are you sure you want to permanently purge ${selectedIds.length} scholar records? This action is irreversible.`)) return;
+        setDeleting(true);
+        try {
+            await adminAPI.deleteUsers(selectedIds);
+            toast.success('Scholar registry synchronized: Records purged');
+            setSelectedIds([]);
+            loadStudents();
+        } catch {
+            toast.error('Registry synchronization failure');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const toggleSelect = (id) => {
+        setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === students.length) setSelectedIds([]);
+        else setSelectedIds(students.map(s => s._id));
     };
 
     const statCards = [
@@ -156,7 +182,7 @@ const FacultyDashboard = () => {
             </div>
 
             {/* Analytical Metrics */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+            <div className="grid-res grid-res-4" style={{ marginBottom: '2.5rem' }}>
                 {statCards.map(({ label, value, icon: Icon, color, bg }) => (
                     <div key={label} className="card" style={{ padding: '1.5rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -179,24 +205,32 @@ const FacultyDashboard = () => {
                         <div style={{ height: '1px', flex: 1, background: 'var(--border-primary)' }}></div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                        <button
-                            onClick={() => { setSemester('all'); setSection('all'); }}
-                            className={`btn ${semester === 'all' ? 'btn-primary' : 'btn-ghost'}`}
-                            style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem' }}
-                        >
-                            Complete Registry
-                        </button>
-                        {semesters.map(sem => (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                             <button
-                                key={sem.id}
-                                onClick={() => { setSemester(sem.id); setSection('all'); }}
-                                className={`btn ${semester === sem.id ? 'btn-primary' : 'btn-ghost'}`}
+                                onClick={() => { setSemester('all'); setSection('all'); }}
+                                className={`btn ${semester === 'all' ? 'btn-primary' : 'btn-ghost'}`}
                                 style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem' }}
                             >
-                                {sem.label}
+                                Complete Registry
                             </button>
-                        ))}
+                            {semesters.map(sem => (
+                                <button
+                                    key={sem.id}
+                                    onClick={() => { setSemester(sem.id); setSection('all'); }}
+                                    className={`btn ${semester === sem.id ? 'btn-primary' : 'btn-ghost'}`}
+                                    style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem' }}
+                                >
+                                    {sem.label}
+                                </button>
+                            ))}
+                        </div>
+                        {selectedIds.length > 0 && (
+                            <button className="btn btn-danger animate-fade-in" onClick={handleDeleteSelected} disabled={deleting} style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <XCircle size={16} />
+                                Purge Selected ({selectedIds.length})
+                            </button>
+                        )}
                     </div>
 
                     {semester !== 'all' && (
@@ -220,15 +254,14 @@ const FacultyDashboard = () => {
                     <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>
                         Scholar Directory — {semester === 'all' ? 'Institutional View' : `Semester ${semester}`} {section !== 'all' ? `(Section ${section})` : ''}
                     </h4>
-                    <div style={{ position: 'relative', width: '300px' }}>
-                        <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.6 }} />
+                    <div className="search-wrapper" style={{ width: '350px' }}>
                         <input
                             className="form-control"
-                            style={{ padding: '0.65rem 1rem 0.65rem 2.75rem', fontSize: '0.85rem' }}
-                            placeholder="Identify by name or enrollment..."
+                            placeholder="Identify scholars by nomenclature or ID..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
+                        <Search size={18} className="search-icon" />
                     </div>
                 </div>
 
@@ -236,6 +269,9 @@ const FacultyDashboard = () => {
                     <table className="table">
                         <thead>
                             <tr>
+                                <th style={{ paddingLeft: '1.75rem', width: '50px' }}>
+                                    <input type="checkbox" checked={students.length > 0 && selectedIds.length === students.length} onChange={toggleSelectAll} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                                </th>
                                 <th>Scholar Profile</th>
                                 <th>Academic Compliance</th>
                                 <th className="text-center">Verification Matrix</th>
@@ -259,7 +295,10 @@ const FacultyDashboard = () => {
                                     </td>
                                 </tr>
                             ) : students.map(student => (
-                                <tr key={student._id} className="hover-row">
+                                <tr key={student._id} className={`hover-row ${selectedIds.includes(student._id) ? 'active-selection' : ''}`}>
+                                    <td style={{ paddingLeft: '1.75rem' }}>
+                                        <input type="checkbox" checked={selectedIds.includes(student._id)} onChange={() => toggleSelect(student._id)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                                    </td>
                                     <td style={{ padding: '1rem 1.75rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <div className="avatar avatar-md" style={{ background: 'var(--primary-100)', color: 'var(--brand-700)', fontWeight: 800 }}>

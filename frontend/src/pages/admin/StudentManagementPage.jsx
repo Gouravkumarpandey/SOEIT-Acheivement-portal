@@ -16,6 +16,8 @@ const StudentManagementPage = () => {
     const [total, setTotal] = useState(0);
     const [pages, setPages] = useState(1);
     const [filters, setFilters] = useState({ department: '', search: '', semester: '', page: 1 });
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [deleting, setDeleting] = useState(false);
 
     const load = async () => {
         setLoading(true);
@@ -34,6 +36,31 @@ const StudentManagementPage = () => {
     };
 
     useEffect(() => { load(); }, [filters.department, filters.semester, filters.page]);
+
+    const handleDeleteSelected = async () => {
+        if (selectedIds.length === 0) return;
+        if (!window.confirm(`Are you sure you want to permanently purge ${selectedIds.length} scholar records? This action is irreversible.`)) return;
+        setDeleting(true);
+        try {
+            await adminAPI.deleteUsers(selectedIds);
+            toast.success('Scholar registry synchronized: Records purged');
+            setSelectedIds([]);
+            load();
+        } catch {
+            toast.error('Registry synchronization failure');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const toggleSelect = (id) => {
+        setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === students.length) setSelectedIds([]);
+        else setSelectedIds(students.map(s => s._id));
+    };
 
     const getInitials = (name) => name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'S';
 
@@ -94,6 +121,12 @@ const StudentManagementPage = () => {
                     <p className="page-subtitle">Unified surveillance of the institutional scholar population and their cumulative merit yields.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.875rem' }}>
+                    {selectedIds.length > 0 && (
+                        <button className="btn btn-danger animate-fade-in" onClick={handleDeleteSelected} disabled={deleting} style={{ fontWeight: 800, padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <XCircle size={18} />
+                            <span>Purge Selected ({selectedIds.length})</span>
+                        </button>
+                    )}
                     <button className="btn btn-ghost" onClick={() => exportStudentData('excel')} style={{ border: '1px solid var(--border-primary)', fontWeight: 800 }}>
                         <Download size={18} />
                         <span>Excel Archive</span>
@@ -108,9 +141,9 @@ const StudentManagementPage = () => {
             {/* Advanced Filtering Intelligence */}
             <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem', border: '1px solid var(--border-primary)' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr 1fr auto', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ position: 'relative' }}>
-                        <Search size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.6 }} />
-                        <input className="form-control" style={{ paddingLeft: '3rem', height: '48px', fontWeight: 600 }} placeholder="Search nomenclature, enrollment numbers, or digital identifiers..." value={filters.search} onChange={e => setFilters(p => ({ ...p, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && load()} />
+                    <div className="search-wrapper" style={{ minWidth: '350px' }}>
+                        <input className="form-control" placeholder="Search nomenclature, enrollment numbers, or digital identifiers..." value={filters.search} onChange={e => setFilters(p => ({ ...p, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && load()} />
+                        <Search size={20} className="search-icon" />
                     </div>
                     <select className="form-control" style={{ height: '48px', fontWeight: 700 }} value={filters.department} onChange={e => setFilters(p => ({ ...p, department: e.target.value, page: 1 }))}>
                         <option value="">All Institutional Departments</option>
@@ -146,7 +179,10 @@ const StudentManagementPage = () => {
                             <table className="table">
                                 <thead>
                                     <tr>
-                                        <th style={{ paddingLeft: '2rem' }}>Scholar Identity</th>
+                                        <th style={{ paddingLeft: '2rem', width: '50px' }}>
+                                            <input type="checkbox" checked={students.length > 0 && selectedIds.length === students.length} onChange={toggleSelectAll} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                                        </th>
+                                        <th>Scholar Identity</th>
                                         <th>Academic Affiliation</th>
                                         <th>Communication Endpoint</th>
                                         <th style={{ textAlign: 'center' }}>Synchronized Units</th>
@@ -156,8 +192,11 @@ const StudentManagementPage = () => {
                                 </thead>
                                 <tbody>
                                     {students.map((s) => (
-                                        <tr key={s._id} className="hover-row">
+                                        <tr key={s._id} className={`hover-row ${selectedIds.includes(s._id) ? 'active-selection' : ''}`}>
                                             <td style={{ paddingLeft: '2rem' }}>
+                                                <input type="checkbox" checked={selectedIds.includes(s._id)} onChange={() => toggleSelect(s._id)} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
+                                            </td>
+                                            <td style={{ paddingLeft: '1rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '0.75rem 0' }}>
                                                     {s.profileImage ? (
                                                         <img src={`${import.meta.env.VITE_UPLOADS_URL || ''}${s.profileImage}`} alt={s.name} style={{ width: 44, height: 44, borderRadius: '12px', objectFit: 'cover', border: '2px solid white', boxShadow: 'var(--shadow-sm)' }} />

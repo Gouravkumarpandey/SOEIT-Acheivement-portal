@@ -314,3 +314,17 @@ exports.manageUser = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Delete users (selective/bulk)
+// @route   DELETE /api/admin/users
+exports.deleteUsers = async (req, res, next) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) return res.status(400).json({ success: false, message: 'Invalid identifiers provided' });
+
+        await User.deleteMany(ids);
+        res.status(200).json({ success: true, message: `${ids.length} scholar records purged from registry` });
+    } catch (error) {
+        next(error);
+    }
+};

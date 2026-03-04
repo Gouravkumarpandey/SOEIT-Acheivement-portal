@@ -102,9 +102,9 @@ const FacultyManagementPage = () => {
             {/* Advanced Filtering Intelligence */}
             <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem', border: '1px solid var(--border-primary)' }}>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ position: 'relative', flex: 1 }}>
-                        <Search size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.6 }} />
-                        <input className="form-control" style={{ paddingLeft: '3rem', height: '48px', fontWeight: 600 }} placeholder="Search faculty nomenclature, institutional emails, or professional identifiers..." value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && loadFaculty()} />
+                    <div className="search-wrapper" style={{ flex: 1 }}>
+                        <input className="form-control" placeholder="Search faculty nomenclature, institutional emails, or professional identifiers..." value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && loadFaculty()} />
+                        <Search size={20} className="search-icon" />
                     </div>
                     <button className="btn btn-primary" style={{ height: '48px', padding: '0 2rem', fontWeight: 800 }} onClick={loadFaculty}>
                         Execute Query

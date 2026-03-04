@@ -62,6 +62,7 @@ export const adminAPI = {
     getFaculty: (params) => API.get('/admin/faculty', { params }),
     getReports: () => API.get('/admin/reports'),
     manageUser: (id, data) => API.put(`/admin/users/${id}`, data),
+    deleteUsers: (ids) => API.delete('/admin/users', { data: { ids } }),
 };
 
 // Event APIs

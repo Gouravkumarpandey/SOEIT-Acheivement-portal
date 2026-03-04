@@ -83,15 +83,14 @@ const MyAchievementsPage = () => {
             {/* Navigation & Control Suite */}
             <div className="card" style={{ marginBottom: '2rem', padding: '1.5rem', background: 'var(--slate-50)', border: '1px solid var(--border-primary)' }}>
                 <form onSubmit={handleSearch} style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 2fr) 1.2fr 1.2fr auto auto', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ position: 'relative' }}>
-                        <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                    <div className="search-wrapper" style={{ minWidth: '300px' }}>
                         <input
                             className="form-control"
-                            style={{ paddingLeft: '3rem', height: '48px', fontWeight: 600 }}
                             placeholder="Query by record title..."
                             value={filters.search}
                             onChange={e => setFilters(p => ({ ...p, search: e.target.value }))}
                         />
+                        <Search size={18} className="search-icon" />
                     </div>
 
                     <select className="form-control" style={{ height: '48px', fontWeight: 700 }} value={filters.status} onChange={e => setFilters(p => ({ ...p, status: e.target.value, page: 1 }))}>

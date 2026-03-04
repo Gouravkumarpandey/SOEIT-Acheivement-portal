@@ -9,6 +9,7 @@ const {
     getFaculty,
     getReports,
     manageUser,
+    deleteUsers,
 } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -22,5 +23,6 @@ router.put('/achievements/:id/verify', verifyAchievement);
 router.get('/students', getStudents);
 router.get('/reports', getReports);
 router.put('/users/:id', authorize('admin'), manageUser);
+router.delete('/users', deleteUsers);
 
 module.exports = router;

@@ -75,9 +75,9 @@ const VerifyAchievementsPage = () => {
             {/* Advanced Filtering Ecosystem */}
             <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem', border: '1px solid var(--border-primary)' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1.5fr) 1fr 1fr auto', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ position: 'relative' }}>
-                        <Search size={20} style={{ position: 'absolute', left: '1.125rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.6 }} />
-                        <input className="form-control" style={{ paddingLeft: '3.25rem', height: '48px', fontWeight: 600 }} placeholder="Search digital identifiers or record nomenclature..." value={filters.search} onChange={e => setFilters(p => ({ ...p, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && load()} />
+                    <div className="search-wrapper" style={{ minWidth: '300px' }}>
+                        <input className="form-control" placeholder="Search digital identifiers or record nomenclature..." value={filters.search} onChange={e => setFilters(p => ({ ...p, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && load()} />
+                        <Search size={20} className="search-icon" />
                     </div>
                     <select className="form-control" style={{ height: '48px', fontWeight: 700 }} value={filters.department} onChange={e => setFilters(p => ({ ...p, department: e.target.value, page: 1 }))}>
                         <option value="">All Institutional Departments</option>
@@ -93,7 +93,7 @@ const VerifyAchievementsPage = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 450px' : '1fr', gap: '2rem', transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+            <div className={`grid-stack ${selected ? 'grid-stack-2' : ''}`} style={{ transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }}>
                 {/* Registry Surveillance View */}
                 <div style={{ minWidth: 0 }}>
                     {loading ? (

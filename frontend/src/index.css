@@ -419,6 +419,69 @@ textarea.form-control {
   resize: vertical;
 }
 
+/* ===================== SEARCH UTILITIES ===================== */
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-wrapper .search-icon {
+  position: absolute;
+  left: 1.25rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.search-wrapper .form-control {
+  padding-left: 3.5rem !important;
+  height: 48px;
+  font-weight: 600;
+}
+
+/* ===================== RESPONSIVE UTILITIES ===================== */
+.grid-res {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.grid-res-4 {
+  grid-template-columns: repeat(var(--cols, 4), 1fr);
+}
+
+.grid-res-2 {
+  grid-template-columns: repeat(var(--cols, 2), 1fr);
+}
+
+@media (max-width: 1200px) {
+  .grid-res-4 {
+    --cols: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-res-4 {
+    --cols: 1;
+  }
+
+  .grid-res-2 {
+    --cols: 1;
+  }
+}
+
+.grid-stack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .grid-stack-2 {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
 /* ===================== BADGES ===================== */
 .badge {
   display: inline-flex;

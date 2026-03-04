@@ -112,7 +112,7 @@ const ReportsPage = () => {
             </div>
 
             {/* Performance Overview Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+            <div className="grid-res grid-res-4" style={{ marginBottom: '2.5rem' }}>
                 {[
                     { label: 'Cumulative Yield', value: data?.topPerformers?.reduce((acc, p) => acc + p.totalPoints, 0) || 0, icon: Star, color: 'var(--brand-600)', bg: 'var(--primary-50)' },
                     { label: 'Evaluation Density', value: data?.categoryStats?.reduce((acc, c) => acc + c.count, 0) || 0, icon: BarChart3, color: 'var(--purple-600)', bg: 'var(--purple-50)' },
@@ -132,7 +132,7 @@ const ReportsPage = () => {
             </div>
 
             {/* Charts Ecosystem */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="grid-res grid-res-2" style={{ gridTemplateColumns: '', marginBottom: '2rem' }}>
                 <div className="card" style={{ border: '1px solid var(--border-primary)' }}>
                     <div className="card-header" style={{ borderBottom: '1px solid var(--border-primary)', padding: '1.5rem' }}>
                         <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Longitudinal Submission Analytics</h4>

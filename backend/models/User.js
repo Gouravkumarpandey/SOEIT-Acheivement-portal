@@ -209,6 +209,20 @@ const User = {
         const args = [];
         if (query.role) { sql += ' AND role = ?'; args.push(query.role); }
         if (query.isActive !== undefined) { sql += ' AND is_active = ?'; args.push(query.isActive ? 1 : 0); }
+        if (query.department) { sql += ' AND department = ?'; args.push(query.department); }
+        if (query.batch) { sql += ' AND batch = ?'; args.push(query.batch); }
+        if (query.semester) { sql += ' AND semester = ?'; args.push(query.semester); }
+        if (query.section) { sql += ' AND section = ?'; args.push(query.section); }
+        if (query.$or) {
+            const likes = [];
+            for (const cond of query.$or) {
+                const key = Object.keys(cond)[0];
+                const colMap = { name: 'name', email: 'email', studentId: 'student_id', enrollmentNo: 'enrollment_no' };
+                const col = colMap[key];
+                if (col && cond[key]?.$regex) { likes.push(`${col} LIKE ?`); args.push(`%${cond[key].$regex}%`); }
+            }
+            if (likes.length) sql += ` AND (${likes.join(' OR ')})`;
+        }
         const result = await db.execute({ sql, args });
         return Number(result.rows[0].cnt);
     },
@@ -243,6 +257,21 @@ const User = {
 
         if (options.new) return User.findById(id);
         return null;
+    },
+    /** DELETE */
+    findByIdAndDelete: async (id) => {
+        const db = getDb();
+        await db.execute({ sql: 'DELETE FROM users WHERE id = ?', args: [id] });
+        await db.execute({ sql: 'DELETE FROM achievements WHERE student_id = ?', args: [id] });
+        return true;
+    },
+    deleteMany: async (ids) => {
+        const db = getDb();
+        if (!ids || ids.length === 0) return true;
+        const placeholders = ids.map(() => '?').join(',');
+        await db.execute({ sql: `DELETE FROM users WHERE id IN (${placeholders})`, args: ids });
+        await db.execute({ sql: `DELETE FROM achievements WHERE student_id IN (${placeholders})`, args: ids });
+        return true;
     },
 };
 

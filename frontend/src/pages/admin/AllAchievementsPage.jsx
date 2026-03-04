@@ -61,16 +61,15 @@ const AllAchievementsPage = () => {
             <div className="card" style={{ marginBottom: '2.5rem' }}>
                 <div className="card-body" style={{ padding: '1.5rem' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr auto auto', gap: '0.875rem', alignItems: 'center' }}>
-                        <div className="search-box">
-                            <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                        <div className="search-wrapper">
                             <input
                                 className="form-control"
-                                style={{ paddingLeft: '2.75rem' }}
                                 placeholder="Search records or student names..."
                                 value={filters.search}
                                 onChange={e => setFilters(p => ({ ...p, search: e.target.value }))}
                                 onKeyDown={e => e.key === 'Enter' && load()}
                             />
+                            <Search size={18} className="search-icon" />
                         </div>
 
                         <select className="form-control" value={filters.status} onChange={e => setFilters(p => ({ ...p, status: e.target.value, page: 1 }))}>
