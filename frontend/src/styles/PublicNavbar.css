@@ -1,0 +1,114 @@
+/* ===================== PUBLIC NAVBAR — OFFICIAL INSTITUTIONAL ===================== */
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 1.5rem 0;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.navbar.scrolled {
+    padding: 1rem 0;
+    background: white;
+    border-bottom: 2px solid var(--brand-600);
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-inner {
+    display: grid;
+    grid-template-columns: 1.5fr auto 1.5fr;
+    /* Distributes space for logo, middle links, and right buttons */
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.navbar .container {
+    max-width: 1440px;
+    width: 95%;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+}
+
+.nav-logo-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--brand-600);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-logo-text {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--brand-600);
+    line-height: 1;
+}
+
+.nav-logo-subtitle {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-top: 4px;
+}
+
+.nav-link-group {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.nav-item {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: color 0.2s ease;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    color: var(--brand-600);
+}
+
+.nav-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    justify-content: flex-end;
+    /* Ensures buttons stick to the right edge */
+}
+
+.nav-cta-group .btn-secondary {
+    border: 2px solid var(--brand-600);
+    color: var(--brand-600);
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-cta-group .btn-secondary:hover {
+    background: var(--brand-50);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 1024px) {
+    .nav-link-group {
+        display: none;
+    }
+}

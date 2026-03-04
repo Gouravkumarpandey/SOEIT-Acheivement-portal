@@ -3,180 +3,137 @@ import { Link } from 'react-router-dom';
 import PublicNavbar from '../../components/common/PublicNavbar';
 import Footer from '../../components/common/Footer';
 import {
-    Trophy, Shield, BarChart3, Upload, CheckCircle,
-    Users, Star, ArrowRight, Zap, Globe, Award, BookOpen, TrendingUp
+    Trophy, Shield, BarChart3, CheckCircle,
+    Users, Star, ArrowRight, Zap, Globe, Award, BookOpen, Clock, GraduationCap, FileCheck, Briefcase
 } from 'lucide-react';
 
 const stats = [
-    { value: '2,500+', label: 'Achievements Tracked' },
-    { value: '800+', label: 'Active Students' },
-    { value: '98%', label: 'Verification Rate' },
-    { value: '10+', label: 'Departments' },
+    { value: '4,200+', label: 'Technical Records' },
+    { value: '1,250+', label: 'Engineer Dossiers' },
+    { value: '100%', label: 'Skill Validation' },
+    { value: '24/7', label: 'Faculty Verification' },
 ];
 
 const features = [
-    { icon: Upload, title: 'Easy Submission', desc: 'Upload achievements with proof documents in minutes. Supports images, PDFs, and certificates.', color: '#3b82f6' },
-    { icon: Shield, title: 'Secure Verification', desc: 'Faculty review and verify submissions with a transparent approval workflow and audit trail.', color: '#8b5cf6' },
-    { icon: BarChart3, title: 'Analytics Dashboard', desc: 'Real-time charts and insights on performance, trends, and department-wise statistics.', color: '#10b981' },
-    { icon: Globe, title: 'Digital Portfolio', desc: 'Share your verified achievements via a public portfolio link — perfect for placements.', color: '#f59e0b' },
-    { icon: Award, title: 'Point System', desc: 'Earn points based on achievement level. International awards carry higher weightage.', color: '#ef4444' },
-    { icon: TrendingUp, title: 'Performance Tracking', desc: 'Track your academic journey and compare performance over semesters.', color: '#06b6d4' },
+    { icon: Shield, title: 'Project Verification', desc: 'Every technical project and certificate is vetted through a faculty workflow ensuring 100% industry-ready validation.', color: 'var(--brand-600)' },
+    { icon: FileCheck, title: 'Engineer Portfolios', desc: 'Students generate tamper-proof project dossiers for top tech recruiters, verified by the SOEIT faculty.', color: 'var(--brand-600)' },
+    { icon: BarChart3, title: 'Compliance Analytics', desc: 'Real-time monitoring of departmental achievements for NAAC, NIRF, and other institutional audits.', color: 'var(--brand-600)' },
+    { icon: Users, title: 'Faculty Oversight', desc: 'Dedicated administrative tools for department heads to monitor student growth and career milestones.', color: 'var(--brand-600)' },
+    { icon: Award, title: 'Excellence Tiering', desc: 'Automated point calculations based on national and international achievement standards and weights.', color: 'var(--brand-600)' },
+    { icon: Globe, title: 'Universal Export', desc: 'Export verified records directly to LinkedIn or download as official university-branded PDF certificates.', color: 'var(--brand-600)' },
 ];
 
-const categories = ['Academic', 'Sports', 'Cultural', 'Technical', 'Research', 'Internship', 'Certification', 'Competition'];
+const categoriesData = [
+    { name: 'Technical Projects', icon: Briefcase },
+    { name: 'Coding Challenges', icon: Zap },
+    { name: 'Industrial Training', icon: Shield },
+    { name: 'Web/App Innovations', icon: Globe },
+    { name: 'Hardware Prototypes', icon: Trophy },
+    { name: 'Skill Certifications', icon: BookOpen },
+    { name: 'Cultural Events', icon: Star },
+    { name: 'Team Leadership', icon: Users }
+];
 
 const LandingPage = () => {
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+        <div className="landing-page">
             <PublicNavbar />
 
             {/* Hero Section */}
-            <section className="hero-section" style={{ paddingTop: '80px' }}>
-                <div className="hero-glow" style={{ width: 700, height: 700, top: '-200px', left: '-300px', background: 'radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)' }} />
-                <div className="hero-glow" style={{ width: 600, height: 600, bottom: '-100px', right: '-200px', background: 'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)' }} />
+            <section className="hero-section">
+                <div className="hero-mesh" />
 
-                <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '5rem 1.5rem' }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: 'var(--radius-full)', padding: '0.4rem 1rem', marginBottom: '2rem', animation: 'fadeIn 0.5s ease' }}>
-                        <Zap size={14} color="var(--primary-400)" />
-                        <span style={{ fontSize: '0.8rem', color: 'var(--primary-400)', fontWeight: 600 }}>Official Achievement Management Platform</span>
+                <div className="container hero-container">
+                    <div className="hero-badge">
+                        <Shield size={14} />
+                        <span className="hero-badge-text">Official Academic Repository of SOEIT</span>
                     </div>
 
-                    <h1 style={{ maxWidth: '800px', margin: '0 auto 1.5rem', animation: 'fadeIn 0.7s ease 0.1s both' }}>
-                        Showcase Your{' '}
-                        <span className="text-gradient">Academic Excellence</span>
-                        {' '}Like Never Before
+                    <h1 className="hero-title">
+                        Centralizing <br />
+                        <span className="text-gradient">Student Excellence</span>
                     </h1>
 
-                    <p style={{ fontSize: 'clamp(1rem, 2vw, 1.2rem)', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: 1.7, animation: 'fadeIn 0.7s ease 0.2s both' }}>
-                        The SOEIT Achievements Portal empowers students to submit, verify, and showcase academic and extracurricular achievements — all in one professional platform.
+                    <p className="hero-subtitle">
+                        The SOEIT Achievement Portal is the primary platform for documenting, verifying, and showcasing the technical projects, coding skills, and engineering milestones of our future innovators.
                     </p>
 
-                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', animation: 'fadeIn 0.7s ease 0.3s both' }}>
-                        <Link to="/register" className="btn btn-primary btn-lg">
-                            Get Started Free <ArrowRight size={18} />
+                    <div className="flex justify-center mt-8">
+                        <Link to="/login" className="btn btn-primary btn-lg rounded-md px-12 bg-brand-600 border-none shadow-xl hover:bg-brand-700 transition-all flex items-center gap-3 font-bold text-lg">
+                            Get Started <ArrowRight size={20} />
                         </Link>
-                        <Link to="/how-it-works" className="btn btn-secondary btn-lg">
-                            See How It Works
-                        </Link>
-                    </div>
-
-                    {/* Hero Visual */}
-                    <div style={{ marginTop: '4rem', position: 'relative', maxWidth: '900px', margin: '4rem auto 0', animation: 'fadeIn 0.8s ease 0.4s both' }}>
-                        <div style={{ background: '#fff', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-xl)', padding: '2rem', boxShadow: 'var(--shadow-xl)' }}>
-                            {/* Mini Dashboard Preview */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
-                                {[
-                                    { label: 'Total', value: '12', color: '#3b82f6', icon: Trophy },
-                                    { label: 'Approved', value: '9', color: '#22c55e', icon: CheckCircle },
-                                    { label: 'Pending', value: '2', color: '#f59e0b', icon: Star },
-                                    { label: 'Points', value: '450', color: '#8b5cf6', icon: Award },
-                                ].map(({ label, value, color, icon: Icon }) => (
-                                    <div key={label} style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: '1rem', border: '1px solid var(--border-primary)', textAlign: 'left' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                            <Icon size={16} color={color} />
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
-                                        </div>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'Space Grotesk' }}>{value}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                {[
-                                    { title: 'National Hackathon Winner', cat: 'Technical', status: 'approved', pts: 75 },
-                                    { title: 'Research Publication', cat: 'Research', status: 'approved', pts: 75 },
-                                    { title: 'Sports Runner-up', cat: 'Sports', status: 'pending', pts: 50 },
-                                ].map(({ title, cat, status, pts }) => (
-                                    <div key={title} style={{ flex: 1, background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: '0.875rem', border: '1px solid var(--border-primary)' }}>
-                                        <div className={`badge badge-${status}`} style={{ marginBottom: '0.5rem' }}>{status}</div>
-                                        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{title}</div>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{cat} • {pts} pts</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* Stats Section */}
-            <section style={{ padding: '4rem 0', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-primary)', borderBottom: '1px solid var(--border-primary)' }}>
+            {/* Stats Strip */}
+            <section className="stats-strip">
                 <div className="container">
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '2rem', textAlign: 'center' }}>
-                        {stats.map(({ value, label }) => (
-                            <div key={label}>
-                                <div style={{ fontSize: '2.5rem', fontWeight: 800, fontFamily: 'Space Grotesk', background: 'linear-gradient(135deg, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{value}</div>
-                                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{label}</div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+                        {stats.map((stat) => (
+                            <div key={stat.label} className="stat-item">
+                                <div className="stat-value">{stat.value}</div>
+                                <div className="stat-label">{stat.label}</div>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Features */}
-            <section style={{ padding: '6rem 0' }}>
+            {/* Features Section */}
+            <section className="py-24 bg-white">
                 <div className="container">
-                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 'var(--radius-full)', padding: '0.4rem 1rem', marginBottom: '1rem' }}>
-                            <Star size={14} color="var(--accent-400)" />
-                            <span style={{ fontSize: '0.8rem', color: 'var(--accent-400)', fontWeight: 600 }}>Platform Features</span>
+                    <div className="text-center mb-20">
+                        <div className="section-label mb-4">
+                            <Shield size={14} className="text-brand-600" />
+                            <span>Academic Governance</span>
                         </div>
-                        <h2>Everything You Need to <span className="text-gradient">Succeed</span></h2>
-                        <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '1rem auto 0', lineHeight: 1.7 }}>
-                            Built specifically for SOEIT students and faculty with features designed for real-world institutional use.
+                        <h2 className="text-4xl font-extrabold mb-4 text-gray-900">Engineered for <span className="text-brand-600">Institutional Success</span></h2>
+                        <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+                            An end-to-end framework designed to streamline the lifecycle of student achievements, from initial submission to final verification.
                         </p>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                        {features.map(({ icon: Icon, title, desc, color }) => (
-                            <div key={title} className="card card-body" style={{ transition: 'all 0.3s ease' }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.borderColor = color + '66'; }}
-                                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--border-primary)'; }}>
-                                <div style={{ width: 48, height: 48, background: color + '20', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-                                    <Icon size={24} color={color} />
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {features.map((feature) => {
+                            const FeatureIcon = feature.icon;
+                            return (
+                                <div key={feature.title} className="feature-card">
+                                    <div className="feature-icon-wrapper" style={{ background: 'var(--bg-secondary)' }}>
+                                        <FeatureIcon size={32} style={{ color: 'var(--brand-600)' }} />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-4 text-gray-800">{feature.title}</h3>
+                                    <p className="text-gray-500 leading-relaxed text-sm">{feature.desc}</p>
                                 </div>
-                                <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{title}</h4>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{desc}</p>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
-            {/* Categories */}
-            <section style={{ padding: '5rem 0', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-primary)' }}>
+            {/* Categories Section */}
+            <section className="py-24 bg-gray-50 border-y">
                 <div className="container">
-                    <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                        <h2>Achievement <span className="text-gradient">Categories</span></h2>
-                        <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem' }}>Track achievements across all areas of student life</p>
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-3 text-gray-900">Engineering <span className="text-brand-600">Skill Categories</span></h2>
+                        <p className="text-gray-500 max-w-lg mx-auto">We provide a structured categorization for every student milestone, ensuring comprehensive performance reports.</p>
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
-                        {categories.map((cat, i) => (
-                            <div key={cat} style={{ padding: '0.625rem 1.25rem', background: '#fff', border: '1px solid var(--border-primary)', borderRadius: 'var(--radius-full)', fontSize: '0.9rem', color: 'var(--text-secondary)', cursor: 'default', transition: 'all 0.2s', fontWeight: 500, boxShadow: 'var(--shadow-sm)' }}
-                                onMouseEnter={e => { e.currentTarget.style.background = 'var(--primary-50)'; e.currentTarget.style.color = 'var(--primary-600)'; e.currentTarget.style.borderColor = 'var(--primary-300)'; }}
-                                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-primary)'; }}>
-                                {cat}
-                            </div>
-                        ))}
+                    <div className="category-grid">
+                        {categoriesData.map((cat) => {
+                            const CatIcon = cat.icon;
+                            return (
+                                <div key={cat.name} className="category-card">
+                                    <div className="category-icon" style={{ background: 'white' }}>
+                                        <CatIcon size={20} />
+                                    </div>
+                                    <span style={{ fontSize: '0.85rem' }}>{cat.name}</span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
-            {/* CTA */}
-            <section style={{ padding: '6rem 0' }}>
-                <div className="container">
-                    <div style={{ textAlign: 'center', background: 'linear-gradient(135deg, var(--primary-50), #ede9fe)', border: '1px solid var(--primary-200)', borderRadius: 'var(--radius-xl)', padding: '4rem 2rem', boxShadow: 'var(--shadow-lg)' }}>
-                        <h2 style={{ marginBottom: '1rem' }}>Ready to <span className="text-gradient">Showcase Your Achievements?</span></h2>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '500px', margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
-                            Join hundreds of students already using SOEIT Portal to document and showcase their journey.
-                        </p>
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <Link to="/register" className="btn btn-primary btn-lg">
-                                Create Your Account <ArrowRight size={18} />
-                            </Link>
-                            <Link to="/contact" className="btn btn-secondary btn-lg">Contact Us</Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             <Footer />
         </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { GraduationCap, Menu, X } from 'lucide-react';
+import { GraduationCap, Menu, X, ArrowRight } from 'lucide-react';
+import '../../styles/PublicNavbar.css';
 
 const PublicNavbar = () => {
     const [scrolled, setScrolled] = useState(false);
@@ -9,52 +10,77 @@ const PublicNavbar = () => {
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', handler);
+        window.addEventListener('scroll', handler, { passive: true });
         return () => window.removeEventListener('scroll', handler);
     }, []);
 
-    return (
-        <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} style={{ background: scrolled ? undefined : 'rgba(248,250,252,0.85)', backdropFilter: scrolled ? undefined : 'blur(12px)', borderBottom: scrolled ? undefined : '1px solid var(--border-primary)' }}>
-            <div className="container-lg">
-                <div className="navbar-inner" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', width: '100%' }}>
-                    {/* Left corner: Logo */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                        <Link to="/" className="nav-logo">
-                            <div className="nav-logo-icon"><GraduationCap size={22} color="#fff" /></div>
-                            <div>
-                                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}>SOEIT Portal</div>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Achievements</div>
-                            </div>
-                        </Link>
-                    </div>
+    const navLinks = [
+        { path: '/', label: 'Home' },
+        { path: '/about', label: 'About' },
+        { path: '/features', label: 'Features' },
+        { path: '/how-it-works', label: 'How It Works' },
+        { path: '/contact', label: 'Contact' },
+    ];
 
-                    {/* Middle: Links */}
-                    <div className="nav-links" style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
-                        {[['/', 'Home'], ['/about', 'About'], ['/features', 'Features'], ['/how-it-works', 'How It Works'], ['/contact', 'Contact']].map(([path, label]) => (
-                            <Link key={path} to={path} className="nav-item">{label}</Link>
+    return (
+        <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+            <div className="container">
+                <div className="navbar-inner">
+                    {/* Brand Logo */}
+                    <Link to="/" className="nav-logo">
+                        <div className="nav-logo-icon">
+                            <GraduationCap size={24} color="#fff" />
+                        </div>
+                        <div className="hidden sm:block">
+                            <div className="nav-logo-text">SOEIT Portal</div>
+                            <div className="nav-logo-subtitle">Technical Excellence</div>
+                        </div>
+                    </Link>
+
+                    {/* Desktop Navigation */}
+                    <div className="nav-link-group">
+                        {navLinks.map(({ path, label }) => (
+                            <Link key={path} to={path} className="nav-item">
+                                {label}
+                            </Link>
                         ))}
                     </div>
 
-                    {/* Right corner: Buttons */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <div className="nav-cta">
-                            <Link to="/login" className="btn btn-secondary btn-sm">Sign In</Link>
-                            <Link to="/register" className="btn btn-primary btn-sm">Get Started</Link>
-                            <button className="btn btn-secondary btn-icon" style={{ display: 'none' }} onClick={() => setMenuOpen(!menuOpen)}>
-                                {menuOpen ? <X size={18} /> : <Menu size={18} />}
-                            </button>
-                        </div>
+                    {/* Auth Actions */}
+                    <div className="nav-cta-group">
+                        <Link to="/login" className="btn btn-secondary btn-sm rounded-md px-6 font-bold">
+                            Sign In
+                        </Link>
+                        <Link to="/register" className="btn btn-primary btn-sm rounded-md px-6 bg-brand-600 border-none font-bold">
+                            Register
+                        </Link>
+
+                        {/* Mobile Toggle */}
+                        <button
+                            className="p-2 md:hidden text-gray-600"
+                            onClick={() => setMenuOpen(!menuOpen)}
+                        >
+                            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
                     </div>
                 </div>
 
+                {/* Mobile Menu Overlay */}
                 {menuOpen && (
-                    <div style={{ padding: '1rem 0', borderTop: '1px solid var(--border-primary)', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem' }}>
-                        {[['/', 'Home'], ['/about', 'About'], ['/features', 'Features'], ['/how-it-works', 'How It Works'], ['/contact', 'Contact']].map(([path, label]) => (
-                            <Link key={path} to={path} className="nav-item" onClick={() => setMenuOpen(false)}>{label}</Link>
+                    <div className="fixed inset-0 top-[70px] bg-white z-[1001] p-6 flex flex-col gap-4 animate-fade-in md:hidden">
+                        {navLinks.map(({ path, label }) => (
+                            <Link
+                                key={path}
+                                to={path}
+                                className="text-xl font-bold text-gray-800 border-b border-gray-100 pb-3"
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                {label}
+                            </Link>
                         ))}
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-                            <Link to="/login" className="btn btn-secondary btn-sm w-full" style={{ justifyContent: 'center' }}>Sign In</Link>
-                            <Link to="/register" className="btn btn-primary btn-sm w-full" style={{ justifyContent: 'center' }}>Get Started</Link>
+                        <div className="mt-auto flex flex-col gap-3">
+                            <Link to="/login" className="btn btn-secondary w-full py-4" onClick={() => setMenuOpen(false)}>Sign In</Link>
+                            <Link to="/register" className="btn btn-primary w-full py-4" onClick={() => setMenuOpen(false)}>Get Started <ArrowRight size={18} /></Link>
                         </div>
                     </div>
                 )}
@@ -64,3 +90,4 @@ const PublicNavbar = () => {
 };
 
 export default PublicNavbar;
+
