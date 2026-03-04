@@ -23,9 +23,10 @@ API.interceptors.response.use(
         if (error.response?.status === 401) {
             localStorage.removeItem('soeit_token');
             localStorage.removeItem('soeit_user');
-            window.location.href = '/login';
+            // Remove hard redirect to allow guests on public pages
         }
         return Promise.reject(error);
+
     }
 );
 
@@ -50,6 +51,8 @@ export const achievementAPI = {
     delete: (id) => API.delete(`/achievements/${id}`),
     getStats: () => API.get('/achievements/stats'),
     getPortfolio: (userId) => API.get(`/achievements/portfolio/${userId}`),
+    getPublicStudents: (params) => API.get('/achievements/public-students', { params }),
+
 };
 
 // Admin APIs

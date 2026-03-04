@@ -1,8 +1,7 @@
 import '../../styles/ContactPage.css';
 import { useState } from 'react';
-import PublicNavbar from '../../components/common/PublicNavbar';
-import Footer from '../../components/common/Footer';
-import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const ContactPage = () => {
     const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
@@ -19,8 +18,12 @@ const ContactPage = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-            <PublicNavbar />
-            <section style={{ paddingTop: '120px', paddingBottom: '5rem' }}>
+            <div style={{ position: 'fixed', top: '1.5rem', left: '1.5rem', zIndex: 100 }}>
+                <Link to="/" className="btn btn-secondary" style={{ fontWeight: 700, borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', backdropFilter: 'blur(10px)', border: '1px solid var(--border-primary)', padding: '0.6rem 1.25rem' }}>
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+            </div>
+            <section style={{ paddingTop: '100px', paddingBottom: '5rem' }}>
                 <div className="container">
                     <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
                         <h1>Get in <span className="text-gradient">Touch</span></h1>
@@ -98,7 +101,6 @@ const ContactPage = () => {
                     </div>
                 </div>
             </section>
-            <Footer />
         </div>
     );
 };

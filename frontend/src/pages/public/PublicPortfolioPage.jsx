@@ -48,10 +48,10 @@ const PublicPortfolioPage = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-            {/* Back link */}
-            <div style={{ position: 'fixed', top: '1rem', left: '1rem', zIndex: 100 }}>
-                <Link to="/" className="btn btn-secondary btn-sm" style={{ backdropFilter: 'blur(10px)' }}>
-                    <ArrowLeft size={14} /> Back
+            {/* Back Button */}
+            <div style={{ position: 'fixed', top: '1.5rem', left: '1.5rem', zIndex: 100 }}>
+                <Link to="/" className="btn btn-secondary" style={{ fontWeight: 700, borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', backdropFilter: 'blur(10px)', border: '1px solid var(--border-primary)', padding: '0.6rem 1.25rem' }}>
+                    <ArrowLeft size={16} /> Back to Home
                 </Link>
             </div>
             {/* Share button */}

@@ -165,6 +165,70 @@ exports.getPublicPortfolio = async (req, res, next) => {
     }
 };
 
+// @desc    Get all students for public directory
+// @route   GET /api/achievements/public-students
+exports.getPublicStudents = async (req, res, next) => {
+    try {
+        const { department, search } = req.query;
+
+        const userQuery = { role: 'student', isActive: true };
+        if (department) userQuery.department = department;
+
+        let students = await User.find(userQuery)
+            .select('-password -resetPasswordToken -resetPasswordExpire -email -phone')
+            .sort({ name: 1 });
+
+        // Filter by search name
+        if (search) {
+            const s = search.toLowerCase();
+            students = students.filter(st =>
+                st.name?.toLowerCase().includes(s) ||
+                st.enrollmentNo?.toLowerCase().includes(s) ||
+                st.department?.toLowerCase().includes(s)
+            );
+        }
+
+        // Get achievement stats for each student in one query
+        const studentIds = students.map(s => s._id?.toString() || s.id);
+        const achievementAgg = await Achievement.find({
+            studentId: { $in: studentIds },
+            status: 'approved',
+            isPublic: true,
+        }).select('studentId points category');
+
+        // Build stats map
+        const statsMap = {};
+        achievementAgg.forEach(a => {
+            const sid = a.studentId;
+            if (!statsMap[sid]) statsMap[sid] = { count: 0, points: 0, categories: new Set() };
+            statsMap[sid].count += 1;
+            statsMap[sid].points += a.points || 0;
+            statsMap[sid].categories.add(a.category);
+        });
+
+        const result = students.map(s => {
+            const sid = s._id?.toString() || s.id;
+            const info = statsMap[sid] || { count: 0, points: 0, categories: new Set() };
+            const plain = s.toObject ? s.toObject() : { ...s };
+            return {
+                ...plain,
+                achievementCount: info.count,
+                totalPoints: info.points,
+                categoryCount: info.categories.size,
+            };
+        });
+
+        // Sort: most achievements first
+        result.sort((a, b) => b.achievementCount - a.achievementCount);
+
+        res.status(200).json({ success: true, data: result, total: result.length });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
 // @desc    Get student stats
 // @route   GET /api/achievements/stats
 exports.getStudentStats = async (req, res, next) => {

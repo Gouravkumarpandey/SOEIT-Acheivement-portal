@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom';
-import PublicNavbar from '../../components/common/PublicNavbar';
-import Footer from '../../components/common/Footer';
-import { HelpCircle, Mail, MessageSquare, BookOpen, ExternalLink, ArrowRight } from 'lucide-react';
+import { HelpCircle, Mail, MessageSquare, BookOpen, ExternalLink, ArrowRight, ArrowLeft } from 'lucide-react';
 
 const Support = () => {
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-            <PublicNavbar />
-            <section style={{ paddingTop: '120px', paddingBottom: '5rem' }}>
+            <div style={{ position: 'fixed', top: '1.5rem', left: '1.5rem', zIndex: 100 }}>
+                <Link to="/" className="btn btn-secondary" style={{ fontWeight: 700, borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', backdropFilter: 'blur(10px)', border: '1px solid var(--border-primary)', padding: '0.6rem 1.25rem' }}>
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+            </div>
+            <section style={{ paddingTop: '100px', paddingBottom: '5rem' }}>
                 <div className="container" style={{ maxWidth: '1000px' }}>
                     <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
                         <div style={{
@@ -85,7 +87,6 @@ const Support = () => {
                     </div>
                 </div>
             </section>
-            <Footer />
         </div>
     );
 };

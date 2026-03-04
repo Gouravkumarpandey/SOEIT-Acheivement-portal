@@ -25,6 +25,7 @@ const Footer = () => {
         { path: '/admin-login', label: 'Admin Login' },
         { path: '/features', label: 'Achievement Categories' },
         { path: '/public-portfolio', label: 'Public Portfolios' },
+
     ];
 
     return (

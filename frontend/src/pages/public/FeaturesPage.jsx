@@ -1,7 +1,5 @@
 import '../../styles/FeaturesPage.css';
-import PublicNavbar from '../../components/common/PublicNavbar';
-import Footer from '../../components/common/Footer';
-import { Upload, Shield, BarChart3, Globe, Award, TrendingUp, CheckCircle, Search, Star, Zap } from 'lucide-react';
+import { Upload, Shield, BarChart3, Globe, Award, TrendingUp, CheckCircle, Search, Star, Zap, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const features = [
@@ -17,8 +15,12 @@ const features = [
 
 const FeaturesPage = () => (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-        <PublicNavbar />
-        <section style={{ paddingTop: '120px', paddingBottom: '6rem' }}>
+        <div style={{ position: 'fixed', top: '1.5rem', left: '1.5rem', zIndex: 100 }}>
+            <Link to="/" className="btn btn-secondary" style={{ fontWeight: 700, borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', backdropFilter: 'blur(10px)', border: '1px solid var(--border-primary)', padding: '0.6rem 1.25rem' }}>
+                <ArrowLeft size={16} /> Back to Home
+            </Link>
+        </div>
+        <section style={{ paddingTop: '100px', paddingBottom: '6rem' }}>
             <div className="container">
                 <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: 'var(--radius-full)', padding: '0.4rem 1rem', marginBottom: '1rem' }}>
@@ -62,7 +64,6 @@ const FeaturesPage = () => (
                 </div>
             </div>
         </section>
-        <Footer />
     </div>
 );
 
