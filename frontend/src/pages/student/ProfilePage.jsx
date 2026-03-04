@@ -73,48 +73,48 @@ const ProfilePage = () => {
 
     return (
         <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            {/* Professional Identity Architecture */}
-            <div className="card" style={{ marginBottom: '2.5rem', padding: '3rem', background: 'linear-gradient(135deg, var(--brand-700) 0%, var(--brand-900) 100%)', position: 'relative', overflow: 'hidden', borderRadius: '30px', boxShadow: 'var(--shadow-2xl)' }}>
-                {/* Institutional Geometric Motifs */}
-                <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '450px', height: '450px', background: 'rgba(255,255,255,0.04)', borderRadius: '80px', transform: 'rotate(25deg)' }}></div>
-                <div style={{ position: 'absolute', bottom: '-30%', left: '-15%', width: '500px', height: '500px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', transform: 'rotate(-15deg)' }}></div>
+            {/* Profile Identity Banner — Light Theme */}
+            <div className="card" style={{ marginBottom: '2.5rem', padding: '2.5rem', background: 'linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 50%, #f0f3ff 100%)', border: '1px solid var(--brand-200)', position: 'relative', overflow: 'hidden', borderRadius: '20px', boxShadow: 'var(--shadow-md)' }}>
+                {/* Subtle geometric motifs */}
+                <div style={{ position: 'absolute', top: '-20%', right: '-8%', width: '380px', height: '380px', background: 'rgba(0, 33, 71, 0.04)', borderRadius: '80px', transform: 'rotate(25deg)' }}></div>
+                <div style={{ position: 'absolute', bottom: '-30%', left: '-10%', width: '320px', height: '320px', background: 'rgba(0, 33, 71, 0.03)', borderRadius: '100px', transform: 'rotate(-15deg)' }}></div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '3rem', position: 'relative', zIndex: 1 }}>
-                    <div style={{ position: 'relative' }}>
-                        <div style={{ position: 'relative', width: 140, height: 140, borderRadius: '40px', overflow: 'hidden', padding: '6px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', boxShadow: 'var(--shadow-xl)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', position: 'relative', zIndex: 1 }}>
+                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                        <div style={{ position: 'relative', width: 120, height: 120, borderRadius: '28px', overflow: 'hidden', padding: '5px', background: 'white', boxShadow: '0 8px 24px rgba(0, 33, 71, 0.18)', border: '1px solid var(--brand-200)' }}>
                             {imagePreview ? (
-                                <img src={imagePreview} alt="Identity Profile" style={{ width: '100%', height: '100%', borderRadius: '34px', objectFit: 'cover' }} />
+                                <img src={imagePreview} alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '22px', objectFit: 'cover' }} />
                             ) : (
-                                <div style={{ width: '100%', height: '100%', borderRadius: '34px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', fontWeight: 900, color: 'white', letterSpacing: '-0.05em' }}>{getInitials(user?.name)}</div>
+                                <div style={{ width: '100%', height: '100%', borderRadius: '22px', background: 'linear-gradient(135deg, var(--brand-600), var(--brand-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 900, color: 'white', letterSpacing: '-0.05em' }}>{getInitials(user?.name)}</div>
                             )}
                         </div>
-                        <label htmlFor="profileImg" style={{ position: 'absolute', bottom: '-10px', right: '-10px', width: 44, height: 44, background: 'white', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 10px 20px rgba(0,0,0,0.2)', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', border: '1px solid rgba(0,0,0,0.05)' }} className="hover-scale">
-                            <Camera size={20} className="text-brand" strokeWidth={2.5} />
+                        <label htmlFor="profileImg" style={{ position: 'absolute', bottom: '-8px', right: '-8px', width: 40, height: 40, background: 'white', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', border: '1px solid var(--border-primary)' }}>
+                            <Camera size={18} style={{ color: 'var(--brand-600)' }} strokeWidth={2.5} />
                         </label>
                         <input id="profileImg" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageChange} />
                     </div>
 
-                    <div style={{ color: 'white', flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem' }}>
-                            <h2 style={{ fontSize: '2.75rem', fontWeight: 950, margin: 0, letterSpacing: '-0.04em', lineHeight: 1.1 }}>{user?.name}</h2>
-                            <div style={{ padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.15)', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(255,255,255,0.2)' }}>VERIFIED OFFICIAL</div>
+                    <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.625rem', flexWrap: 'wrap' }}>
+                            <h2 style={{ fontSize: '2.25rem', fontWeight: 900, margin: 0, letterSpacing: '-0.04em', lineHeight: 1.1, color: 'var(--brand-700)' }}>{user?.name}</h2>
+                            <div style={{ padding: '0.35rem 0.85rem', background: 'white', border: '1px solid var(--brand-200)', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--brand-600)', boxShadow: 'var(--shadow-sm)' }}>VERIFIED OFFICIAL</div>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', opacity: 0.9, marginBottom: '1.75rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                                <div style={{ width: 32, height: 32, background: 'rgba(255,255,255,0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Mail size={16} /></div>
-                                <span style={{ fontWeight: 600, fontSize: '1rem' }}>{user?.email}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <div style={{ width: 30, height: 30, background: 'white', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-primary)', color: 'var(--brand-600)' }}><Mail size={15} /></div>
+                                <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{user?.email}</span>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                                <div style={{ width: 32, height: 32, background: 'rgba(255,255,255,0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={16} /></div>
-                                <span style={{ fontWeight: 600, fontSize: '1rem' }}>{user?.enrollmentNo || user?.studentId || 'Admin Infrastructure'}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <div style={{ width: 30, height: 30, background: 'white', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-primary)', color: 'var(--brand-600)' }}><BookOpen size={15} /></div>
+                                <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{user?.enrollmentNo || user?.studentId || 'Admin'}</span>
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <div style={{ padding: '0.625rem 1.25rem', background: 'white', color: 'var(--brand-800)', borderRadius: '14px', fontWeight: 900, fontSize: '0.85rem', textTransform: 'uppercase', boxShadow: 'var(--shadow-sm)' }}>{user?.department}</div>
-                            <div style={{ padding: '0.625rem 1.25rem', background: 'rgba(255,255,255,0.15)', color: 'white', borderRadius: '14px', fontWeight: 900, fontSize: '0.85rem', textTransform: 'uppercase', border: '1px solid rgba(255,255,255,0.2)' }}>{user?.role}</div>
-                            {user?.batch && <div style={{ padding: '0.625rem 1.25rem', background: 'var(--success-500)', color: 'white', borderRadius: '14px', fontWeight: 900, fontSize: '0.85rem', textTransform: 'uppercase', boxShadow: 'var(--shadow-sm)' }}>COHORT {user.batch}</div>}
+                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                            <div style={{ padding: '0.5rem 1rem', background: 'white', color: 'var(--brand-700)', borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em', border: '1px solid var(--brand-200)', boxShadow: 'var(--shadow-sm)' }}>{user?.department}</div>
+                            <div style={{ padding: '0.5rem 1rem', background: 'var(--primary-100)', color: 'var(--primary-700)', borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em', border: '1px solid var(--primary-200)' }}>{user?.role}</div>
+                            {user?.batch && <div style={{ padding: '0.5rem 1rem', background: 'var(--success-50)', color: 'var(--success-600)', borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em', border: '1px solid var(--success-100)' }}>COHORT {user.batch}</div>}
                         </div>
                     </div>
                 </div>
@@ -189,26 +189,37 @@ const ProfilePage = () => {
                                 <div style={{ marginBottom: '2rem' }}>
                                     <h4 style={{ margin: 0, fontWeight: 950, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Global Connectivity</h4>
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                    <div className="form-group">
-                                        <label className="form-label" style={{ fontWeight: 900, fontSize: '0.8rem', textTransform: 'uppercase' }}>Professional Network (LinkedIn)</label>
-                                        <div style={{ position: 'relative' }}>
-                                            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, background: 'var(--primary-50)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-600)' }}><Linkedin size={16} strokeWidth={2.5} /></div>
-                                            <input className="form-control" style={{ paddingLeft: '3.75rem', height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="linkedin.com/in/identifier" value={form.linkedIn} onChange={e => setForm(p => ({ ...p, linkedIn: e.target.value }))} />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                    {/* LinkedIn */}
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label className="form-label" style={{ fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>LinkedIn</label>
+                                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border-primary)', borderRadius: '10px', overflow: 'hidden', background: 'var(--bg-secondary)' }}>
+                                            <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#e8f0fe', borderRight: '1px solid var(--border-primary)', flexShrink: 0, color: '#0a66c2' }}>
+                                                <Linkedin size={18} strokeWidth={2} />
+                                            </div>
+                                            <input className="form-control" style={{ border: 'none', background: 'transparent', height: '48px', borderRadius: 0, paddingLeft: '0.875rem', fontWeight: 600, outline: 'none', boxShadow: 'none', flex: 1 }} placeholder="linkedin.com/in/yourname" value={form.linkedIn} onChange={e => setForm(p => ({ ...p, linkedIn: e.target.value }))} />
                                         </div>
                                     </div>
-                                    <div className="form-group">
-                                        <label className="form-label" style={{ fontWeight: 900, fontSize: '0.8rem', textTransform: 'uppercase' }}>Source Repository (GitHub)</label>
-                                        <div style={{ position: 'relative' }}>
-                                            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, background: 'var(--slate-100)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--slate-800)' }}><Github size={16} strokeWidth={2.5} /></div>
-                                            <input className="form-control" style={{ paddingLeft: '3.75rem', height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="github.com/identifier" value={form.github} onChange={e => setForm(p => ({ ...p, github: e.target.value }))} />
+
+                                    {/* GitHub */}
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label className="form-label" style={{ fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>GitHub</label>
+                                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border-primary)', borderRadius: '10px', overflow: 'hidden', background: 'var(--bg-secondary)' }}>
+                                            <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', borderRight: '1px solid var(--border-primary)', flexShrink: 0, color: '#24292f' }}>
+                                                <Github size={18} strokeWidth={2} />
+                                            </div>
+                                            <input className="form-control" style={{ border: 'none', background: 'transparent', height: '48px', borderRadius: 0, paddingLeft: '0.875rem', fontWeight: 600, outline: 'none', boxShadow: 'none', flex: 1 }} placeholder="github.com/yourusername" value={form.github} onChange={e => setForm(p => ({ ...p, github: e.target.value }))} />
                                         </div>
                                     </div>
-                                    <div className="form-group">
-                                        <label className="form-label" style={{ fontWeight: 900, fontSize: '0.8rem', textTransform: 'uppercase' }}>Digital Portfolio (External)</label>
-                                        <div style={{ position: 'relative' }}>
-                                            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, background: 'var(--success-50)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--success-600)' }}><Globe size={16} strokeWidth={2.5} /></div>
-                                            <input className="form-control" style={{ paddingLeft: '3.75rem', height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="institutional-yield.com" value={form.portfolio} onChange={e => setForm(p => ({ ...p, portfolio: e.target.value }))} />
+
+                                    {/* Portfolio */}
+                                    <div className="form-group" style={{ marginBottom: 0 }}>
+                                        <label className="form-label" style={{ fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Portfolio</label>
+                                        <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border-primary)', borderRadius: '10px', overflow: 'hidden', background: 'var(--bg-secondary)' }}>
+                                            <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--success-50)', borderRight: '1px solid var(--border-primary)', flexShrink: 0, color: 'var(--success-600)' }}>
+                                                <Globe size={18} strokeWidth={2} />
+                                            </div>
+                                            <input className="form-control" style={{ border: 'none', background: 'transparent', height: '48px', borderRadius: 0, paddingLeft: '0.875rem', fontWeight: 600, outline: 'none', boxShadow: 'none', flex: 1 }} placeholder="yourportfolio.com" value={form.portfolio} onChange={e => setForm(p => ({ ...p, portfolio: e.target.value }))} />
                                         </div>
                                     </div>
                                 </div>

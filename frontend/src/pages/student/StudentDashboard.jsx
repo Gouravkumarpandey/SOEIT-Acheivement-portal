@@ -27,16 +27,16 @@ const StatusBadge = ({ status }) => {
 
 const StudentDashboard = () => {
     const { user } = useAuth();
-    const [stats, setStats] = useState(null);
+    const [stats, setStats] = useState({ stats: { all: 0, approved: 0, pending: 0, totalPoints: 0, byCategory: [], byLevel: [] }, recentActivity: [] });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const load = async () => {
             try {
                 const { data } = await achievementAPI.getStats();
-                setStats(data);
+                if (data) setStats(data);
             } catch {
-                toast.error('Identity synchronization failed: Dashboard unavailable');
+                toast.error('Could not load dashboard data. Please check your connection.');
             } finally {
                 setLoading(false);
             }
@@ -83,23 +83,24 @@ const StudentDashboard = () => {
             </div>
 
             {/* Welcome Institutional Banner */}
-            <div className="card" style={{ marginBottom: '2.5rem', background: 'linear-gradient(135deg, var(--brand-700), var(--brand-900))', padding: '2.5rem', border: 'none', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '-20%', right: '-5%', width: '300px', height: '300px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', position: 'relative', zIndex: 1 }}>
-                    <div style={{ width: 100, height: 100, borderRadius: '24px', background: 'rgba(255,255,255,0.15)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-xl)', border: '1px solid rgba(255,255,255,0.2)' }}>
-                        <GraduationCap size={48} />
+            <div className="card" style={{ marginBottom: '2.5rem', background: 'linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 50%, #f0f3ff 100%)', padding: '2rem 2.5rem', border: '1px solid var(--brand-200)', position: 'relative', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+                <div style={{ position: 'absolute', top: '-30%', right: '-3%', width: '280px', height: '280px', background: 'rgba(0, 33, 71, 0.04)', borderRadius: '50%' }}></div>
+                <div style={{ position: 'absolute', bottom: '-40%', right: '15%', width: '200px', height: '200px', background: 'rgba(0, 33, 71, 0.03)', borderRadius: '50%' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', position: 'relative', zIndex: 1 }}>
+                    <div style={{ width: 80, height: 80, borderRadius: '20px', background: 'linear-gradient(135deg, var(--brand-600), var(--brand-800))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(0, 33, 71, 0.25)', flexShrink: 0 }}>
+                        <GraduationCap size={40} />
                     </div>
-                    <div style={{ color: 'white' }}>
-                        <h3 style={{ fontSize: '2.25rem', fontWeight: 900, marginBottom: '0.75rem', letterSpacing: '-0.02em' }}>Welcome back, {user?.name}</h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+                    <div>
+                        <h3 style={{ fontSize: '1.75rem', fontWeight: 900, marginBottom: '0.5rem', letterSpacing: '-0.03em', color: 'var(--brand-700)' }}>Welcome back, {user?.name}</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success-400)' }}></div>
-                                <span style={{ fontWeight: 700, fontSize: '0.9rem', opacity: 0.9 }}>{user?.department} DOMAIN</span>
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success-500)' }}></div>
+                                <span style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{user?.department} DOMAIN</span>
                             </div>
-                            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.2)' }}></div>
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', opacity: 0.9 }}>ACADEMIC COHORT: {user?.batch || '2024'}</span>
-                            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.2)' }}></div>
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', opacity: 0.9 }}>SEMESTER RESOLUTION: {user?.semester || 'N/A'}</span>
+                            <div style={{ width: '1px', height: '14px', background: 'var(--border-primary)' }}></div>
+                            <span style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ACADEMIC COHORT: {user?.batch || '2024'}</span>
+                            <div style={{ width: '1px', height: '14px', background: 'var(--border-primary)' }}></div>
+                            <span style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SEMESTER: {user?.semester || 'N/A'}</span>
                         </div>
                     </div>
                 </div>
