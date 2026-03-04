@@ -1,0 +1,232 @@
+.manual-viewport {
+    perspective: 2500px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 60px 20px;
+    min-height: 80vh;
+    background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+}
+
+.book-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    position: relative;
+}
+
+/* Enhancing Book Container */
+.book-container {
+    position: relative;
+    width: 500px;
+    height: 380px;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.12));
+}
+
+.book-page {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 250px;
+    height: 100%;
+    transform-origin: left center;
+    transition: transform 0.9s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transform-style: preserve-3d;
+    cursor: pointer;
+    z-index: 1;
+}
+
+/* Interior Page Design */
+.page-front,
+.page-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    padding: 20px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e2e8f0;
+    box-shadow: inset 5px 0 15px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+}
+
+/* Adding Paper Texture */
+.page-front::after,
+.page-back::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+    opacity: 0.03;
+    pointer-events: none;
+}
+
+/* Interior Borders and Professional Touches */
+.page-inner-border {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-back {
+    transform: rotateY(180deg);
+    background: #fdfdfd;
+}
+
+/* Flipped state */
+.book-page.flipped {
+    transform: rotateY(-180deg);
+}
+
+/* Aesthetic Covers */
+.book-cover {
+    color: white !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center;
+    border-radius: 0 12px 12px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cover Textures/Gradients */
+.book-cover.student {
+    background: linear-gradient(145deg, #1e3a8a, #3b82f6) !important;
+}
+
+.book-cover.faculty {
+    background: linear-gradient(145deg, #064e3b, #10b981) !important;
+}
+
+.book-cover::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.book-cover h1 {
+    font-size: 1.75rem;
+    font-weight: 1000;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.book-page-number {
+    position: absolute;
+    bottom: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 0.1em;
+}
+
+.page-front .book-page-number {
+    right: 25px;
+}
+
+.page-back .book-page-number {
+    left: 25px;
+}
+
+/* Page Content Styling */
+.content-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.content-header h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.decorative-line {
+    height: 2px;
+    width: 30px;
+    background: currentColor;
+    opacity: 0.2;
+}
+
+.page-content p {
+    color: #64748b;
+    line-height: 1.5;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Professional Step Indicators */
+.step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.stat-box {
+    margin-top: auto;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.8rem;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 1400px) {
+    .manual-viewport {
+        flex-wrap: wrap;
+        gap: 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    .book-container {
+        width: 100%;
+        height: 600px;
+        perspective: none;
+    }
+
+    .book-page {
+        position: relative;
+        left: 0;
+        width: 100%;
+        transform: none !important;
+        margin-bottom: 15px;
+    }
+
+    .page-back {
+        display: none;
+    }
+}
