@@ -395,43 +395,22 @@ const LandingPage = () => {
             {/* Support & Manual CTA */}
             <section className="py-20 bg-white">
                 <div className="container">
-                    <div style={{
-                        background: 'linear-gradient(135deg, var(--brand-600), var(--brand-700))',
-                        borderRadius: '2rem',
-                        padding: '4rem',
-                        textAlign: 'center',
-                        color: 'white',
-                        boxShadow: '0 25px 50px -12px rgba(37, 99, 235, 0.25)',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}>
+                    <div className="cta-support-card">
                         {/* Decorative Circles */}
-                        <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '300px', height: '300px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
-                        <div style={{ position: 'absolute', bottom: '-20%', left: '-5%', width: '250px', height: '250px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
+                        <div className="cta-circle-top"></div>
+                        <div className="cta-circle-bottom"></div>
 
-                        <div style={{ position: 'relative', zIndex: 1 }}>
-                            <div style={{
-                                display: 'inline-flex',
-                                padding: '0.5rem 1rem',
-                                background: 'rgba(255,255,255,0.1)',
-                                borderRadius: '99px',
-                                marginBottom: '1.5rem',
-                                fontSize: '0.875rem',
-                                fontWeight: 600,
-                                gap: '0.5rem',
-                                alignItems: 'center',
-                                backdropFilter: 'blur(4px)',
-                                border: '1px solid rgba(255,255,255,0.1)'
-                            }}>
+                        <div className="relative z-10">
+                            <div className="cta-support-badge">
                                 <CircleHelp size={16} /> Need Assistance?
                             </div>
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'white', marginBottom: '1.25rem' }}>
-                                New to the <span style={{ color: 'var(--brand-100)' }}>SOEIT Portal?</span>
+                            <h2 className="cta-support-title">
+                                New to the <span className="text-brand-100">SOEIT Portal?</span>
                             </h2>
-                            <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.8)', maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
+                            <p className="cta-support-desc">
                                 Explore our comprehensive user guide to master the achievement verification workflow or reach out to our support team for any technical help.
                             </p>
-                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <div className="flex justify-center">
                                 <Link to="/manual" className="btn btn-secondary btn-lg rounded-md px-10 bg-white text-brand-600 border-none hover:bg-brand-50 shadow-lg flex items-center gap-3 font-bold text-lg">
                                     <BookOpen size={22} /> View User Guide
                                 </Link>

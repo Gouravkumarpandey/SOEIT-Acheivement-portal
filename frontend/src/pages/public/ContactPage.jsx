@@ -29,7 +29,7 @@ const ContactPage = () => {
                         </p>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '3rem', alignItems: 'start' }}>
+                    <div className="contact-grid">
                         {/* Contact Info */}
                         <div>
                             <h3 style={{ marginBottom: '1.5rem' }}>Contact Information</h3>
@@ -71,7 +71,7 @@ const ContactPage = () => {
                             ) : (
                                 <form onSubmit={handleSubmit}>
                                     <h3 style={{ marginBottom: '1.5rem' }}>Send a Message</h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="contact-form-row">
                                         <div className="form-group">
                                             <label className="form-label required">Your Name</label>
                                             <input className="form-control" placeholder="John Doe" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required />

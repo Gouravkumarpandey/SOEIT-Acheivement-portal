@@ -31,7 +31,7 @@ const FeaturesPage = () => (
                     </p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                <div className="features-grid">
                     {features.map(({ icon: Icon, color, title, points }) => (
                         <div key={title} className="card card-body" style={{ transition: 'all 0.3s' }}
                             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.borderColor = color + '55'; }}
@@ -55,7 +55,7 @@ const FeaturesPage = () => (
 
                 <div style={{ textAlign: 'center', marginTop: '4rem' }}>
                     <h2 style={{ marginBottom: '1.5rem' }}>Ready to get started?</h2>
-                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <div className="features-action-btns">
                         <Link to="/register" className="btn btn-primary btn-lg">Create Student Account</Link>
                         <Link to="/contact" className="btn btn-secondary btn-lg">Contact for Admin Access</Link>
                     </div>

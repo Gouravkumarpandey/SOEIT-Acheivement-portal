@@ -27,7 +27,7 @@ const HowItWorksPage = () => (
 
                 <div style={{ position: 'relative' }}>
                     {steps.map(({ icon: Icon, step, title, desc, color }, i) => (
-                        <div key={step} style={{ display: 'flex', gap: '2rem', marginBottom: '2rem', alignItems: 'flex-start' }}>
+                        <div key={step} className="how-step-row">
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
                                 <div style={{ width: 60, height: 60, background: color + '20', border: `2px solid ${color}`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, position: 'relative' }}>
                                     <Icon size={26} color={color} />

@@ -15,7 +15,7 @@ const AboutPage = () => (
                     </p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+                <div className="about-hero-grid">
                     {[
                         { icon: Target, title: 'Our Mission', text: 'To provide every SOEIT student with a transparent, efficient, and professional platform to document, verify, and share their academic and extracurricular achievements.', color: '#3b82f6' },
                         { icon: Eye, title: 'Our Vision', text: 'To become the gold standard for institutional achievement tracking in engineering colleges across India, enabling data-driven decisions about student potential.', color: '#8b5cf6' },
@@ -32,7 +32,7 @@ const AboutPage = () => (
                 </div>
 
                 <div className="card card-body" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.05), rgba(99,102,241,0.05))' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center' }}>
+                    <div className="about-content-grid">
                         <div>
                             <h2 style={{ marginBottom: '1rem' }}>About <span className="text-gradient">Arka Jain University</span></h2>
                             <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: '1rem' }}>
@@ -42,7 +42,7 @@ const AboutPage = () => (
                                 The School of Engineering & IT (SOEIT) offers programs in CSE, IT, ECE, EEE, Mechanical, and Civil Engineering, with a strong emphasis on practical learning and industry readiness.
                             </p>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div className="about-stats-grid">
                             {[['10+', 'Years of Excellence'], ['5000+', 'Alumni Network'], ['50+', 'Industry Partners'], ['95%', 'Placement Rate']].map(([val, lbl]) => (
                                 <div key={lbl} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '1.25rem', border: '1px solid var(--border-primary)', textAlign: 'center' }}>
                                     <div style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'Space Grotesk', color: 'var(--primary-400)' }}>{val}</div>
