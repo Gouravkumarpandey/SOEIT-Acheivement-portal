@@ -42,10 +42,10 @@ const AdminDashboard = () => {
     if (loading) {
         return (
             <div className="animate-fade-in">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                <div className="admin-skeleton-grid">
                     {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: 160, borderRadius: '20px' }} />)}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '2rem' }}>
+                <div className="admin-skeleton-charts">
                     <div className="skeleton" style={{ height: 400, borderRadius: '20px' }} />
                     <div className="skeleton" style={{ height: 400, borderRadius: '20px' }} />
                 </div>
@@ -56,19 +56,19 @@ const AdminDashboard = () => {
     return (
         <div className="animate-fade-in">
             {/* Header Context Suite */}
-            <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                <div>
+            <div className="page-header admin-header-suite">
+                <div className="admin-header-content">
                     <h2 className="heading-display">Administrative Oversight</h2>
                     <p className="page-subtitle">Unified surveillance of institutional achievements, departmental growth, and evaluation performance metrics.</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem 1.25rem', background: 'white', borderRadius: '12px', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
+                <div className="admin-header-sync">
                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success-500)', boxShadow: '0 0 0 4px var(--success-50)' }}></div>
                     <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>REAL-TIME SYNCHRONIZATION</span>
                 </div>
             </div>
 
             {/* Premium Stat Architecture */}
-            <div className="grid-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+            <div className="grid-stats admin-stats-grid">
                 {statCards.map(({ label, value, icon: Icon, color, bg, delta, iconColor }) => (
                     <div key={label} className="card" style={{ padding: '1.75rem', position: 'relative', overflow: 'hidden', border: '1px solid var(--border-primary)', borderRadius: '20px', boxShadow: 'var(--shadow-sm)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
@@ -90,16 +90,16 @@ const AdminDashboard = () => {
             </div>
 
             {/* Dynamic Visualization Ecosystem */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '2rem', marginBottom: '2.5rem' }}>
+            <div className="admin-charts-ecosystem">
                 {/* Submission Longitudinal Trend */}
-                <div className="card" style={{ border: '1px solid var(--border-primary)', borderRadius: '20px', overflow: 'hidden' }}>
-                    <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-primary)', padding: '1.5rem 2rem', background: 'var(--slate-50)' }}>
+                <div className="card admin-chart-card-res">
+                    <div className="card-header admin-chart-header">
                         <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Submission Longitudinal Trend</h4>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 900, color: 'var(--brand-600)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             <BarChart3 size={16} /> 12-Month Resolution
                         </div>
                     </div>
-                    <div className="card-body" style={{ padding: '2.5rem 1.5rem 1rem 1.5rem' }}>
+                    <div className="card-body admin-chart-body">
                         <ResponsiveContainer width="100%" height={320}>
                             <AreaChart data={trendData}>
                                 <defs>
@@ -118,11 +118,11 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Domain Distribution Intelligence */}
-                <div className="card" style={{ border: '1px solid var(--border-primary)', borderRadius: '20px', overflow: 'hidden' }}>
-                    <div className="card-header" style={{ borderBottom: '1px solid var(--border-primary)', padding: '1.5rem 2rem', background: 'var(--slate-50)' }}>
+                <div className="card admin-chart-card-res">
+                    <div className="card-header admin-chart-header">
                         <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Domain Yield Analysis</h4>
                     </div>
-                    <div className="card-body" style={{ padding: '2rem' }}>
+                    <div className="card-body admin-domain-body">
                         <ResponsiveContainer width="100%" height={320}>
                             <PieChart>
                                 <Pie
@@ -147,12 +147,12 @@ const AdminDashboard = () => {
             </div>
 
             {/* Departmental Intelligence & Critical Action Queue */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '2rem' }}>
-                <div className="card" style={{ border: '1px solid var(--border-primary)', borderRadius: '20px', overflow: 'hidden' }}>
-                    <div className="card-header" style={{ borderBottom: '1px solid var(--border-primary)', padding: '1.5rem 2rem', background: 'var(--slate-50)' }}>
+            <div className="admin-charts-ecosystem-alt">
+                <div className="card admin-chart-card-res">
+                    <div className="card-header admin-chart-header">
                         <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Departmental Compliance Performance</h4>
                     </div>
-                    <div className="card-body" style={{ padding: '2.5rem 2rem 1.5rem 1rem' }}>
+                    <div className="card-body admin-chart-body">
                         <ResponsiveContainer width="100%" height={320}>
                             <BarChart data={data?.byDepartment || []} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                                 <XAxis dataKey="_id" tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 900 }} tickLine={false} axisLine={false} dy={15} />
@@ -166,14 +166,14 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                <div className="card" style={{ border: '1px solid var(--border-primary)', borderRadius: '20px', overflow: 'hidden' }}>
-                    <div className="card-header" style={{ borderBottom: '1px solid var(--border-primary)', padding: '1.5rem 2rem', background: 'var(--slate-50)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="card admin-chart-card-res">
+                    <div className="card-header admin-chart-header">
                         <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Critical Review Queue</h4>
-                        <Link to="/admin/verify" className="btn btn-ghost" style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--brand-600)', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'white', border: '1px solid var(--border-primary)', padding: '0.5rem 1rem', borderRadius: '10px' }}>
+                        <Link to="/admin/verify" className="btn btn-ghost admin-sync-btn">
                             <span>AUDIT REGISTRY</span> <Award size={16} strokeWidth={2.5} />
                         </Link>
                     </div>
-                    <div className="card-body" style={{ padding: '1.25rem' }}>
+                    <div className="card-body admin-queue-body">
                         {(data?.recentAchievements || []).length === 0 ? (
                             <div style={{ padding: '5rem 2rem', textAlign: 'center' }}>
                                 <div style={{ width: 80, height: 80, background: 'var(--success-50)', color: 'var(--success-600)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {data.recentAchievements.map(a => (
-                                    <div key={a._id} style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.25rem', borderRadius: '16px', background: 'white', border: '1px solid var(--border-primary)', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'default' }} className="hover-row">
+                                    <div key={a._id} className="admin-recent-achievements-row hover-row">
                                         <div style={{ width: 48, height: 48, background: 'var(--primary-50)', color: 'var(--brand-700)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.1rem', border: '1px solid var(--primary-100)', flexShrink: 0 }}>
                                             {a.studentId?.name?.charAt(0) || 'S'}
                                         </div>
