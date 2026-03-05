@@ -38,7 +38,7 @@ const ContactPage = () => {
                             <h3 style={{ marginBottom: '1.5rem' }}>Contact Information</h3>
                             {[
                                 { icon: Mail, label: 'Email', value: 'soeit@arkajainuniversity.ac.in', color: '#3b82f6' },
-                                { icon: Phone, label: 'Phone', value: '+91 98765 43210', color: '#8b5cf6' },
+                                { icon: Phone, label: 'Phone', value: '1800-1200-200', color: '#8b5cf6' },
                                 { icon: MapPin, label: 'Address', value: 'Arka Jain University, Gamharia, Jamshedpur, Jharkhand 832108', color: '#10b981' },
                             ].map(({ icon: Icon, label, value, color }) => (
                                 <div key={label} className="card card-body" style={{ marginBottom: '1rem', display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
