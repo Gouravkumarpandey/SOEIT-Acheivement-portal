@@ -13,6 +13,9 @@ const UserManual = () => {
     const [studentFlipped, setStudentFlipped] = useState(new Array(6).fill(false));
     const [facultyFlipped, setFacultyFlipped] = useState(new Array(6).fill(false));
 
+    const getStudentProgress = () => studentFlipped.filter(p => p).length;
+    const getFacultyProgress = () => facultyFlipped.filter(p => p).length;
+
     const toggleStudentPage = (index) => {
         const newFlipped = [...studentFlipped];
         if (index === studentFlipped.length - 1 && studentFlipped[index]) {
@@ -66,9 +69,14 @@ const UserManual = () => {
 
                         {/* BOOK 1: STUDENT MANUAL */}
                         <div className="book-wrapper">
-                            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--brand-600)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--brand-600)', display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
                                 <Users size={28} /> Student Manual
                             </h2>
+
+                            <div className="mobile-hint">
+                                <Zap size={14} style={{ marginRight: '4px' }} /> Tap pages or buttons to flip
+                            </div>
+
                             <div className="book-container">
                                 {/* Page 6: Final/Back Cover */}
                                 <div className={`book-page ${studentFlipped[5] ? 'flipped' : ''}`} style={{ zIndex: studentFlipped[5] ? 20 : 1 }} onClick={() => toggleStudentPage(5)}>
@@ -237,13 +245,30 @@ const UserManual = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="book-controls">
+                                <button className="control-btn" onClick={(e) => { e.stopPropagation(); toggleStudentPage(Math.max(0, getStudentProgress() - 1)); }} disabled={getStudentProgress() === 0}>
+                                    <ArrowLeft size={20} />
+                                </button>
+                                <div className="page-indicator">
+                                    {getStudentProgress() + 1} / {studentFlipped.length + 1}
+                                </div>
+                                <button className="control-btn" onClick={(e) => { e.stopPropagation(); toggleStudentPage(getStudentProgress()); }} disabled={getStudentProgress() === studentFlipped.length}>
+                                    <ArrowRight size={20} />
+                                </button>
+                            </div>
                         </div>
 
                         {/* BOOK 2: FACULTY MANUAL */}
                         <div className="book-wrapper">
-                            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#064e3b', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#064e3b', display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
                                 <ShieldCheck size={28} /> Faculty Manual
                             </h2>
+
+                            <div className="mobile-hint">
+                                <Zap size={14} style={{ marginRight: '4px' }} /> Tap pages or buttons to flip
+                            </div>
+
                             <div className="book-container">
                                 {/* Page 6: Final/Back Cover */}
                                 <div className={`book-page ${facultyFlipped[5] ? 'flipped' : ''}`} style={{ zIndex: facultyFlipped[5] ? 20 : 1 }} onClick={() => toggleFacultyPage(5)}>
@@ -408,6 +433,18 @@ const UserManual = () => {
                                         <span className="book-page-number">PAGE 02</span>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div className="book-controls">
+                                <button className="control-btn" onClick={(e) => { e.stopPropagation(); toggleFacultyPage(Math.max(0, getFacultyProgress() - 1)); }} disabled={getFacultyProgress() === 0}>
+                                    <ArrowLeft size={20} />
+                                </button>
+                                <div className="page-indicator">
+                                    {getFacultyProgress() + 1} / {facultyFlipped.length + 1}
+                                </div>
+                                <button className="control-btn" onClick={(e) => { e.stopPropagation(); toggleFacultyPage(getFacultyProgress()); }} disabled={getFacultyProgress() === facultyFlipped.length}>
+                                    <ArrowRight size={20} />
+                                </button>
                             </div>
                         </div>
 
