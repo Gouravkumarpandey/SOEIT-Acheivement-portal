@@ -64,7 +64,10 @@ exports.getPendingAchievements = async (req, res, next) => {
 
         if (department) { sql += ' AND u.department = ?'; args.push(department); }
         if (category) { sql += ' AND a.category = ?'; args.push(category); }
-        if (search) { sql += ' AND (a.title LIKE ? OR u.name LIKE ?)'; args.push(`%${search}%`, `%${search}%`); }
+        if (search) {
+            sql += ' AND (a.title LIKE ? OR u.name LIKE ? OR u.enrollment_no LIKE ?)';
+            args.push(`%${search}%`, `%${search}%`, `%${search}%`);
+        }
 
         // Count
         const countRes = await db.execute({
@@ -159,7 +162,10 @@ exports.getAllAchievements = async (req, res, next) => {
         if (status) { sql += ' AND a.status = ?'; args.push(status); }
         if (department) { sql += ' AND u.department = ?'; args.push(department); }
         if (category) { sql += ' AND a.category = ?'; args.push(category); }
-        if (search) { sql += ' AND (a.title LIKE ? OR u.name LIKE ?)'; args.push(`%${search}%`, `%${search}%`); }
+        if (search) {
+            sql += ' AND (a.title LIKE ? OR u.name LIKE ? OR u.enrollment_no LIKE ?)';
+            args.push(`%${search}%`, `%${search}%`, `%${search}%`);
+        }
 
         const countRes = await db.execute({
             sql: sql.replace(/SELECT[\s\S]*?FROM achievements/, 'SELECT COUNT(*) AS cnt FROM achievements'),

@@ -83,6 +83,12 @@ const Course = {
             args.push(filters.status);
         }
 
+        if (filters.search) {
+            sql += ' AND (u.name LIKE ? OR u.enrollment_no LIKE ? OR c.course_name LIKE ?)';
+            const searchVal = `%${filters.search}%`;
+            args.push(searchVal, searchVal, searchVal);
+        }
+
         sql += ' ORDER BY c.updated_at DESC';
 
         const result = await db.execute({ sql, args });

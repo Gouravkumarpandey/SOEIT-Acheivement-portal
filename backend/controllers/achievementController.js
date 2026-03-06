@@ -1,6 +1,7 @@
 const Achievement = require('../models/Achievement');
 const Verification = require('../models/Verification');
 const User = require('../models/User');
+const Course = require('../models/Course');
 
 // @desc    Create achievement
 // @route   POST /api/achievements
@@ -142,11 +143,17 @@ exports.getPublicPortfolio = async (req, res, next) => {
             isPublic: true,
         }).sort({ createdAt: -1 });
 
+        const [coursesRows] = await Promise.all([
+            Course.findByStudentId(req.params.userId)
+        ]);
+
         const stats = {
             total: achievements.length,
             byCategory: {},
             byLevel: {},
             totalPoints: achievements.reduce((sum, a) => sum + (a.points || 0), 0),
+            courses: coursesRows.length,
+            completedCourses: coursesRows.filter(c => c.status === 'Completed').length
         };
         achievements.forEach((a) => {
             stats.byCategory[a.category] = (stats.byCategory[a.category] || 0) + 1;
@@ -159,7 +166,7 @@ exports.getPublicPortfolio = async (req, res, next) => {
         delete studentData.resetPasswordToken;
         delete studentData.resetPasswordExpire;
 
-        res.status(200).json({ success: true, student: studentData, achievements, stats });
+        res.status(200).json({ success: true, student: studentData, achievements, courses: coursesRows, stats });
     } catch (error) {
         next(error);
     }

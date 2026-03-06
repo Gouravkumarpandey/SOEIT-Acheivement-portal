@@ -41,7 +41,7 @@ const PublicPortfolioPage = () => {
         </div>
     );
 
-    const { student, achievements, stats } = data;
+    const { student, achievements, stats, courses = [] } = data;
     const categories = [...new Set(achievements.map(a => a.category))];
     const filtered = selectedCat ? achievements.filter(a => a.category === selectedCat) : achievements;
     const getInitials = (name) => name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'S';
@@ -66,14 +66,14 @@ const PublicPortfolioPage = () => {
                 <div className="container">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
                         {student.profileImage ? (
-                            <img src={student.profileImage} alt={student.name} style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', border: '4px solid rgba(59,130,246,0.4)', boxShadow: '0 0 30px rgba(59,130,246,0.3)' }} />
+                            <img src={`${import.meta.env.VITE_UPLOADS_URL || ''}${student.profileImage}`} alt={student.name} style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', border: '4px solid rgba(59,130,246,0.4)', boxShadow: '0 0 30px rgba(59,130,246,0.3)' }} />
                         ) : (
                             <div className="avatar" style={{ width: 110, height: 110, fontSize: '2.5rem', border: '4px solid rgba(59,130,246,0.4)', boxShadow: '0 0 30px rgba(59,130,246,0.3)' }}>{getInitials(student.name)}</div>
                         )}
                         <div style={{ flex: 1 }}>
                             <h1 style={{ marginBottom: '0.375rem' }}>{student.name}</h1>
                             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '0.75rem' }}>
-                                {student.department} Engineering • {student.batch ? `Batch ${student.batch}` : ''} {student.semester ? `• Sem ${student.semester}` : ''}
+                                {student.department} Engineering • {student.enrollment_no ? `Enrollment: ${student.enrollment_no}` : ''} {student.semester ? `• Sem ${student.semester}` : ''}
                             </p>
                             {student.bio && <p style={{ color: 'var(--text-muted)', maxWidth: 500, lineHeight: 1.7, marginBottom: '1rem', fontSize: '0.9rem' }}>{student.bio}</p>}
                             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -93,8 +93,8 @@ const PublicPortfolioPage = () => {
                         {[
                             { label: 'Achievements', value: stats.total, icon: Trophy, color: '#3b82f6' },
                             { label: 'Total Points', value: stats.totalPoints, icon: Star, color: '#f59e0b' },
-                            { label: 'Categories', value: Object.keys(stats.byCategory).length, icon: Award, color: '#8b5cf6' },
-                            { label: 'Highest Level', value: Object.keys(stats.byLevel)[0] || 'N/A', icon: CheckCircle, color: '#10b981' },
+                            { label: 'Courses Enrolled', value: stats.courses || 0, icon: Award, color: '#8b5cf6' },
+                            { label: 'Completed', value: stats.completedCourses || 0, icon: CheckCircle, color: '#10b981' },
                         ].map(({ label, value, icon: Icon, color }) => (
                             <div key={label}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
@@ -108,8 +108,52 @@ const PublicPortfolioPage = () => {
                 </div>
             </div>
 
+            {/* Courses Section (if any) */}
+            {courses.length > 0 && (
+                <div className="container" style={{ padding: '3rem 1.5rem 0' }}>
+                    <div className="section-header" style={{ marginBottom: '2rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-primary)' }}>Skill Development Ledger</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Real-time synchronization of external certifications and platform-based learning.</p>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
+                        {courses.map(course => (
+                            <div key={course.id} className="card card-body" style={{ border: '1px solid var(--border-primary)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                    <div>
+                                        <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{course.course_name}</h4>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--brand-600)' }}>{course.platform}</div>
+                                    </div>
+                                    <span style={{
+                                        fontSize: '0.65rem',
+                                        fontWeight: 800,
+                                        padding: '0.2rem 0.6rem',
+                                        borderRadius: '6px',
+                                        background: course.status === 'Completed' ? 'var(--success-50)' : 'var(--primary-50)',
+                                        color: course.status === 'Completed' ? 'var(--success-700)' : 'var(--brand-700)',
+                                        textTransform: 'uppercase'
+                                    }}>
+                                        {course.status}
+                                    </span>
+                                </div>
+                                <div style={{ height: '6px', background: 'var(--slate-100)', borderRadius: '3px', overflow: 'hidden', marginBottom: '0.5rem' }}>
+                                    <div style={{ width: `${course.progress}%`, height: '100%', background: 'linear-gradient(90deg, var(--brand-500), var(--brand-700))' }} />
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                                    <span>PROGRESS</span>
+                                    <span>{course.progress}%</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Achievements */}
             <div className="container" style={{ padding: '3rem 1.5rem' }}>
+                <div className="section-header" style={{ marginBottom: '2rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-primary)' }}>Verified Accomplishments</h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>A chronological record of validated institutional achievements and merit points.</p>
+                </div>
                 {/* Category Filter */}
                 {categories.length > 1 && (
                     <div style={{ marginBottom: '2rem' }}>
@@ -157,7 +201,7 @@ const PublicPortfolioPage = () => {
 
                 {filtered.length === 0 ? (
                     <div className="empty-state">
-                        <Trophy /><h3>No achievements yet</h3><p>Achievements will appear here once verified.</p>
+                        <Trophy /><h3>No verified achievements yet</h3><p>Achievements will appear here once verified.</p>
                     </div>
                 ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>

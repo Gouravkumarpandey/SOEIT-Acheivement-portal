@@ -78,8 +78,8 @@ exports.deleteCourse = async (req, res, next) => {
 // @route   GET /api/courses
 exports.getAllCourses = async (req, res, next) => {
     try {
-        const { department, status } = req.query;
-        const courses = await Course.findAllEnriched({ department, status });
+        const { department, status, search } = req.query;
+        const courses = await Course.findAllEnriched({ department, status, search });
 
         // Transform row names back to JS names if needed (though the frontend can handle row keys too)
         const transformed = courses.map(c => ({

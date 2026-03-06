@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { courseAPI } from '../../services/api';
-import { Search, Filter, BookOpen, GraduationCap, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
+import { Search, Filter, BookOpen, GraduationCap, ChevronLeft, ChevronRight, Activity, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const StudentCoursesPage = () => {
@@ -21,8 +22,11 @@ const StudentCoursesPage = () => {
     };
 
     useEffect(() => {
-        loadAllCourses();
-    }, [filters.department, filters.status]);
+        const handler = setTimeout(() => {
+            loadAllCourses();
+        }, 300); // 300ms debounce
+        return () => clearTimeout(handler);
+    }, [filters.department, filters.status, filters.search]);
 
     return (
         <div className="animate-fade-in">
@@ -37,10 +41,9 @@ const StudentCoursesPage = () => {
                         <div className="search-wrapper">
                             <input
                                 className="form-control"
-                                placeholder="Identify scholars or specific course paths..."
+                                placeholder="Search by Enrollment No, Scholar Name, or Course Protocol..."
                                 value={filters.search}
                                 onChange={e => setFilters({ ...filters, search: e.target.value })}
-                                onKeyDown={e => e.key === 'Enter' && loadAllCourses()}
                             />
                             <Search size={18} className="search-icon" />
                         </div>
@@ -76,7 +79,8 @@ const StudentCoursesPage = () => {
                                 <th>Course Resolution</th>
                                 <th>Platform Path</th>
                                 <th style={{ textAlign: 'center' }}>Progress Metrics</th>
-                                <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Registry Status</th>
+                                <th>Registry Status</th>
+                                <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Audit</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -121,10 +125,15 @@ const StudentCoursesPage = () => {
                                                 <span style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--brand-700)', minWidth: '40px' }}>{course.progress}%</span>
                                             </div>
                                         </td>
-                                        <td style={{ textAlign: 'right', paddingRight: '2rem' }}>
-                                            <span className={`badge ${course.status === 'Completed' ? 'badge-success' : 'badge-warning'}`} style={{ fontWeight: 800, padding: '0.5rem 1rem', textTransform: 'uppercase' }}>
+                                        <td style={{ textAlign: 'center' }}>
+                                            <span className={`badge ${course.status === 'Completed' ? 'badge-success' : 'badge-warning'}`} style={{ fontWeight: 800, padding: '0.4rem 0.8rem', textTransform: 'uppercase' }}>
                                                 {course.status}
                                             </span>
+                                        </td>
+                                        <td style={{ textAlign: 'right', paddingRight: '2rem' }}>
+                                            <Link to={`/portfolio/${course.student_id || course.studentId}`} className="btn btn-ghost" style={{ padding: '0.5rem', color: 'var(--brand-600)' }} title="Audit Scholar Portfolio">
+                                                <Eye size={20} strokeWidth={2.5} />
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))
