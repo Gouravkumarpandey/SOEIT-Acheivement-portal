@@ -2,7 +2,7 @@ import '../../styles/PublicPortfolioPage.css';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { achievementAPI } from '../../services/api';
-import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft } from 'lucide-react';
+import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -93,7 +93,8 @@ const PublicPortfolioPage = () => {
                         {[
                             { label: 'Achievements', value: stats.total, icon: Trophy, color: '#3b82f6' },
                             { label: 'Total Points', value: stats.totalPoints, icon: Star, color: '#f59e0b' },
-                            { label: 'Courses Enrolled', value: stats.courses || 0, icon: Award, color: '#8b5cf6' },
+                            { label: 'Hackathons Explored', value: stats.hackathonsExplored || 0, icon: Terminal, color: '#8b5cf6' },
+                            { label: 'Courses Enrolled', value: stats.courses || 0, icon: Award, color: '#06b6d4' },
                             { label: 'Completed', value: stats.completedCourses || 0, icon: CheckCircle, color: '#10b981' },
                         ].map(({ label, value, icon: Icon, color }) => (
                             <div key={label}>

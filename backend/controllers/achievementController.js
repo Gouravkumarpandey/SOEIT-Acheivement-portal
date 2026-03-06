@@ -2,6 +2,7 @@ const Achievement = require('../models/Achievement');
 const Verification = require('../models/Verification');
 const User = require('../models/User');
 const Course = require('../models/Course');
+const HackathonActivity = require('../models/HackathonActivity');
 
 // @desc    Create achievement
 // @route   POST /api/achievements
@@ -143,8 +144,9 @@ exports.getPublicPortfolio = async (req, res, next) => {
             isPublic: true,
         }).sort({ createdAt: -1 });
 
-        const [coursesRows] = await Promise.all([
-            Course.findByStudentId(req.params.userId)
+        const [coursesRows, hackathonsExplored] = await Promise.all([
+            Course.findByStudentId(req.params.userId),
+            HackathonActivity.countByStudent(req.params.userId)
         ]);
 
         const stats = {
@@ -153,7 +155,8 @@ exports.getPublicPortfolio = async (req, res, next) => {
             byLevel: {},
             totalPoints: achievements.reduce((sum, a) => sum + (a.points || 0), 0),
             courses: coursesRows.length,
-            completedCourses: coursesRows.filter(c => c.status === 'Completed').length
+            completedCourses: coursesRows.filter(c => c.status === 'Completed').length,
+            hackathonsExplored
         };
         achievements.forEach((a) => {
             stats.byCategory[a.category] = (stats.byCategory[a.category] || 0) + 1;

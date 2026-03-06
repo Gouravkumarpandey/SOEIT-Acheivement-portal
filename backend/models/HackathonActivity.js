@@ -46,6 +46,16 @@ const HackathonActivity = {
 
         const result = await db.execute({ sql, args });
         return result.rows;
+    },
+
+    /** Count distinct hackathons a student has explored */
+    countByStudent: async (studentId) => {
+        const db = getDb();
+        const result = await db.execute({
+            sql: `SELECT COUNT(DISTINCT hackathon_title) as cnt FROM hackathon_activities WHERE student_id = ?`,
+            args: [studentId],
+        });
+        return Number(result.rows[0]?.cnt) || 0;
     }
 };
 
