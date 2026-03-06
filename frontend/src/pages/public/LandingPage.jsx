@@ -9,50 +9,66 @@ import {
     Github, Linkedin, Code, Library, Terminal, CircleHelp, MessageSquare
 } from 'lucide-react';
 
-const stats = [
-    { value: '4,200+', label: 'Technical Records' },
-    { value: '1,250+', label: 'Engineer Dossiers' },
-    { value: '100%', label: 'Skill Validation' },
-    { value: '24/7', label: 'Faculty Verification' },
+const quickLinks = [
+    { title: 'Hackathons', icon: Trophy, color: '#ff6b6b' },
+    { title: 'Coding', icon: Terminal, color: '#4facfe' },
+    { title: 'Internships', icon: Briefcase, color: '#00f2fe' },
+    { title: 'Mentorship', icon: Users, color: '#f093fb' },
+    { title: 'Courses', icon: BookOpen, color: '#43e97b' },
+    { title: 'Practice', icon: Code, color: '#fa709a' },
 ];
 
-const features = [
-    { icon: Shield, title: 'Project Verification', desc: 'Every technical project and certificate is vetted through a faculty workflow ensuring 100% industry-ready validation.', color: 'var(--brand-600)' },
-    { icon: FileCheck, title: 'Engineer Portfolios', desc: 'Students generate tamper-proof project dossiers for top tech recruiters, verified by the SOEIT faculty.', color: 'var(--brand-600)' },
-    { icon: BarChart3, title: 'Compliance Analytics', desc: 'Real-time monitoring of departmental achievements for NAAC, NIRF, and other institutional audits.', color: 'var(--brand-600)' },
-    { icon: Users, title: 'Faculty Oversight', desc: 'Dedicated administrative tools for department heads to monitor student growth and career milestones.', color: 'var(--brand-600)' },
-    { icon: Award, title: 'Excellence Tiering', desc: 'Automated point calculations based on national and international achievement standards and weights.', color: 'var(--brand-600)' },
-    { icon: Globe, title: 'Universal Export', desc: 'Export verified records directly to LinkedIn or download as official university-branded PDF certificates.', color: 'var(--brand-600)' },
-];
-
-const categoriesData = [
-    { name: 'Technical Projects', icon: Briefcase },
-    { name: 'Coding Challenges', icon: Zap },
-    { name: 'Industrial Training', icon: Shield },
-    { name: 'Web/App Innovations', icon: Globe },
-    { name: 'Hardware Prototypes', icon: Trophy },
-    { name: 'Skill Certifications', icon: BookOpen },
-    { name: 'Cultural Events', icon: Star },
-    { name: 'Team Leadership', icon: Users }
-];
-
-const workflowSteps = [
+const liveChallenges = [
     {
-        title: 'Submit Achievement',
-        desc: 'Students upload their technical milestones, project documentation, and valid certificates through their dedicated portal.',
-        icon: GraduationCap
+        title: 'Smart India Hackathon 2026',
+        type: 'SIH | Govt of India',
+        img: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800',
+        prize: '₹1,00,000 Per Theme',
+        stats: { students: '25k+', days: 'Starts Sept' },
+        badge: 'Premier'
     },
     {
-        title: 'Faculty Verification',
-        desc: 'Appointed faculty coordinators review the submissions against institutional standards to ensure authenticity.',
-        icon: FileCheck
+        title: 'MLH Global Hack Week',
+        type: 'Open Source | MLH',
+        img: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=800',
+        prize: 'Exclusive Swag + Prizes',
+        stats: { students: '10k+', days: 'Monthly' },
+        badge: 'Ongoing'
     },
     {
-        title: 'Global Recognition',
-        desc: 'Verified achievements are instantly added to the public dossier, ready for placement drives and recruiter reviews.',
-        icon: Award
+        title: 'Google Solution Challenge',
+        type: 'GDSC | Global',
+        img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800',
+        prize: '$12,000 + Mentorship',
+        stats: { students: '15k+', days: 'Jan - Mar' },
+        badge: 'Elite'
+    },
+    {
+        title: 'Amazon ML Challenge',
+        type: 'Machine Learning',
+        img: 'https://images.unsplash.com/photo-1527474305487-b87b222841cc?auto=format&fit=crop&q=80&w=800',
+        prize: '₹10L + PPO Opportunities',
+        stats: { students: '12k+', days: 'Aug 2025' },
+        badge: 'High Impact'
+    },
+    {
+        title: 'NASA Space Apps Challenge',
+        type: 'Innovation | Global',
+        img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800',
+        prize: 'Global Recognition',
+        stats: { students: '30k+', days: 'Oct 2025' },
+        badge: 'Prestigious'
+    },
+    {
+        title: 'Flipkart GRID 7.0',
+        type: 'Robotics & E-com',
+        img: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800',
+        prize: '₹5,00,000 + Jobs',
+        stats: { students: '20k+', days: 'Upcoming' },
+        badge: 'Top Tier'
     }
 ];
+
 
 const faqs = [
     {
@@ -156,122 +172,65 @@ const LandingPage = () => {
         <div className="landing-page">
             <PublicNavbar />
 
-            {/* Hero Section */}
+            {/* Hero Section - Split Layout (Devpost Style) */}
             <section className="hero-section">
                 <div className="hero-mesh" />
 
                 <div className="container hero-container">
-                    <div className="hero-badge">
-                        <Shield size={14} />
-                        <span className="hero-badge-text">Official Academic Repository of SOEIT</span>
-                    </div>
-
-                    <h1 className="hero-title">
-                        Centralizing <br />
-                        <span className="text-gradient">Student Excellence</span>
-                    </h1>
-
-                    <p className="hero-subtitle">
-                        The SOEIT Achievement Portal is the primary platform for documenting, verifying, and showcasing the technical projects, coding skills, and engineering milestones of our future innovators.
-                    </p>
-
-                    <div className="flex justify-center mt-8">
-                        <Link to="/login" className="btn btn-primary btn-lg rounded-md px-12 bg-brand-600 border-none shadow-xl hover:bg-brand-700 transition-all flex items-center gap-3 font-bold text-lg">
-                            Get Started <ArrowRight size={20} />
-                        </Link>
-                    </div>
-                </div>
-            </section>
-
-
-            {/* Features Section */}
-            <section className="py-24 bg-white">
-                <div className="container">
-                    <div className="text-center mb-20">
-                        <div className="section-label mb-4">
-                            <Shield size={14} className="text-brand-600" />
-                            <span>Academic Governance</span>
+                    <div className="hero-content">
+                        <div className="hero-badge">
+                            <Shield size={14} />
+                            <span className="hero-badge-text">Official SOEIT Technical Ecosystem</span>
                         </div>
-                        <h2 className="text-4xl font-extrabold mb-4 text-gray-900">Engineered for <span className="text-brand-600">Institutional Success</span></h2>
-                        <p className="text-gray-500 max-w-2xl mx-auto text-lg">
-                            An end-to-end framework designed to streamline the lifecycle of student achievements, from initial submission to final verification.
+
+                        <h1 className="hero-title">
+                            Empowering <br />
+                            <span className="text-brand-emphasized">Engineering Excellence</span>
+                        </h1>
+
+                        <p className="hero-subtitle">
+                            Arka Jain University's (NAAC A Accredited) premier hub for tracking academic milestones, technical certifications, and global competition wins.
                         </p>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {features.map((feature) => {
-                            const FeatureIcon = feature.icon;
-                            return (
-                                <div key={feature.title} className="feature-card">
-                                    <div className="feature-icon-wrapper" style={{ background: 'var(--bg-secondary)' }}>
-                                        <FeatureIcon size={32} style={{ color: 'var(--brand-600)' }} />
-                                    </div>
-                                    <h3 className="text-xl font-bold mb-4 text-gray-800">{feature.title}</h3>
-                                    <p className="text-gray-500 leading-relaxed text-sm">{feature.desc}</p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* Categories Section */}
-            <section className="py-24 bg-gray-50 border-y">
-                <div className="container">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold mb-3 text-gray-900">Engineering <span className="text-brand-600">Skill Categories</span></h2>
-                        <p className="text-gray-500 max-w-lg mx-auto">We provide a structured categorization for every student milestone, ensuring comprehensive performance reports.</p>
-                    </div>
-                    <div className="category-grid">
-                        {categoriesData.map((cat) => {
-                            const CatIcon = cat.icon;
-                            return (
-                                <div key={cat.name} className="category-card">
-                                    <div className="category-icon" style={{ background: 'white' }}>
-                                        <CatIcon size={20} />
-                                    </div>
-                                    <span style={{ fontSize: '0.85rem' }}>{cat.name}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
-            {/* Workflow Section */}
-            <section className="py-24 bg-white border-y">
-                <div className="container">
-                    <div className="workflow-container">
-                        <div className="workflow-text">
-                            <h2 className="text-4xl font-extrabold mb-6 text-gray-900">A Structured Path to <span className="text-brand-600">Verification</span></h2>
-                            <p className="text-gray-500 text-lg mb-8 leading-relaxed">
-                                Our platform ensures that every achievement is more than just a line on a resume. We follow a rigorous verification cycle that maintains the integrity of the SOEIT brand while highlighting individual excellence.
-                            </p>
-                            <div className="workflow-steps">
-                                {workflowSteps.map((step, idx) => {
-                                    const StepIcon = step.icon;
-                                    return (
-                                        <div key={idx} className="workflow-step-item">
-                                            <div className="workflow-step-icon">
-                                                <StepIcon size={20} />
-                                            </div>
-                                            <div className="workflow-step-content">
-                                                <h4 className="font-bold text-gray-900 mb-1">{step.title}</h4>
-                                                <p className="text-sm text-gray-500">{step.desc}</p>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                        <div className="flex gap-4">
+                            <Link to="/login" className="btn btn-primary btn-lg rounded-xl px-10 shadow-2xl hover:scale-105 transition-transform bg-brand-600 border-none">
+                                Explore Opportunities
+                            </Link>
+                            <Link to="/register" className="btn btn-secondary btn-lg rounded-xl px-10 border-gray-200">
+                                Register Now
+                            </Link>
                         </div>
-                        <div className="workflow-visual">
-                            <div className="workflow-visual-inner">
-                                <div className="workflow-visual-card">
-                                    <div className="workflow-visual-icon">
-                                        <Zap size={32} />
+                    </div>
+
+                    <div className="hero-visual">
+                        <div className="hero-main-card">
+                            <div className="flex items-center justify-between mb-8">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">JD</div>
+                                    <div>
+                                        <div className="font-bold text-gray-900">John Doe</div>
+                                        <div className="text-xs text-gray-500">B.Tech CS | 3rd Year</div>
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">Automated Audit System</h3>
-                                    <p className="text-gray-500 text-sm">Real-time data synchronization with departmental databases for seamless administrative reporting.</p>
+                                </div>
+                                <Award className="text-accent-gold" size={24} />
+                            </div>
+                            <div className="space-y-5">
+                                <div className="flex justify-between items-end">
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Level 12 Architect</span>
+                                    <span className="text-brand-600 font-black">2,450 XP</span>
+                                </div>
+                                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                                    <div className="h-full bg-brand-600 rounded-full" style={{ width: '75%' }}></div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 pt-2">
+                                    <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div className="text-[10px] text-gray-400 font-bold uppercase">Hackathons</div>
+                                        <div className="text-lg font-black text-gray-900">08</div>
+                                    </div>
+                                    <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div className="text-[10px] text-gray-400 uppercase">Projects</div>
+                                        <div className="text-lg font-black text-gray-900">14</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -279,54 +238,158 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Institutional Impact Section */}
+            {/* Quick Access Section (Unstop Style) */}
+            <section className="quick-access-section">
+                <div className="container">
+                    <div className="quick-access-grid">
+                        {quickLinks.map((link, idx) => {
+                            const Icon = link.icon;
+                            return (
+                                <div key={idx} className="quick-card">
+                                    <div className="quick-icon" style={{ background: `${link.color}10`, color: link.color }}>
+                                        <Icon size={24} />
+                                    </div>
+                                    <span className="quick-label">{link.title}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+
+            <section className="marquee-container">
+                <div className="marquee-content">
+                    {/* Real ARKA JAIN University Data 2024-25 */}
+                    <div className="marquee-item">
+                        <span className="marquee-val">2800+</span>
+                        <span className="marquee-label">PLACEMENTS TO DATE</span>
+                        <Briefcase size={16} />
+                    </div>
+                    <div className="marquee-item">
+                        <span className="marquee-val">₹23 LPA</span>
+                        <span className="marquee-label">HIGHEST PACKAGE</span>
+                        <Trophy size={16} />
+                    </div>
+                    <div className="marquee-item">
+                        <span className="marquee-val">7,000+</span>
+                        <span className="marquee-label">ENROLLED STUDENTS</span>
+                        <Users size={16} />
+                    </div>
+                    <div className="marquee-item">
+                        <span className="marquee-val">500+</span>
+                        <span className="marquee-label">PLACEMENTS OFFERS (2024)</span>
+                        <Award size={16} />
+                    </div>
+                    <div className="marquee-item">
+                        <span className="marquee-val">NAAC 'A'</span>
+                        <span className="marquee-label">ACCREDITED UNIVERSITY</span>
+                        <GraduationCap size={16} />
+                    </div>
+                    {/* Duplicate for seamless loop */}
+                    <div className="marquee-item">
+                        <span className="marquee-val">2800+</span>
+                        <span className="marquee-label">PLACEMENTS TO DATE</span>
+                        <Briefcase size={16} />
+                    </div>
+                    <div className="marquee-item">
+                        <span className="marquee-val">₹23 LPA</span>
+                        <span className="marquee-label">HIGHEST PACKAGE</span>
+                        <Trophy size={16} />
+                    </div>
+                    <div className="marquee-item">
+                        <span className="marquee-val">7,000+</span>
+                        <span className="marquee-label">ENROLLED STUDENTS</span>
+                        <Users size={16} />
+                    </div>
+                </div>
+            </section>
+
+            {/* Live Competitions Section (Devpost Style) */}
+            <section className="py-16 bg-white">
+                <div className="container">
+                    <div className="section-header mb-8">
+                        <span className="section-tag">Ongoing Challenges</span>
+                        <h2 className="text-2xl md:text-3xl font-black text-gray-900">Explore <span className="text-brand-600">Opportunities</span></h2>
+                    </div>
+
+                    <div className="flex flex-row flex-nowrap md:flex-wrap justify-start md:justify-center gap-10 overflow-x-auto md:overflow-visible pb-6 md:pb-0 snap-x snap-mandatory">
+                        {liveChallenges.map((comp, idx) => (
+                            <div key={idx} className="comp-card snap-center mb-4">
+                                <div className="comp-image">
+                                    <img src={comp.img} alt={comp.title} />
+                                    <div className="comp-badge">{comp.badge}</div>
+                                </div>
+                                <div className="comp-content">
+                                    <span className="comp-type">{comp.type}</span>
+                                    <h3 className="comp-title">{comp.title}</h3>
+                                    <div className="comp-meta">
+                                        <span><Users size={14} /> {comp.stats.students}</span>
+                                        <span><Clock size={14} /> {comp.stats.days} Left</span>
+                                    </div>
+                                    <Link to="/login" className="btn btn-primary w-full rounded-lg bg-brand-600 border-none py-2 font-bold text-sm">Apply Now</Link>
+                                </div>
+                                <div className="comp-footer">
+                                    <div className="text-gray-500">Prize Pool</div>
+                                    <div className="prize-pool">{comp.prize}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+
+            {/* Impact Section */}
             <section className="impact-section py-24 bg-gray-50 border-y">
                 <div className="container">
                     <div className="impact-grid">
-                        <div data-aos="fade-right">
-                            <h2 className="text-4xl font-bold mb-6 text-gray-900 leading-tight">
-                                Driving Institutional <br />
-                                <span className="text-brand-600">Digital Transformation</span>
+                        <div>
+                            <span className="section-tag">Institutional Scale</span>
+                            <h2 className="text-4xl font-black mb-6 text-gray-900 leading-tight">
+                                Driving Digital <br />
+                                <span className="text-brand-600">Transformation</span>
                             </h2>
-                            <p className="text-gray-600 mb-10 text-lg">
-                                We go beyond simple record-keeping. The SOEIT Achievement Portal is a strategic asset for the university, providing data-driven insights into student performance and departmental growth.
+                            <p className="text-gray-600 mb-10 text-lg leading-relaxed">
+                                We go beyond simple record-keeping. The SOEIT Achievement Portal is a strategic asset, providing data-driven insights into student performance and departmental growth.
                             </p>
                             <div className="impact-stats">
-                                <div>
+                                <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
                                     <div className="impact-stat-value text-brand-600">98%</div>
-                                    <div className="impact-stat-label">Audit Data Readiness</div>
+                                    <div className="impact-stat-label">Data Readiness</div>
                                 </div>
-                                <div>
+                                <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
                                     <div className="impact-stat-value text-brand-600">15k+</div>
-                                    <div className="impact-stat-label">Verified Milestone Records</div>
+                                    <div className="impact-stat-label">Milestones</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="relative" data-aos="fade-left">
+                        <div className="relative">
                             <div className="impact-testimonial light">
-                                <p className="testimonial-quote">
+                                <div className="testimonial-watermark">
+                                    <MessageSquare size={120} />
+                                </div>
+                                <p className="testimonial-quote relative z-10">
                                     "{testimonials[activeTestimonial].quote}"
                                 </p>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-6">
-                                        <button onClick={prevTestimonial} className="testimonial-btn prev" aria-label="Previous Insight">
-                                            <ArrowLeft size={18} />
-                                        </button>
-                                        <div className="testimonial-author">
-                                            <div className="testimonial-avatar">
-                                                {testimonials[activeTestimonial].initial}
-                                            </div>
-                                            <div>
-                                                <div className="author-name text-gray-900">{testimonials[activeTestimonial].author}</div>
-                                                <div className="author-role">{testimonials[activeTestimonial].role}</div>
-                                            </div>
+                                <div className="flex items-center justify-between mt-10">
+                                    <div className="flex items-center gap-4">
+                                        <div className="testimonial-avatar">
+                                            {testimonials[activeTestimonial].initial}
+                                        </div>
+                                        <div>
+                                            <div className="author-name">{testimonials[activeTestimonial].author}</div>
+                                            <div className="author-role">{testimonials[activeTestimonial].role}</div>
                                         </div>
                                     </div>
-                                    <button onClick={nextTestimonial} className="testimonial-btn next" aria-label="Next Insight">
-                                        <span>Next Insight</span>
-                                        <ArrowRight size={18} />
-                                    </button>
+                                    <div className="flex gap-2">
+                                        <button onClick={prevTestimonial} className="testimonial-btn prev">
+                                            <ArrowLeft size={18} />
+                                        </button>
+                                        <button onClick={nextTestimonial} className="testimonial-btn prev">
+                                            <ArrowRight size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

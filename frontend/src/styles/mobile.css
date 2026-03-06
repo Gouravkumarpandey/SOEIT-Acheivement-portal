@@ -127,6 +127,34 @@ body {
     gap: 1rem !important;
 }
 
+.gap-6 {
+    gap: 1.5rem !important;
+}
+
+.gap-10 {
+    gap: 2.5rem !important;
+}
+
+.flex-row {
+    flex-direction: row !important;
+}
+
+.flex-wrap {
+    flex-wrap: wrap !important;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap !important;
+}
+
+.justify-start {
+    justify-content: flex-start !important;
+}
+
+.overflow-x-auto {
+    overflow-x: auto !important;
+}
+
 /* Text */
 .font-bold {
     font-weight: 700 !important;
@@ -169,6 +197,22 @@ body {
 
     .md\:flex {
         display: flex !important;
+    }
+
+    .md\:flex-wrap {
+        flex-wrap: wrap !important;
+    }
+
+    .md\:justify-center {
+        justify-content: center !important;
+    }
+
+    .md\:overflow-visible {
+        overflow: visible !important;
+    }
+
+    .md\:pb-0 {
+        padding-bottom: 0 !important;
     }
 }
 
