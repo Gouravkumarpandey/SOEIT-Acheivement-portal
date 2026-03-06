@@ -10,6 +10,7 @@
 .faculty-header-actions {
     display: flex;
     gap: 0.875rem;
+    flex-wrap: wrap;
 }
 
 .faculty-filter-box {
@@ -32,12 +33,28 @@
     height: 48px;
     padding: 0 2rem;
     font-weight: 800;
+    white-space: nowrap;
 }
 
 .faculty-action-btn {
     height: 48px !important;
     padding: 0 1.5rem !important;
     font-weight: 800 !important;
+}
+
+/* Table wrapper used in faculty registry */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Hover row highlight */
+.hover-row {
+    transition: background 0.15s;
+}
+
+.hover-row:hover {
+    background: var(--slate-50, #f8fafc);
 }
 
 @media (max-width: 768px) {
