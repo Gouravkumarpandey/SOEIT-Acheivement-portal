@@ -127,6 +127,11 @@
 }
 
 @media (max-width: 1024px) {
+    .navbar-inner {
+        display: flex;
+        justify-content: space-between;
+    }
+
     .nav-link-group {
         display: none;
     }
@@ -134,4 +139,66 @@
     .nav-cta-group a.btn {
         display: none;
     }
+
+    .nav-cta-group {
+        justify-content: flex-end;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mobile-menu-overlay {
+    position: fixed;
+    top: 80px;
+    /* Right below the 80px navbar */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 80px);
+    /* Fill the rest of the screen */
+    background-color: #ffffff;
+    /* Solid white background */
+    z-index: 9999;
+    /* Ensure it's above hero section */
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.mobile-nav-item {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-100);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.mobile-nav-item:hover {
+    color: var(--brand-600);
+}
+
+.mobile-nav-cta {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-bottom: 2rem;
 }

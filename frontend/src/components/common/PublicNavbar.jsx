@@ -14,6 +14,17 @@ const PublicNavbar = () => {
         return () => window.removeEventListener('scroll', handler);
     }, []);
 
+    useEffect(() => {
+        if (menuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [menuOpen]);
+
     const navLinks = [
         { path: '/', label: 'Home' },
         { path: '/about', label: 'About' },
@@ -67,20 +78,20 @@ const PublicNavbar = () => {
 
                 {/* Mobile Menu Overlay */}
                 {menuOpen && (
-                    <div className="fixed inset-0 top-[70px] bg-white z-[1001] p-6 flex flex-col gap-4 animate-fade-in md:hidden">
+                    <div className="mobile-menu-overlay">
                         {navLinks.map(({ path, label }) => (
                             <Link
                                 key={path}
                                 to={path}
-                                className="text-xl font-bold text-gray-800 border-b border-gray-100 pb-3"
+                                className="mobile-nav-item"
                                 onClick={() => setMenuOpen(false)}
                             >
                                 {label}
                             </Link>
                         ))}
-                        <div className="mt-auto flex flex-col gap-3">
-                            <Link to="/login" className="btn btn-secondary w-full py-4" onClick={() => setMenuOpen(false)}>Sign In</Link>
-                            <Link to="/register" className="btn btn-primary w-full py-4" onClick={() => setMenuOpen(false)}>Get Started <ArrowRight size={18} /></Link>
+                        <div className="mobile-nav-cta">
+                            <Link to="/login" className="btn btn-secondary w-full py-4 text-center justify-center" onClick={() => setMenuOpen(false)}>Sign In</Link>
+                            <Link to="/register" className="btn btn-primary w-full py-4 text-center justify-center flex items-center gap-2" onClick={() => setMenuOpen(false)}>Get Started <ArrowRight size={18} /></Link>
                         </div>
                     </div>
                 )}
