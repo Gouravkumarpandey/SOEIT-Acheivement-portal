@@ -51,22 +51,6 @@ const liveChallenges = [
         stats: { students: '12k+', days: 'Aug 2025' },
         badge: 'High Impact'
     },
-    {
-        title: 'NASA Space Apps Challenge',
-        type: 'Innovation | Global',
-        img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800',
-        prize: 'Global Recognition',
-        stats: { students: '30k+', days: 'Oct 2025' },
-        badge: 'Prestigious'
-    },
-    {
-        title: 'Flipkart GRID 7.0',
-        type: 'Robotics & E-com',
-        img: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800',
-        prize: '₹5,00,000 + Jobs',
-        stats: { students: '20k+', days: 'Upcoming' },
-        badge: 'Top Tier'
-    }
 ];
 
 
