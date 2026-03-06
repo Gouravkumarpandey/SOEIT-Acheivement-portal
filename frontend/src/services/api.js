@@ -83,4 +83,12 @@ export const noticeAPI = {
     delete: (id) => API.delete(`/notices/${id}`),
 };
 
+export const courseAPI = {
+    add: (data) => API.post('/courses', data),
+    getMy: () => API.get('/courses/my'),
+    updateProgress: (id, data) => API.put(`/courses/${id}/progress`, data),
+    delete: (id) => API.delete(`/courses/${id}`),
+    getAll: (params) => API.get('/courses', { params }),
+};
+
 export default API;

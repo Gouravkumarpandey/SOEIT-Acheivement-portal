@@ -29,6 +29,8 @@ import StudentDashboard from './pages/student/StudentDashboard';
 import MyAchievementsPage from './pages/student/MyAchievementsPage';
 import UploadAchievementPage from './pages/student/UploadAchievementPage';
 import ProfilePage from './pages/student/ProfilePage';
+import MyCoursesPage from './pages/student/MyCoursesPage';
+import StudentCoursesPage from './pages/admin/StudentCoursesPage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -103,6 +105,7 @@ function App() {
             <Route path="/achievements" element={<MyAchievementsPage />} />
             <Route path="/achievements/upload" element={<UploadAchievementPage />} />
             <Route path="/achievements/edit/:id" element={<UploadAchievementPage />} />
+            <Route path="/courses" element={<MyCoursesPage />} />
           </Route>
 
           {/* Admin / Faculty Shared Management Routes */}
@@ -113,6 +116,7 @@ function App() {
             <Route path="/admin/achievements" element={<AllAchievementsPage />} />
             <Route path="/admin/students" element={<StudentManagementPage />} />
             <Route path="/admin/reports" element={<ReportsPage />} />
+            <Route path="/admin/courses" element={<StudentCoursesPage />} />
           </Route>
 
           {/* Admin Exclusive Routes */}

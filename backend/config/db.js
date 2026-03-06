@@ -93,6 +93,20 @@ const initSchema = async (client) => {
             created_at  TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (created_by) REFERENCES users(id)
         )`,
+    `CREATE TABLE IF NOT EXISTS courses (
+            id              TEXT PRIMARY KEY,
+            student_id      TEXT NOT NULL,
+            course_name     TEXT NOT NULL,
+            platform        TEXT NOT NULL,
+            status          TEXT DEFAULT 'Ongoing',
+            progress        INTEGER DEFAULT 0,
+            start_date      TEXT,
+            completion_date TEXT,
+            certificate_url TEXT,
+            created_at      TEXT DEFAULT (datetime('now')),
+            updated_at      TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (student_id) REFERENCES users(id)
+        )`,
   ], 'write');
 };
 

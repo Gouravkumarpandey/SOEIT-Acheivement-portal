@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
     LayoutDashboard, Trophy, Upload, User, BarChart3,
     CheckCircle, Users, Settings, LogOut, GraduationCap,
-    FileText, X, Shield, Star, Calendar, ChevronLeft, ChevronRight
+    FileText, X, Shield, Star, Calendar, ChevronLeft, ChevronRight, BookOpen
 } from 'lucide-react';
 
 const studentLinks = [
@@ -11,6 +11,7 @@ const studentLinks = [
     { to: '/events', icon: Calendar, label: 'Campus Events' },
     { to: '/achievements', icon: Trophy, label: 'My Achievements' },
     { to: '/achievements/upload', icon: Upload, label: 'Upload Achievement' },
+    { to: '/courses', icon: BookOpen, label: 'Course Registry' },
     { to: '/profile', icon: User, label: 'My Profile' },
 ];
 
@@ -22,6 +23,7 @@ const adminLinks = [
     { to: '/admin/students', icon: Users, label: 'Students' },
     { to: '/admin/faculty', icon: Shield, label: 'Faculty' },
     { to: '/admin/reports', icon: BarChart3, label: 'Reports & Analytics' },
+    { to: '/admin/courses', icon: BookOpen, label: 'Course Monitoring' },
     { to: '/profile', icon: User, label: 'My Profile' },
 ];
 
@@ -61,7 +63,6 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}>
 
-                {/* Institutional Branding Container */}
                 <div className="sidebar-header" style={{
                     padding: '2rem 1.5rem',
                     borderBottom: '1px solid var(--border-primary)',
@@ -81,7 +82,6 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                         </div>
                     </div>
 
-                    {/* Toggle Button for Desktop */}
                     <button
                         onClick={onToggleCollapse}
                         className="sidebar-toggle display-desktop"
@@ -103,12 +103,10 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                             zIndex: 10,
                             color: 'var(--brand-700)'
                         }}
-                        title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
                     >
                         {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                     </button>
 
-                    {/* Mobile Close Button (shown via mobileOpen) */}
                     {mobileOpen && (
                         <button onClick={onClose} className="display-mobile" style={{ padding: '0.5rem', borderRadius: '8px', color: 'var(--text-muted)' }}>
                             <X size={20} />
@@ -116,7 +114,6 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                     )}
                 </div>
 
-                {/* Identity Suite */}
                 <div style={{ padding: '1.25rem 1rem', borderBottom: '1px solid var(--border-primary)', background: 'var(--slate-50)', transition: 'all 0.3s' }}>
                     <div className="identity-card" style={{
                         display: 'flex',
@@ -141,14 +138,12 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                     </div>
                 </div>
 
-                {/* Navigation Ecosystem */}
                 <nav className="sidebar-nav" style={{ flex: 1, padding: '1.5rem 0.75rem', overflowY: 'auto' }}>
                     <div className="sidebar-text-expand" style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--text-muted)', padding: '0 1rem 1rem', opacity: 0.6 }}>Operational Control</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         {filteredLinks.map(({ to, icon: Icon, label }) => (
                             <NavLink key={to} to={to} onClick={mobileOpen ? onClose : undefined}
                                 className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-                                title={collapsed ? label : ""}
                                 style={({ isActive }) => ({
                                     display: 'flex',
                                     alignItems: 'center',
@@ -174,12 +169,10 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                     </div>
                 </nav>
 
-                {/* Administrative Actions */}
                 <div style={{ padding: '1rem 0.75rem', borderTop: '1px solid var(--border-primary)' }}>
                     {isStudent && (
                         <NavLink to={`/portfolio/${user?._id}`} onClick={mobileOpen ? onClose : undefined}
                             className="admin-link-btn"
-                            title={collapsed ? "Public Portfolio" : ""}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -201,7 +194,6 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                     )}
                     <button onClick={handleLogout}
                         className="admin-link-btn"
-                        title={collapsed ? "Sign Out Portal" : ""}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
