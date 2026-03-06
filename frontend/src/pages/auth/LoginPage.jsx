@@ -171,9 +171,7 @@ const LoginPage = () => {
                     </p>
                 </div>
 
-                <div className="demo-alert" style={{ marginTop: '1.5rem' }}>
-                    <strong>Demo Accounts:</strong> AJU/221403 (Student) | AJU/FACULTY (Faculty) | AJU/ADMIN (Admin) | <br /> <strong>Pass:</strong> Test@123 / Faculty@123 / Admin@123
-                </div>
+
             </div>
         </div>
     );
