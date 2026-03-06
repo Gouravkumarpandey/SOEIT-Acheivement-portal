@@ -160,7 +160,21 @@ const Achievement = {
             let sql = `${BASE_SELECT} WHERE 1=1`;
             const args = [];
 
-            if (query.studentId) { sql += ' AND a.student_id = ?'; args.push(query.studentId); }
+            if (query.studentId) {
+                if (typeof query.studentId === 'object' && query.studentId.$in) {
+                    const ids = query.studentId.$in;
+                    if (ids.length > 0) {
+                        const placeholders = ids.map(() => '?').join(',');
+                        sql += ` AND a.student_id IN (${placeholders})`;
+                        args.push(...ids);
+                    } else {
+                        sql += ' AND 1=0'; // Empty list means no matches
+                    }
+                } else {
+                    sql += ' AND a.student_id = ?';
+                    args.push(query.studentId);
+                }
+            }
             if (query.status) { sql += ' AND a.status = ?'; args.push(query.status); }
             if (query.category) { sql += ' AND a.category = ?'; args.push(query.category); }
             if (query.level) { sql += ' AND a.level = ?'; args.push(query.level); }
@@ -182,6 +196,7 @@ const Achievement = {
         };
 
         const chain = {
+            select: () => chain,
             populate: () => chain,
             sort: (s) => { _sort = s; return chain; },
             skip: (n) => { _skip = n; return chain; },

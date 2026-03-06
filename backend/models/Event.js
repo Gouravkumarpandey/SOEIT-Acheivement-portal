@@ -93,6 +93,7 @@ const Event = {
         };
 
         const chain = {
+            select: () => chain,
             populate: () => chain,
             sort: (s) => { _sort = s; return chain; },
             then: (resolve, reject) => buildAndExec().then(resolve, reject),

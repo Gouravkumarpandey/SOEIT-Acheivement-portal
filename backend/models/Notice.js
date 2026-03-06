@@ -75,6 +75,7 @@ const Notice = {
         };
 
         const chain = {
+            select: () => chain,
             populate: () => chain,
             sort: () => chain,
             then: (resolve, reject) => buildAndExec().then(resolve, reject),
