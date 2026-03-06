@@ -133,7 +133,37 @@ const testimonials = [
         author: "Academic Council",
         role: "Curriculum Design",
         initial: "A"
-    }
+    },
+    {
+        quote: "The public portfolio feature has been a game changer. Recruiters can directly verify our students' accomplishments without any manual paperwork.",
+        author: "Training & Placement",
+        role: "Corporate Connect",
+        initial: "T"
+    },
+    {
+        quote: "I submitted my national-level coding competition win and it was verified within 24 hours. The process is fast, transparent, and incredibly reliable.",
+        author: "3rd Year Student, CSE",
+        role: "Student Innovator",
+        initial: "S"
+    },
+    {
+        quote: "Having a centralized platform to monitor all departmental achievements has drastically improved our NIRF submission quality and turnaround time.",
+        author: "NIRF Coordination Cell",
+        role: "Institutional Rankings",
+        initial: "N"
+    },
+    {
+        quote: "The merit point system has brought a new level of engagement. Students are proactively seeking certifications to climb the institutional leaderboard.",
+        author: "Faculty Coordinator",
+        role: "Student Affairs",
+        initial: "F"
+    },
+    {
+        quote: "This portal reflects SOEIT's commitment to digital excellence. Every verified achievement here tells the story of a student who dared to go beyond the classroom.",
+        author: "Principal",
+        role: "School of Engineering & IT",
+        initial: "P"
+    },
 ];
 
 const LandingPage = () => {
