@@ -144,14 +144,17 @@ exports.getPublicPortfolio = async (req, res, next) => {
             });
         }
 
-        const student = await User.findById(req.params.userId);
-        if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
+        // Parallelize fetching student data and achievements for speed
+        const [student, achievements] = await Promise.all([
+            User.findById(req.params.userId),
+            Achievement.find({
+                studentId: req.params.userId,
+                status: 'approved',
+                isPublic: true,
+            }).sort({ createdAt: -1 })
+        ]);
 
-        const achievements = await Achievement.find({
-            studentId: req.params.userId,
-            status: 'approved',
-            isPublic: true,
-        }).sort({ createdAt: -1 });
+        if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
 
         const [coursesRows, hackathonsExplored] = await Promise.all([
             Course.findByStudentId(req.params.userId),
@@ -197,58 +200,47 @@ exports.getPublicStudents = async (req, res, next) => {
         }
 
         const { department, search } = req.query;
+        const db = require('../config/db').getDb();
 
-        const userQuery = { role: 'student', isActive: true };
-        if (department) userQuery.department = department;
+        // High-speed data fetching: JOIN aggregation for O(1) database roundtrip
+        let sql = `
+            SELECT 
+                u.id, u.name, u.department, u.enrollment_no, u.student_id, u.profile_image, 
+                u.batch, u.bio,
+                COUNT(a.id) as achievementCount,
+                SUM(COALESCE(a.points, 0)) as totalPoints,
+                COUNT(DISTINCT a.category) as categoryCount
+            FROM users u
+            LEFT JOIN achievements a ON u.id = a.student_id AND a.status = 'approved' AND a.is_public = 1
+            WHERE u.role = 'student' AND u.is_active = 1
+        `;
+        const args = [];
 
-        let students = await User.find(userQuery)
-            .select('-password -resetPasswordToken -resetPasswordExpire -email -phone')
-            .sort({ name: 1 });
-
-        // Filter by search name
-        if (search) {
-            const s = search.toLowerCase();
-            students = students.filter(st =>
-                st.name?.toLowerCase().includes(s) ||
-                st.enrollmentNo?.toLowerCase().includes(s) ||
-                st.department?.toLowerCase().includes(s)
-            );
+        if (department) {
+            sql += ' AND u.department = ?';
+            args.push(department);
         }
 
-        // Get achievement stats for each student in one query
-        const studentIds = students.map(s => s._id?.toString() || s.id);
-        const achievementAgg = await Achievement.find({
-            studentId: { $in: studentIds },
-            status: 'approved',
-            isPublic: true,
-        }).select('studentId points category');
+        if (search) {
+            sql += ' AND (u.name LIKE ? OR u.enrollment_no LIKE ? OR u.student_id LIKE ?)';
+            const sVal = `%${search}%`;
+            args.push(sVal, sVal, sVal);
+        }
 
-        // Build stats map
-        const statsMap = {};
-        achievementAgg.forEach(a => {
-            const sid = a.studentId;
-            if (!statsMap[sid]) statsMap[sid] = { count: 0, points: 0, categories: new Set() };
-            statsMap[sid].count += 1;
-            statsMap[sid].points += a.points || 0;
-            statsMap[sid].categories.add(a.category);
-        });
+        sql += ` GROUP BY u.id ORDER BY achievementCount DESC, u.name ASC`;
 
-        const result = students.map(s => {
-            const sid = s._id?.toString() || s.id;
-            const info = statsMap[sid] || { count: 0, points: 0, categories: new Set() };
-            const plain = s.toObject ? s.toObject() : { ...s };
-            return {
-                ...plain,
-                achievementCount: info.count,
-                totalPoints: info.points,
-                categoryCount: info.categories.size,
-            };
-        });
+        const result = await db.execute({ sql, args });
 
-        // Sort: most achievements first
-        result.sort((a, b) => b.achievementCount - a.achievementCount);
+        // Map back to expected format
+        const finalData = result.rows.map(r => ({
+            ...r,
+            _id: r.id,
+            achievementCount: Number(r.achievementCount || 0),
+            totalPoints: Number(r.totalPoints || 0),
+            categoryCount: Number(r.categoryCount || 0)
+        }));
 
-        res.status(200).json({ success: true, data: result, total: result.length });
+        res.status(200).json({ success: true, data: finalData, total: finalData.length });
     } catch (error) {
         next(error);
     }
@@ -261,15 +253,20 @@ exports.getPublicStudents = async (req, res, next) => {
 exports.getStudentStats = async (req, res, next) => {
     try {
         const studentId = req.user.id;
+        const db = require('../config/db').getDb();
 
-        const [all, approved, pending, rejected] = await Promise.all([
-            Achievement.countDocuments({ studentId }),
-            Achievement.countDocuments({ studentId, status: 'approved' }),
-            Achievement.countDocuments({ studentId, status: 'pending' }),
-            Achievement.countDocuments({ studentId, status: 'rejected' }),
-        ]);
-
-        const [byCategory, byLevel, totalPointsResult, recent] = await Promise.all([
+        // High Performance: Combine all count and points queries into ONE SQL execution
+        const [quickStats, byCategory, byLevel, recent] = await Promise.all([
+            db.execute({
+                sql: `SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) as approved,
+                    SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN status='rejected' THEN 1 ELSE 0 END) as rejected,
+                    SUM(CASE WHEN status='approved' THEN points ELSE 0 END) as totalPoints
+                  FROM achievements WHERE student_id = ?`,
+                args: [studentId]
+            }),
             Achievement.aggregate([
                 { $match: { studentId } },
                 { $group: { _id: '$category', count: { $sum: 1 } } },
@@ -278,18 +275,19 @@ exports.getStudentStats = async (req, res, next) => {
                 { $match: { studentId, status: 'approved' } },
                 { $group: { _id: '$level', count: { $sum: 1 } } },
             ]),
-            Achievement.aggregate([
-                { $match: { studentId, status: 'approved' } },
-                { $group: { _id: null, total: { $sum: '$points' } } },
-            ]),
             Achievement.find({ studentId }).sort({ createdAt: -1 }).limit(5),
         ]);
+
+        const statsRow = quickStats.rows[0] || {};
 
         res.status(200).json({
             success: true,
             stats: {
-                all, approved, pending, rejected,
-                totalPoints: totalPointsResult[0]?.total || 0,
+                all: Number(statsRow.total || 0),
+                approved: Number(statsRow.approved || 0),
+                pending: Number(statsRow.pending || 0),
+                rejected: Number(statsRow.rejected || 0),
+                totalPoints: Number(statsRow.totalPoints || 0),
                 byCategory,
                 byLevel,
             },
