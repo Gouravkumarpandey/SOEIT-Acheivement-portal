@@ -258,19 +258,40 @@ const User = {
         if (options.new) return User.findById(id);
         return null;
     },
-    /** DELETE */
     findByIdAndDelete: async (id) => {
         const db = getDb();
-        await db.execute({ sql: 'DELETE FROM users WHERE id = ?', args: [id] });
-        await db.execute({ sql: 'DELETE FROM achievements WHERE student_id = ?', args: [id] });
+        const statements = [
+            { sql: `DELETE FROM verifications WHERE verified_by = ?`, args: [id] },
+            { sql: `DELETE FROM verifications WHERE achievement_id IN (SELECT id FROM achievements WHERE student_id = ?)`, args: [id] },
+            { sql: `DELETE FROM achievements WHERE student_id = ?`, args: [id] },
+            { sql: `UPDATE achievements SET verified_by = NULL WHERE verified_by = ?`, args: [id] },
+            { sql: `DELETE FROM events WHERE created_by = ?`, args: [id] },
+            { sql: `DELETE FROM notices WHERE created_by = ?`, args: [id] },
+            { sql: `DELETE FROM courses WHERE student_id = ?`, args: [id] },
+            { sql: `DELETE FROM hackathon_activities WHERE student_id = ?`, args: [id] },
+            { sql: `DELETE FROM users WHERE id = ?`, args: [id] }
+        ];
+        await db.batch(statements, 'write');
         return true;
     },
     deleteMany: async (ids) => {
         const db = getDb();
         if (!ids || ids.length === 0) return true;
         const placeholders = ids.map(() => '?').join(',');
-        await db.execute({ sql: `DELETE FROM users WHERE id IN (${placeholders})`, args: ids });
-        await db.execute({ sql: `DELETE FROM achievements WHERE student_id IN (${placeholders})`, args: ids });
+
+        const statements = [
+            { sql: `DELETE FROM verifications WHERE verified_by IN (${placeholders})`, args: ids },
+            { sql: `DELETE FROM verifications WHERE achievement_id IN (SELECT id FROM achievements WHERE student_id IN (${placeholders}))`, args: ids },
+            { sql: `DELETE FROM achievements WHERE student_id IN (${placeholders})`, args: ids },
+            { sql: `UPDATE achievements SET verified_by = NULL WHERE verified_by IN (${placeholders})`, args: ids },
+            { sql: `DELETE FROM events WHERE created_by IN (${placeholders})`, args: ids },
+            { sql: `DELETE FROM notices WHERE created_by IN (${placeholders})`, args: ids },
+            { sql: `DELETE FROM courses WHERE student_id IN (${placeholders})`, args: ids },
+            { sql: `DELETE FROM hackathon_activities WHERE student_id IN (${placeholders})`, args: ids },
+            { sql: `DELETE FROM users WHERE id IN (${placeholders})`, args: ids }
+        ];
+
+        await db.batch(statements, 'write');
         return true;
     },
 };

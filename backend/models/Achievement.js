@@ -57,7 +57,11 @@ const rowToAchievement = (row) => {
 
         deleteOne: async function () {
             const db = getDb();
-            await db.execute({ sql: 'DELETE FROM achievements WHERE id = ?', args: [this.id] });
+            const statements = [
+                { sql: 'DELETE FROM verifications WHERE achievement_id = ?', args: [this.id] },
+                { sql: 'DELETE FROM achievements WHERE id = ?', args: [this.id] }
+            ];
+            await db.batch(statements, 'write');
         },
 
         save: async function () {
