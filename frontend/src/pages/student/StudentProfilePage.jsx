@@ -141,8 +141,8 @@ const StudentProfilePage = () => {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Batch</label>
-                            <input className="form-control" placeholder="e.g. 2021" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
+                            <label className="form-label">Batch *</label>
+                            <input className="form-control" placeholder="e.g. 2022-26" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
                         </div>
                         <div className="form-group">
                             <label className="form-label">Semester</label>

@@ -75,6 +75,8 @@ const RegisterPage = () => {
         else if (form.password.length < 6) e.password = 'Password must be at least 6 characters';
         if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
         if (!form.department) e.department = 'Department is required';
+        if (!form.batch) e.batch = 'Batch is required';
+        else if (!/^\d{4}-\d{2}$/.test(form.batch)) e.batch = 'Invalid format (e.g. 2022-26)';
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -133,9 +135,27 @@ const RegisterPage = () => {
                         </div>
 
                         <div className="form-row">
-                            <Field name="batch" label="Batch Year" placeholder="e.g. 2022-26" form={form} setForm={setForm} errors={errors} />
-                            <div className="form-row-sm">
-                                <Field name="semester" label="Semester" placeholder="1-8" form={form} setForm={setForm} errors={errors} />
+                            <Field
+                                name="batch"
+                                label="Batch Year *"
+                                placeholder="e.g. 2022-26"
+                                required
+                                form={form}
+                                setForm={setForm}
+                                errors={errors}
+                            />
+                            <div className="form-row-sm" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', flex: 1.2 }}>
+                                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                                    <label className="form-label">Semester</label>
+                                    <select
+                                        className="form-control"
+                                        value={form.semester}
+                                        onChange={e => setForm(p => ({ ...p, semester: e.target.value }))}
+                                    >
+                                        <option value="">Select</option>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>{s}</option>)}
+                                    </select>
+                                </div>
                                 <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                                     <label className="form-label">Section</label>
                                     <select

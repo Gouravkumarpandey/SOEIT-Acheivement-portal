@@ -158,8 +158,8 @@ const ProfilePage = () => {
                                 {user?.role === 'student' && (
                                     <>
                                         <div className="form-group">
-                                            <label className="form-label field-label-res">Institutional Batch</label>
-                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="Cohorts Year (e.g., 2026)" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
+                                            <label className="form-label field-label-res">Institutional Batch *</label>
+                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="XXXX-XX (e.g., 2022-26)" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
                                         </div>
                                         <div className="form-group">
                                             <label className="form-label field-label-res">Semester Resolution</label>
