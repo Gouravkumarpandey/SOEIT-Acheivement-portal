@@ -2,6 +2,7 @@ import '../../styles/PublicPortfolioPage.css';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { achievementAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -10,15 +11,23 @@ const LEVEL_COLORS = { International: '#f59e0b', National: '#3b82f6', State: '#8
 const CATEGORY_ICONS = { Academic: '🎓', Sports: '🏆', Cultural: '🎭', Technical: '💻', Research: '🔬', Internship: '💼', Certification: '📜', Competition: '🥇', 'Community Service': '🤝', Other: '⭐' };
 
 const PublicPortfolioPage = () => {
+    const { user } = useAuth();
     const { userId } = useParams();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [selectedCat, setSelectedCat] = useState('');
 
     useEffect(() => {
+        setLoading(true);
+        setError(null);
         achievementAPI.getPortfolio(userId)
             .then(res => setData(res.data))
-            .catch(() => toast.error('Portfolio not found'))
+            .catch(err => {
+                const msg = err.response?.data?.message || 'Portfolio not found';
+                setError(msg);
+                toast.error(msg);
+            })
             .finally(() => setLoading(false));
     }, [userId]);
 
@@ -33,10 +42,23 @@ const PublicPortfolioPage = () => {
         </div>
     );
 
+    if (error) return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', flexDirection: 'column', gap: '1.5rem', padding: '2rem', textAlign: 'center' }}>
+            <div style={{ padding: '2rem', background: 'var(--primary-50)', borderRadius: '50%', color: 'var(--brand-600)' }}>
+                <Shield size={64} />
+            </div>
+            <div style={{ maxWidth: 500 }}>
+                <h2 style={{ color: 'var(--text-primary)', fontWeight: 900, marginBottom: '0.5rem' }}>Access Synchronization Failure</h2>
+                <p style={{ color: 'var(--text-muted)', fontWeight: 600, lineHeight: 1.6 }}>{error}</p>
+            </div>
+            <Link to={user?.role === 'student' ? '/dashboard' : '/'} className="btn btn-primary" style={{ fontWeight: 800, padding: '0.75rem 2rem' }}>Return to Terminal</Link>
+        </div>
+    );
+
     if (!data) return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', flexDirection: 'column', gap: '1rem' }}>
             <Trophy size={64} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
-            <h2 style={{ color: 'var(--text-secondary)' }}>Portfolio Not Found</h2>
+            <h2 style={{ color: 'var(--text-secondary)' }}>Portfolio Not found</h2>
             <Link to="/" className="btn btn-primary">Back Home</Link>
         </div>
     );

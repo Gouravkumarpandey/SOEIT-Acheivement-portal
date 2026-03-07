@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { achievementAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { Trophy, Star, Search, Users, BookOpen, ChevronRight, Award, ArrowLeft } from 'lucide-react';
+import toast from 'react-hot-toast';
 import '../../styles/PublicPortfoliosPage.css';
 
 const DEPT_PILLS = ['All', 'CSE', 'AIDS (IBM)', 'AIML', 'ME', 'EEE', 'BCA (Regular)', 'AIDL', 'Cybersecurity', 'DCSE', 'DME', 'DEEE'];
@@ -65,11 +67,21 @@ const StudentCard = ({ student }) => {
 };
 
 const PublicPortfoliosPage = () => {
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [department, setDepartment] = useState('All');
     const [debouncedSearch, setDebouncedSearch] = useState('');
+
+    // Student Privacy: If a student tries to browse the directory, redirect to their own portfolio
+    useEffect(() => {
+        if (user && user.role === 'student') {
+            toast.error('The public student registry is restricted to external visitors and faculty. Redirecting to your personal showcase.');
+            navigate(`/portfolio/${user.id || user._id}`);
+        }
+    }, [user, navigate]);
 
     // Debounce search
     useEffect(() => {

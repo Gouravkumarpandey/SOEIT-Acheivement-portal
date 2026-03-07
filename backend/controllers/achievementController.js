@@ -135,6 +135,15 @@ exports.deleteAchievement = async (req, res, next) => {
 // @route   GET /api/achievements/portfolio/:userId
 exports.getPublicPortfolio = async (req, res, next) => {
     try {
+        // Enforce student-to-student privacy: 
+        // A student cannot see another student's portfolio.
+        if (req.user && req.user.role === 'student' && req.user.id !== req.params.userId) {
+            return res.status(403).json({
+                success: false,
+                message: 'Access Restricted: You can only view your own portfolio. One student is not authorized to audit another student\'s accomplishments.'
+            });
+        }
+
         const student = await User.findById(req.params.userId);
         if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
 
@@ -179,6 +188,14 @@ exports.getPublicPortfolio = async (req, res, next) => {
 // @route   GET /api/achievements/public-students
 exports.getPublicStudents = async (req, res, next) => {
     try {
+        // Enforce student privacy: Students cannot browse the public student directory
+        if (req.user && req.user.role === 'student') {
+            return res.status(403).json({
+                success: false,
+                message: 'Access Restricted: Browsing the student registry is restricted to administrative and faculty accounts only. Use your direct link for sharing.'
+            });
+        }
+
         const { department, search } = req.query;
 
         const userQuery = { role: 'student', isActive: true };

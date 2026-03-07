@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { achievementAPI } from '../../services/api';
-import { Trophy, CheckCircle, Clock, XCircle, Star, Upload, TrendingUp, Award, GraduationCap, ArrowUpRight } from 'lucide-react';
+import { Trophy, CheckCircle, Clock, XCircle, Star, Upload, TrendingUp, Award, GraduationCap, ArrowUpRight, Globe } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -76,11 +76,18 @@ const StudentDashboard = () => {
                     <h2 className="heading-display">Scholar Performance Suite</h2>
                     <p className="page-subtitle">Unified tracking of institutional achievements, certifications, and academic impact.</p>
                 </div>
-                <Link to="/achievements/upload" className="btn btn-primary dashboard-header-btn">
-                    <Upload size={18} />
-                    <span className="hide-mobile">Upload New Credential</span>
-                    <span className="show-mobile">Upload</span>
-                </Link>
+                <div className="header-actions" style={{ display: 'flex', gap: '0.75rem' }}>
+                    <Link to={`/portfolio/${user?.id || user?._id}`} className="btn btn-secondary dashboard-header-btn" style={{ border: '1px solid var(--border-primary)' }}>
+                        <Globe size={18} />
+                        <span className="hide-mobile">View Public Showcase</span>
+                        <span className="show-mobile">Portfolio</span>
+                    </Link>
+                    <Link to="/achievements/upload" className="btn btn-primary dashboard-header-btn">
+                        <Upload size={18} />
+                        <span className="hide-mobile">Upload New Credential</span>
+                        <span className="show-mobile">Upload</span>
+                    </Link>
+                </div>
             </div>
 
             {/* Welcome Institutional Banner */}

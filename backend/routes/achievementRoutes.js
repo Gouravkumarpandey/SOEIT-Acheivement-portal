@@ -10,12 +10,12 @@ const {
     getPublicStudents,
     getStudentStats,
 } = require('../controllers/achievementController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, optionalProtect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
-// Public routes (no auth)
-router.get('/portfolio/:userId', getPublicPortfolio);
-router.get('/public-students', getPublicStudents);
+// Public routes (with optional auth for identification)
+router.get('/portfolio/:userId', optionalProtect, getPublicPortfolio);
+router.get('/public-students', optionalProtect, getPublicStudents);
 
 router.use(protect);
 
