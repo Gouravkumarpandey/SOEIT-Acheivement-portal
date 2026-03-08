@@ -51,12 +51,14 @@ const PublicPortfolioPage = () => {
         try {
             const zip = new JSZip();
             const prodBase = 'https://soeit-acheivement-portal.onrender.com';
+            const localBase = 'http://localhost:5000';
 
-
+            // Gather all proof files across all achievements
             const filesToDownload = [];
             data.achievements.forEach(ach => {
                 if (ach.proofFiles && ach.proofFiles.length > 0) {
                     ach.proofFiles.forEach(file => {
+                        // Normalize pathing: ensure relative URL is clean
                         const relPath = file.url.startsWith('/uploads') ? file.url : `/uploads/certificates/${file.filename}`;
                         filesToDownload.push({
                             relPath,
@@ -64,7 +66,8 @@ const PublicPortfolioPage = () => {
                         });
                     });
                 } else if (ach.certificateUrl) {
-                    const relPath = ach.certificateUrl;
+                    // Normalize pathing for certificateUrl as well
+                    const relPath = ach.certificateUrl.startsWith('/uploads') ? ach.certificateUrl : `/uploads/certificates/${ach.certificateUrl.split('/').pop()}`;
                     filesToDownload.push({
                         relPath,
                         name: `${ach.category}_Certificate.pdf`
@@ -79,13 +82,43 @@ const PublicPortfolioPage = () => {
                 return;
             }
 
-            // Fetch all files in parallel from Production Cloud Hub
+            // Fetch all files in parallel with Production -> Local fallback protocol
             const downloadPromises = filesToDownload.map(async (file, index) => {
                 try {
-                    const response = await fetch(`${prodBase}${file.relPath}`);
-                    if (!response.ok) {
-                        console.error(`Archival sync failure: Document not found on production node [${file.name}]`);
-                        return;
+                    let response;
+                    let success = false;
+
+                    // Node Probe 01: Production Hub (Render)
+                    try {
+                        const prodResponse = await fetch(`${prodBase}${file.relPath}`);
+                        if (prodResponse.ok) {
+                            response = prodResponse;
+                            success = true;
+                        } else {
+                            console.warn(`Production node responded with status ${prodResponse.status} for: ${file.name}`);
+                        }
+                    } catch (e) {
+                        console.warn(`Cloud node unreachable or network error for ${file.name}:`, e.message);
+                    }
+
+                    // Node Probe 02: Local Development Fallback (if prod fails or 404s)
+                    if (!success) {
+                        try {
+                            const localResponse = await fetch(`${localBase}${file.relPath}`);
+                            if (localResponse.ok) {
+                                response = localResponse;
+                                success = true;
+                            } else {
+                                console.warn(`Local node responded with status ${localResponse.status} for: ${file.name}`);
+                            }
+                        } catch (e) {
+                            console.warn(`Local node unreachable or network error for ${file.name}:`, e.message);
+                        }
+                    }
+
+                    if (!success) {
+                        console.error(`Archival sync failure: Record missing on all known nodes [${file.name}]`);
+                        return; // Skip invalid record to maintain ZIP integrity
                     }
 
                     const blob = await response.blob();
@@ -101,7 +134,7 @@ const PublicPortfolioPage = () => {
             await Promise.all(downloadPromises);
 
             if (Object.keys(zip.files).length === 0) {
-                toast.error('Synchronization failed: Files not found in production storage.', { id: toastId });
+                toast.error('Synchronization failed: Files not found in production or local storage. Records may have been purged by the server.', { id: toastId });
                 setDownloading(false);
                 return;
             }
