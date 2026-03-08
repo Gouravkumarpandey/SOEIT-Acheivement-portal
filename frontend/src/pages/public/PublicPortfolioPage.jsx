@@ -72,11 +72,13 @@ const PublicPortfolioPage = () => {
                 return;
             }
 
+            let missingFilesCount = 0;
             const downloadPromises = filesToDownload.map(async (file, index) => {
                 try {
                     const response = await fetch(file.url);
                     if (!response.ok) {
                         console.error(`Archival sync failed for record: ${file.name} (Status: ${response.status})`);
+                        missingFilesCount++;
                         return;
                     }
 
@@ -87,13 +89,14 @@ const PublicPortfolioPage = () => {
                     zip.file(finalName, blob);
                 } catch (err) {
                     console.error(`Protocol exception: ${file.name}`, err);
+                    missingFilesCount++;
                 }
             });
 
             await Promise.all(downloadPromises);
 
             if (Object.keys(zip.files).length === 0) {
-                toast.error('Synchronization failed: Records unavailable on the server.', { id: toastId });
+                toast.error('Synchronization failed: All evidentiary records have been purged from the server.', { id: toastId });
                 setDownloading(false);
                 return;
             }
@@ -105,7 +108,12 @@ const PublicPortfolioPage = () => {
                 : `${data.student.name.replace(/\s+/g, '_')}_PORTFOLIO.zip`;
 
             saveAs(content, fileName);
-            toast.success('Archival sequence complete. Student records exported.', { id: toastId });
+
+            if (missingFilesCount > 0) {
+                toast.success(`Archival exported, but ${missingFilesCount} files were missing on the server.`, { id: toastId });
+            } else {
+                toast.success('Archival sequence complete. Student records exported.', { id: toastId });
+            }
         } catch (error) {
             console.error('Critical archival exception:', error);
             toast.error('Protocol failure during record synchronization.', { id: toastId });
