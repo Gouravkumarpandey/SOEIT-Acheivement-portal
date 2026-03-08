@@ -3,6 +3,8 @@ const Verification = require('../models/Verification');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const HackathonActivity = require('../models/HackathonActivity');
+const FileData = require('../models/FileData'); // Wait, I named it File.js
+const FileModel = require('../models/File');
 
 // @desc    Create achievement
 // @route   POST /api/achievements
@@ -12,13 +14,17 @@ exports.createAchievement = async (req, res, next) => {
         const proofFiles = [];
 
         if (req.files && req.files.length > 0) {
-            req.files.forEach((file) => {
+            for (const file of req.files) {
+                // Persistent Database Storage: Save buffer to 'files' table
+                const fileId = await FileModel.upload(file.buffer, file.originalname, file.mimetype);
+
                 proofFiles.push({
-                    filename: file.filename,
+                    id: fileId,
+                    filename: file.filename || file.originalname,
                     originalname: file.originalname,
-                    url: `/uploads/certificates/${file.filename}`,
+                    url: `/api/achievements/files/${fileId}`,
                 });
-            });
+            }
         }
 
         const achievement = await Achievement.create({
@@ -35,6 +41,25 @@ exports.createAchievement = async (req, res, next) => {
             message: 'Achievement submitted successfully! Awaiting verification.',
             data: achievement,
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/** SERVE FILE FROM DATABASE */
+exports.serveFile = async (req, res, next) => {
+    try {
+        const file = await FileModel.findById(req.params.id);
+        if (!file) {
+            return res.status(404).json({ success: false, message: 'Record not found in database' });
+        }
+
+        res.set('Content-Type', file.mimetype);
+        res.set('Content-Disposition', `inline; filename="${file.filename}"`);
+        res.set('Cache-Control', 'public, max-age=86400'); // Cache for 24h
+
+        // Send buffer data from DB
+        res.send(Buffer.from(file.data));
     } catch (error) {
         next(error);
     }

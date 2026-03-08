@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const FileModel = require('../models/File');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
@@ -90,7 +91,11 @@ exports.updateProfile = async (req, res, next) => {
         const updates = {};
         allowedFields.forEach((field) => { if (req.body[field] !== undefined) updates[field] = req.body[field]; });
 
-        if (req.file) updates.profileImage = `/uploads/profiles/${req.file.filename}`;
+        if (req.file) {
+            // Persistent Database Storage for Avatar
+            const fileId = await FileModel.upload(req.file.buffer, req.file.originalname, req.file.mimetype);
+            updates.profileImage = `/api/achievements/files/${fileId}`;
+        }
 
         const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true });
         res.status(200).json({ success: true, message: 'Profile updated successfully', user });

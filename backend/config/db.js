@@ -128,6 +128,13 @@ const initSchema = async (client) => {
             action_type      TEXT NOT NULL DEFAULT 'visit',
             created_at       TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (student_id) REFERENCES users(id)
+        )`,
+    `CREATE TABLE IF NOT EXISTS files (
+            id               TEXT PRIMARY KEY,
+            filename         TEXT NOT NULL,
+            mimetype         TEXT NOT NULL,
+            data             BLOB NOT NULL,
+            created_at       TEXT DEFAULT (datetime('now'))
         )`
   ], 'write');
 };

@@ -9,6 +9,7 @@ const {
     getPublicPortfolio,
     getPublicStudents,
     getStudentStats,
+    serveFile,
 } = require('../controllers/achievementController');
 const { protect, authorize, optionalProtect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
@@ -16,6 +17,7 @@ const upload = require('../middleware/upload');
 // Public routes (with optional auth for identification)
 router.get('/portfolio/:userId', optionalProtect, getPublicPortfolio);
 router.get('/public-students', optionalProtect, getPublicStudents);
+router.get('/files/:id', serveFile); // Critical: Database-driven file serving route
 
 router.use(protect);
 

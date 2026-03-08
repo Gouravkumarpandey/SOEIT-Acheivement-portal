@@ -64,34 +64,42 @@ const MyAchievementsPage = () => {
             // Collect ALL proof files from currently loaded achievements
             const filesToDownload = [];
             achievements.forEach(ach => {
-                const getRelPath = (url) => url?.startsWith('/uploads') ? url : `/uploads/certificates/${url?.split('/').pop()}`;
+                // Universal Path Normalizer: Handles both legacy filesystem and new DB paths
+                const getRelPath = (url) => {
+                    if (!url) return '';
+                    if (url.startsWith('/api') || url.startsWith('/uploads')) return url;
+                    return `/api/achievements/files/${url.split('/').pop()}`;
+                };
 
                 if (ach.proofFiles && ach.proofFiles.length > 0) {
                     ach.proofFiles.forEach(file => {
                         filesToDownload.push({
-                            url: `${STATIC_BASE_URL}${getRelPath(file.url)}`,
+                            relPath: getRelPath(file.url),
                             name: `${ach.category}_${decodeURIComponent(file.originalname)}`
                         });
                     });
                 } else if (ach.certificateUrl) {
                     filesToDownload.push({
-                        url: `${STATIC_BASE_URL}${getRelPath(ach.certificateUrl)}`,
+                        relPath: getRelPath(ach.certificateUrl),
                         name: `${ach.category}_Certificate.pdf`
                     });
                 }
             });
 
             if (filesToDownload.length === 0) {
-                toast.error('No evidentiary records detected for archival protocol.', { id: toastId });
+                toast.error('No certificates detected for export.', { id: toastId });
                 setDownloading(false);
                 return;
             }
 
+            let missingFilesCount = 0;
             const downloadPromises = filesToDownload.map(async (file, index) => {
                 try {
-                    const response = await fetch(file.url);
+                    // Direct fetch from Render Backend ONLY
+                    const response = await fetch(`${STATIC_BASE_URL}${file.relPath}`);
+
                     if (!response.ok) {
-                        console.error(`Archival sync failed for record: ${file.name} (Status: ${response.status})`);
+                        missingFilesCount++;
                         return;
                     }
 
@@ -101,22 +109,27 @@ const MyAchievementsPage = () => {
                     const finalName = `${baseName}_${index}.${extension}`;
                     zip.file(finalName, blob);
                 } catch (err) {
-                    console.error('File resolution failure', err);
+                    missingFilesCount++;
                 }
             });
 
             await Promise.all(downloadPromises);
 
             if (Object.keys(zip.files).length === 0) {
-                toast.error('Archival synchronization failed: Evidence unavailable on the server.', { id: toastId });
+                toast.error('Certificates could not be retrieved. They may have been deleted from Render.', { id: toastId, duration: 6000 });
                 setDownloading(false);
                 return;
             }
 
             const content = await zip.generateAsync({ type: 'blob' });
-            const fileName = `${user?.name?.replace(/\s+/g, '_')}_LEDGER_EXPORT.zip`;
+            const fileName = `${user?.name?.replace(/\s+/g, '_')}_CERTIFICATES.zip`;
             saveAs(content, fileName);
-            toast.success('Archival ledger successfully exported.', { id: toastId });
+
+            if (missingFilesCount > 0) {
+                toast.success(`Download complete. (${missingFilesCount} files were unavailable)`, { id: toastId });
+            } else {
+                toast.success('All certificates downloaded successfully!', { id: toastId });
+            }
         } catch (error) {
             console.error('Archival failure', error);
             toast.error('Critical failure during record synchronization.', { id: toastId });

@@ -41,44 +41,50 @@ const PublicPortfolioPage = () => {
 
     const handleDownloadAll = async () => {
         if (downloading) return;
-        const toastId = toast.loading('Synchronizing institutional archive...');
+        const toastId = toast.loading('Preparing certificates for download...');
         setDownloading(true);
 
         try {
             const zip = new JSZip();
-
             const filesToDownload = [];
+
             data.achievements.forEach(ach => {
-                const getRelPath = (url) => url?.startsWith('/uploads') ? url : `/uploads/certificates/${url?.split('/').pop()}`;
+                // Universal Path Normalizer: Handles both legacy filesystem and new DB paths
+                const getRelPath = (url) => {
+                    if (!url) return '';
+                    if (url.startsWith('/api') || url.startsWith('/uploads')) return url;
+                    return `/api/achievements/files/${url.split('/').pop()}`;
+                };
 
                 if (ach.proofFiles && ach.proofFiles.length > 0) {
                     ach.proofFiles.forEach(file => {
                         filesToDownload.push({
-                            url: `${STATIC_BASE_URL}${getRelPath(file.url)}`,
+                            relPath: getRelPath(file.url),
                             name: `${ach.category}_${decodeURIComponent(file.originalname)}`
                         });
                     });
                 } else if (ach.certificateUrl) {
                     filesToDownload.push({
-                        url: `${STATIC_BASE_URL}${getRelPath(ach.certificateUrl)}`,
+                        relPath: getRelPath(ach.certificateUrl),
                         name: `${ach.category}_Certificate.pdf`
                     });
                 }
             });
 
             if (filesToDownload.length === 0) {
-                toast.error('No evidentiary documents identified in registry.', { id: toastId });
+                toast.error('No certificates found to download.', { id: toastId });
                 setDownloading(false);
                 return;
             }
 
-            let missingFilesCount = 0;
+            let missingFiles = 0;
             const downloadPromises = filesToDownload.map(async (file, index) => {
                 try {
-                    const response = await fetch(file.url);
+                    // Direct fetch from Render Backend ONLY
+                    const response = await fetch(`${STATIC_BASE_URL}${file.relPath}`);
+
                     if (!response.ok) {
-                        console.error(`Archival sync failed for record: ${file.name} (Status: ${response.status})`);
-                        missingFilesCount++;
+                        missingFiles++;
                         return;
                     }
 
@@ -88,35 +94,34 @@ const PublicPortfolioPage = () => {
                     const finalName = `${baseName}_${index}.${extension}`;
                     zip.file(finalName, blob);
                 } catch (err) {
-                    console.error(`Protocol exception: ${file.name}`, err);
-                    missingFilesCount++;
+                    missingFiles++;
                 }
             });
 
             await Promise.all(downloadPromises);
 
             if (Object.keys(zip.files).length === 0) {
-                toast.error('Synchronization failed: All evidentiary records have been purged from the server.', { id: toastId });
+                toast.error('Certificates could not be retrieved from the server. They may have been deleted by Render.', { id: toastId, duration: 6000 });
                 setDownloading(false);
                 return;
             }
 
             const content = await zip.generateAsync({ type: 'blob' });
-            const idKey = data.student.enrollmentNo || data.student.enrollment_no || data.student.studentId || 'SCHOLAR';
+            const idKey = data.student.enrollment_no || data.student.enrollmentNo || data.student.studentId || data.student.userId;
+
             const fileName = (user?.role === 'admin' || user?.role === 'faculty')
-                ? `${idKey}_EVIDENCE_LEDGER.zip`
+                ? `${idKey || 'LEDGER'}_CERTIFICATES.zip`
                 : `${data.student.name.replace(/\s+/g, '_')}_PORTFOLIO.zip`;
 
             saveAs(content, fileName);
 
-            if (missingFilesCount > 0) {
-                toast.success(`Archival exported, but ${missingFilesCount} files were missing on the server.`, { id: toastId });
+            if (missingFiles > 0) {
+                toast.success(`Download complete. (${missingFiles} files were unavailable)`, { id: toastId });
             } else {
-                toast.success('Archival sequence complete. Student records exported.', { id: toastId });
+                toast.success('All certificates downloaded successfully!', { id: toastId });
             }
         } catch (error) {
-            console.error('Critical archival exception:', error);
-            toast.error('Protocol failure during record synchronization.', { id: toastId });
+            toast.error('Failed to create ZIP file.', { id: toastId });
         } finally {
             setDownloading(false);
         }
@@ -164,14 +169,6 @@ const PublicPortfolioPage = () => {
             </div>
             {/* Action buttons */}
             <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 100, display: 'flex', gap: '0.75rem' }}>
-                <button
-                    className={`btn ${downloading ? 'btn-ghost' : 'btn-secondary'} btn-sm`}
-                    onClick={handleDownloadAll}
-                    disabled={downloading}
-                    style={{ backdropFilter: 'blur(10px)', fontWeight: 800 }}
-                >
-                    {downloading ? <div className="spinner-sm" /> : <><Download size={14} /> Download Ledger</>}
-                </button>
                 <button className="btn btn-primary btn-sm" onClick={handleShare} style={{ backdropFilter: 'blur(10px)', fontWeight: 800 }}>
                     <Share2 size={14} /> Share Portfolio
                 </button>
@@ -192,10 +189,23 @@ const PublicPortfolioPage = () => {
                                 {student.department} Engineering • {student.enrollment_no ? `Enrollment: ${student.enrollment_no}` : ''} {student.semester ? `• Sem ${student.semester}` : ''}
                             </p>
                             {student.bio && <p style={{ color: 'var(--text-muted)', maxWidth: 500, lineHeight: 1.7, marginBottom: '1rem', fontSize: '0.9rem' }}>{student.bio}</p>}
-                            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                 {student.linkedIn && <a href={student.linkedIn.startsWith('http') ? student.linkedIn : `https://${student.linkedIn}`} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm"><Linkedin size={14} /> LinkedIn</a>}
                                 {student.github && <a href={student.github.startsWith('http') ? student.github : `https://${student.github}`} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm"><Github size={14} /> GitHub</a>}
                                 {student.portfolio && <a href={student.portfolio.startsWith('http') ? student.portfolio : `https://${student.portfolio}`} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm"><Globe size={14} /> Portfolio</a>}
+
+                                <div style={{ width: '1px', height: '20px', background: 'var(--border-primary)', margin: '0 0.25rem' }} />
+
+                                {(user?.role === 'admin' || user?.role === 'faculty' || user?.id === userId || user?._id === userId) && (
+                                    <button
+                                        className="btn btn-primary btn-sm"
+                                        onClick={handleDownloadAll}
+                                        disabled={downloading}
+                                        style={{ background: 'var(--brand-700)', border: 'none', boxShadow: '0 4px 12px rgba(0,33,71,0.2)' }}
+                                    >
+                                        {downloading ? <div className="spinner-sm" /> : <><Download size={14} /> Download Evidence Ledger</>}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
