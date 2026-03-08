@@ -29,7 +29,7 @@ const ScrollToTopButton = () => {
     return (
         <div className={`scroll-to-top ${isVisible ? 'visible' : ''}`}>
             <button onClick={scrollToTop} aria-label="Scroll to top">
-                <ArrowUp size={24} />
+                <ArrowUp size={20} />
             </button>
         </div>
     );

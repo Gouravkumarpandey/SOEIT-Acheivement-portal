@@ -16,8 +16,8 @@
 }
 
 .scroll-to-top button {
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
     background-color: var(--brand-600);
     color: white;
     border: none;
@@ -43,7 +43,7 @@
     }
 
     .scroll-to-top button {
-        width: 3rem;
-        height: 3rem;
+        width: 2.25rem;
+        height: 2.25rem;
     }
 }
