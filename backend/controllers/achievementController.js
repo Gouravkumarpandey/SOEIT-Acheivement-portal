@@ -3,7 +3,6 @@ const Verification = require('../models/Verification');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const HackathonActivity = require('../models/HackathonActivity');
-const FileData = require('../models/FileData'); // Wait, I named it File.js
 const FileModel = require('../models/File');
 
 // @desc    Create achievement
