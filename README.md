@@ -13,14 +13,14 @@
 The **SOEIT Achievement Portal** is a high-performance, enterprise-grade digital infrastructure developed for the **School of Engineering & IT (SOEIT)** at Arka Jain University. It serves as the single source of truth for student milestones, faculty oversight, and institutional auditing. Designed with a **Premium Academic Aesthetic**, the platform eliminates administrative friction and replaces legacy tracking with a seamless, data-driven ecosystem.
 
 > [!IMPORTANT]
-> **Audit-Ready Infrastructure**: Every transaction and verification cycle is logged for NAAC, NIRF, and internal institutional compliance reporting.
+> **Audit-Ready Infrastructure**: Every transaction and verification cycle is logged for NAAC, NIRF, and internal institutional compliance reporting. **Zero-Loss Persistence**: All student certificates are stored directly in the database to survive server restarts.
 
 ---
 
 ## 🏗️ System Architecture
 
 ### High-Level Architecture
-The portal utilizes a decoupled **REVN** stack (React, Express, Vite, Node) with LibSQL/Turso as the persistence layer.
+The portal utilizes a decoupled **REVN** stack (React, Express, Vite, Node) with **LibSQL/Turso (BLOB Storage)** as the persistence layer for both metadata and binary files.
 
 ```mermaid
 graph TD
@@ -42,18 +42,16 @@ graph TD
         JWT --> AuthS[Auth Controller]
         JWT --> AdminS[Admin/Faculty Logic]
         JWT --> StudentS[Student Achievement Engine]
-        JWT --> HackS[Hackathon Activity Engine]
-
+        
         AuthS --> Models[Data Models]
         AdminS --> Models
         StudentS --> Models
-        HackS --> Models
     end
 
-    subgraph "Persistence Layer"
-        Models --> DB[(LibSQL / Turso)]
-        Models --> Email[Nodemailer Broadcast]
-        Models --> Storage[Certificate Storage]
+    subgraph "Persistence Layer (Turso / LibSQL)"
+        Models --> DB[(SQL Metadata)]
+        Models --> BLOB[(File BLOB Repository)]
+        Note over BLOB: Certificates & Profile Images stored as Binary Literals
     end
 ```
 
@@ -64,19 +62,20 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant S as Student
+    participant B as Backend (SQL BLOB)
     participant F as Faculty/Admin
-    participant D as DB & Analytics
     participant P as Public Portfolio
 
-    S->>S: Formulate Metadata & Upload Certificate
-    S->>F: Submit Achievement for Verification
-    Note over S,F: Trigger Email to Faculty
+    S->>S: Formulate Metadata
+    S->>B: Upload Certificate (Sent as Buffer)
+    B->>B: Archive in 'files' table as BLOB
+    B-->>S: Return Dynamic Resource Pointer (/api/achievements/files/:id)
 
-    F->>F: Review High-Res Document
+    F->>F: Review High-Res Document from DB
     alt Approved
-        F->>D: Verify Milestone & Assign Points
-        D-->>S: Real-time Analytics Update
-        D-->>P: Append to Shareable E-Portfolio
+        F->>F: Verify Milestone & Assign Points
+        F-->>S: Real-time Analytics Update
+        F-->>P: Append to Shareable E-Portfolio
     else Rejected
         F->>S: Request Re-submission with Feedback
     end
@@ -88,17 +87,18 @@ sequenceDiagram
 
 | Role | Access Level | Primary Responsibility |
 | :-- | :-- | :-- |
-| **Student** | Learner | Achievement submission, Portfolio management, Hackathon discovery |
-| **Faculty** | Overseer | Dept-wide monitoring, Notice broadcasting, Student analytics |
-| **Admin** | Validator | Achievement verification, Event management, Hackathon activity tracking |
+| **Student** | Learner | Achievement submission, Personal Portfolio management, ZIP Ledger export (Self only) |
+| **Faculty** | Overseer | Dept-wide monitoring, Notice broadcasting, Student analytics, **Resilient Archival Access** |
+| **Admin** | Validator | Achievement verification, Event management, Hackathon activity tracking, **Institutional Record Export** |
 
 ---
 
 ## ✨ Features
 
 ### 🎓 Student Features
-- **Dashboard** — Real-time stats: total achievements, verified count, pending, points earned
-- **Upload Achievement** — Multi-file certificate upload with metadata (level, category, institution, date)
+- **Dashboard** — Real-time stats: total achievements, verified count, pending, points earned.
+- **Persistent Evidence Storage** — Certificates are stored as BLOBs in Turso; no more 404 errors due to Render's ephemeral filesystem.
+- **Evidence Ledger Export** — Download all verified certificates in a single, synchronized ZIP archive.
 - **My Achievements** — Full history with status badges, filter, search, and edit/delete
 - **Live Hackathons Page** — 91+ real upcoming hackathons (2026+) across 13 categories:
   - Govt of India, AI/ML, Web Development, Cybersecurity, Mobile App Dev
@@ -107,38 +107,42 @@ sequenceDiagram
   - Search by name, filter by category, live count badge
   - Scroll-to-Top button for easy navigation
   - All links are real and verified; activity logged on Apply
-- **Public Portfolio** — Shareable profile with achievement cards, stats strip, course progress
+- **Public Portfolio** — Shareable profile with achievement cards, stats strip, course progress.
 - **Course Registry** — Track enrolled courses with progress bars
 - **Campus Events** — Browse and track institutional events
-- **Student Profile** — Edit bio, LinkedIn, GitHub, portfolio links, profile photo
+- **Student Profile** — Edit bio, LinkedIn, GitHub, and upload persistent profile photos to the database.
 
 ### 🏫 Faculty Features
-- **Faculty Command Center** — Institution-wide student analytics dashboard
-- **Scholar Directory** — Filter by semester (1–8) and section (A–G), search by name/enrollment
+- **Faculty Command Center** — Institution-wide student analytics dashboard.
+- **Resilient Archival Protocol** — Authorized access to download any student's certificate ledger as a ZIP file.
+- **Scholar Directory** — Filter by semester (1–8) and section (A–G), search by name/enrollment.
 - **Verification Matrix** — View total, verified, pending achievements per student
 - **Export Reports** — Export data to PDF (jsPDF + autoTable) or Excel (XLSX)
-- **Dispatch Notice** — Broadcast institutional notices to all students via SMTP email
+- **Dispatch Notice** — Broadcast institutional notices to all students via SMTP email.
 - **Student Quick View** — Modal summary with achievement analytics per student
 - **Full Portfolio Access** — Direct link to any student's public portfolio
 
 ### 🔐 Admin Features
 - **Admin Dashboard** — Platform-wide charts: achievement trends, domain distribution, verification queue
-- **Verify Achievements** — Review and approve/reject uploaded certificates with feedback
+- **Institutional Record Export** — Download student evidence ZIPs automatically named by **Enrollment Number** for NAAC/NIRF audits.
+- **Verify Achievements** — Review and approve/reject uploaded certificates with feedback.
 - **All Achievements** — Browse every submission across the institution
 - **Student Management** — Full student directory with bulk delete support
 - **Faculty Management** — Activate/deactivate faculty access, export faculty roster
 - **Reports & Analytics** — Deep-dive statistical reports (by department, semester, category, level)
 - **Course Monitoring** — Track course enrollment and completion across all students
-- **Hackathon Activity Monitor** — Live log of which students clicked which hackathons, with CSV export
+- **Hackathon Activity Monitor** — Live log of which students clicked which hackathons, with CSV export.
+- **Student & Faculty Management** — Full control over platform-wide user access and activation.
 
 ### 🌐 Public Pages
 - **Landing Page** — Hackathon-style hero, stats strip, feature cards
-- **Public Portfolio** — Publicly shareable student achievement page with:
+- **Public Portfolio** — Publicly shareable student achievement page (Download button restricted to authorized roles).
   - Stats: Achievements · Points · **Hackathons Explored** · Courses · Completed
   - Achievement cards with category icons, level badges, verified stamp
   - Course progress cards
   - Category filter (desktop buttons + mobile dropdown)
-- **Public Portfolios Directory** — Browse all students by department
+- **Public Portfolios Directory** — Browse all students by department.
+- **Strategic Hackathons Page** — 91+ real upcoming hackathons across 13 categories; activity logged for institutional analytics.
 - **How It Works**, **Features**, **About**, **Contact** pages
 
 ### 🔒 Auth & Security
@@ -154,8 +158,12 @@ sequenceDiagram
 
 | Feature | Description |
 |---------|-------------|
-| 🏆 **91+ Live Hackathons** | 13 categories, 7 per category, all 2026+ real events with verified links |
-| 🔍 **Hackathon Search & Filter** | Search by name, filter by type, live hackathon count badge |
+| 🗄️ **Full DB Binary Storage** | Migrated from ephemeral disk to Turso SQL BLOB storage for all certificates and avatars. |
+| 📁 **Resilient Archival Protocol** | Added "Download Evidence Ledger" feature to package all student certificates into a ZIP archive. |
+| 🔐 **RBAC Download Security** | Restricted portfolio ZIP downloads to Faculty, Admins, and the student's own account. |
+| 🏷️ **Audit-Ready Naming** | ZIP files are automatically named by Student Name (for Students) or Enrollment No (for Admins). |
+| 🏆 **Strategic Hackathons** | 91+ real 2026 events with search, filtering, and "Apply Now" activity tracking. |
+| 📐 **Uniform UI Design** | Synchronized card heights and layout across all achievement and hackathon listings. |
 | ⬆️ **Scroll to Top** | Smooth scroll-to-top button on the Hackathons page |
 | 💻 **Hackathon Activity Tracking** | Backend logs every student's "Apply Now" click; admin can monitor & export |
 | 📊 **Portfolio Hackathon Stat** | Public portfolio now shows "Hackathons Explored" count in the stats strip |
@@ -180,20 +188,20 @@ SOEIT-Portal/
 │   │   ├── context/              # AuthContext (JWT, login, logout, RBAC)
 │   │   ├── pages/
 │   │   │   ├── auth/             # LoginPage, RegisterPage, ForgotPassword
-│   │   │   ├── student/          # Dashboard, Achievements, HackathonsPage
-│   │   │   ├── admin/            # AdminDashboard, VerifyAchievements, HackathonMonitoringPage
+│   │   │   ├── student/          # Dashboard, MyAchievements (Resilient Export)
+│   │   │   ├── admin/            # Dashboard, HackathonMonitoring
 │   │   │   ├── faculty/          # FacultyDashboard
-│   │   │   └── public/           # PublicPortfolioPage, PublicPortfoliosPage
-│   │   ├── services/             # api.js — Axios API layer
-│   │   └── styles/               # Per-page CSS (vanilla, no Tailwind)
+│   │   │   └── public/           # PublicPortfolio (Role-Protected Download)
+│   │   ├── services/             # api.js — Centralized API & Resource URL configuration
+│   │   └── styles/               # Vanilla CSS Design System
 │   └── public/                   # Brand assets
 │
-├── backend/                      # Core API (Express + LibSQL)
-│   ├── controllers/              # achievementController, hackathonController, etc.
-│   ├── models/                   # User, Achievement, HackathonActivity, Course, etc.
+├── backend/                      # Core API (Express + Turso/LibSQL)
+│   ├── controllers/              # achievementController (Binary Upload/Serve Logic)
+│   ├── models/                   # File.js (BLOB Model), User, Achievement, HackathonActivity, Course, etc.
 │   ├── routes/                   # Protected REST endpoints
-│   ├── middleware/               # Auth guard, rate limiter, file upload (Multer)
-│   └── config/                   # db.js (LibSQL/Turso), environment
+│   ├── middleware/               # Auth Guards & Memory-resident Upload (Multer)
+│   ├── config/                   # db.js (Turso Connection & Schema Init)
 │
 └── demo_credentials.txt          # 🔐 Dev-only login credentials (not shown in UI)
 ```
@@ -207,18 +215,17 @@ SOEIT-Portal/
 **`backend/.env`**
 ```env
 PORT=5000
-TURSO_DATABASE_URL=your_turso_db_url
-TURSO_AUTH_TOKEN=your_turso_token
+TURSO_URL=your_turso_db_url
 JWT_SECRET=your_high_entropy_secret
+JWT_EXPIRE=30d
 SMTP_USER=your_email@domain.com
 SMTP_PASS=your_app_password
-FRONTEND_URL=http://localhost:5173
+CLIENT_URL=https://your-vercel-frontend.vercel.app
 ```
 
 **`frontend/.env`**
 ```env
 VITE_API_URL=http://localhost:5000/api
-VITE_UPLOADS_URL=http://localhost:5000
 ```
 
 ### 2. Install & Run
@@ -238,11 +245,10 @@ cd frontend && npm run dev
 ---
 
 ## 📈 Strategic Roadmap
-- [ ] **AI-driven Validation** — Automated certificate parsing and fraud detection via OCR
-- [ ] **Alumni Integration** — Extending achievement lifecycles to SOEIT post-graduates
-- [ ] **Institutional Dashboard** — High-level dean's view for department-wide comparisons
-- [ ] **Mobile App** — React Native companion for on-the-go achievement submission
-- [ ] **Hackathon Registration** — In-app team formation and registration for listed hackathons
+- [ ] **AI-driven Validation** — Automated certificate parsing and fraud detection via OCR.
+- [ ] **Alumni Integration** — Extending achievement lifecycles to SOEIT post-graduates.
+- [ ] **Institutional Dashboard** — High-level dean's view for department-wide comparisons.
+- [ ] **Mobile App** — React Native companion for on-the-go achievement submission.
 
 ---
 

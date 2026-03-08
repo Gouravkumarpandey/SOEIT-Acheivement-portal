@@ -49,11 +49,18 @@ const PublicPortfolioPage = () => {
             const filesToDownload = [];
 
             data.achievements.forEach(ach => {
-                // Universal Path Normalizer: Handles both legacy filesystem and new DB paths
-                const getRelPath = (url) => {
-                    if (!url) return '';
-                    if (url.startsWith('/api') || url.startsWith('/uploads')) return url;
-                    return `/api/achievements/files/${url.split('/').pop()}`;
+                // Universal Path Normalizer: Gracefully handles legacy filesystem and modern DB paths
+                const getRelPath = (rawUrl) => {
+                    if (!rawUrl) return '';
+                    // 1. If it's already a relative institutional path, keep it
+                    if (rawUrl.startsWith('/api') || rawUrl.startsWith('/uploads')) return rawUrl;
+                    // 2. If it's a full URL containing /uploads or /api, extract the relative part
+                    const uploadsIdx = rawUrl.indexOf('/uploads/');
+                    if (uploadsIdx !== -1) return rawUrl.substring(uploadsIdx);
+                    const apiIdx = rawUrl.indexOf('/api/');
+                    if (apiIdx !== -1) return rawUrl.substring(apiIdx);
+                    // 3. Otherwise assume it's a target for the database serving route
+                    return `/api/achievements/files/${rawUrl.split('/').pop()}`;
                 };
 
                 if (ach.proofFiles && ach.proofFiles.length > 0) {
@@ -84,6 +91,12 @@ const PublicPortfolioPage = () => {
                     const response = await fetch(`${STATIC_BASE_URL}${file.relPath}`);
 
                     if (!response.ok) {
+                        // Audit Log: Specifically identify legacy files lost to Render's ephemeral filesystem
+                        if (file.relPath.startsWith('/uploads')) {
+                            console.warn(`[DIAGNOSTIC] Legacy archive document missing: ${file.name}. This is due to Render's ephemeral disk policy. These files MUST be re-uploaded once to be saved permanently in the database.`);
+                        } else {
+                            console.warn(`[DIAGNOSTIC] Database record heartbeat failure: ${file.name}`);
+                        }
                         missingFiles++;
                         return;
                     }

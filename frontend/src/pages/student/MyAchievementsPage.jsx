@@ -64,11 +64,18 @@ const MyAchievementsPage = () => {
             // Collect ALL proof files from currently loaded achievements
             const filesToDownload = [];
             achievements.forEach(ach => {
-                // Universal Path Normalizer: Handles both legacy filesystem and new DB paths
-                const getRelPath = (url) => {
-                    if (!url) return '';
-                    if (url.startsWith('/api') || url.startsWith('/uploads')) return url;
-                    return `/api/achievements/files/${url.split('/').pop()}`;
+                // Universal Path Normalizer: Gracefully handles legacy filesystem and modern DB paths
+                const getRelPath = (rawUrl) => {
+                    if (!rawUrl) return '';
+                    // 1. If it's already a relative institutional path, keep it
+                    if (rawUrl.startsWith('/api') || rawUrl.startsWith('/uploads')) return rawUrl;
+                    // 2. If it's a full URL containing /uploads or /api, extract the relative part
+                    const uploadsIdx = rawUrl.indexOf('/uploads/');
+                    if (uploadsIdx !== -1) return rawUrl.substring(uploadsIdx);
+                    const apiIdx = rawUrl.indexOf('/api/');
+                    if (apiIdx !== -1) return rawUrl.substring(apiIdx);
+                    // 3. Otherwise assume it's a target for the database serving route
+                    return `/api/achievements/files/${rawUrl.split('/').pop()}`;
                 };
 
                 if (ach.proofFiles && ach.proofFiles.length > 0) {
@@ -99,6 +106,10 @@ const MyAchievementsPage = () => {
                     const response = await fetch(`${STATIC_BASE_URL}${file.relPath}`);
 
                     if (!response.ok) {
+                        // Audit Log for legacy file loss
+                        if (file.relPath.startsWith('/uploads')) {
+                            console.warn(`[DIAGNOSTIC] Peer-to-peer sync failure for legacy file: ${file.name}. Render disk purged. Re-upload required to migrate to database.`);
+                        }
                         missingFilesCount++;
                         return;
                     }
