@@ -2,9 +2,13 @@ import '../../styles/MyAchievementsPage.css';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { achievementAPI } from '../../services/api';
-import { Trophy, Search, Filter, Pencil, Trash2, Clock, CheckCircle, XCircle, Eye, Upload, ChevronLeft, ChevronRight, Star, GraduationCap } from 'lucide-react';
+import { Trophy, Search, Filter, Pencil, Trash2, Clock, CheckCircle, XCircle, Eye, Upload, ChevronLeft, ChevronRight, Star, GraduationCap, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import { useAuth } from '../../context/AuthContext';
+import { STATIC_BASE_URL } from '../../services/api';
 
 const CATEGORIES = ['', 'Academic', 'Sports', 'Cultural', 'Technical', 'Research', 'Internship', 'Certification', 'Competition', 'Other'];
 const STATUSES = ['', 'pending', 'approved', 'rejected'];
@@ -25,8 +29,10 @@ const StatusBadge = ({ status }) => {
 };
 
 const MyAchievementsPage = () => {
+    const { user } = useAuth();
     const [achievements, setAchievements] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [downloading, setDownloading] = useState(false);
     const [total, setTotal] = useState(0);
     const [pages, setPages] = useState(1);
     const [filters, setFilters] = useState({ status: '', category: '', search: '', page: 1 });
@@ -44,6 +50,78 @@ const MyAchievementsPage = () => {
             toast.error('Identity protocol failed: Records unavailable');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDownloadAll = async () => {
+        if (downloading || achievements.length === 0) return;
+        const toastId = toast.loading('Synchronizing personal institutional archive...');
+        setDownloading(true);
+
+        try {
+            const zip = new JSZip();
+
+            // Collect ALL proof files from currently loaded achievements
+            const filesToDownload = [];
+            achievements.forEach(ach => {
+                const getRelPath = (url) => url?.startsWith('/uploads') ? url : `/uploads/certificates/${url?.split('/').pop()}`;
+
+                if (ach.proofFiles && ach.proofFiles.length > 0) {
+                    ach.proofFiles.forEach(file => {
+                        filesToDownload.push({
+                            url: `${STATIC_BASE_URL}${getRelPath(file.url)}`,
+                            name: `${ach.category}_${decodeURIComponent(file.originalname)}`
+                        });
+                    });
+                } else if (ach.certificateUrl) {
+                    filesToDownload.push({
+                        url: `${STATIC_BASE_URL}${getRelPath(ach.certificateUrl)}`,
+                        name: `${ach.category}_Certificate.pdf`
+                    });
+                }
+            });
+
+            if (filesToDownload.length === 0) {
+                toast.error('No evidentiary records detected for archival protocol.', { id: toastId });
+                setDownloading(false);
+                return;
+            }
+
+            const downloadPromises = filesToDownload.map(async (file, index) => {
+                try {
+                    const response = await fetch(file.url);
+                    if (!response.ok) {
+                        console.error(`Archival sync failed for record: ${file.name} (Status: ${response.status})`);
+                        return;
+                    }
+
+                    const blob = await response.blob();
+                    const extension = file.name.split('.').pop();
+                    const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
+                    const finalName = `${baseName}_${index}.${extension}`;
+                    zip.file(finalName, blob);
+                } catch (err) {
+                    console.error('File resolution failure', err);
+                }
+            });
+
+            await Promise.all(downloadPromises);
+
+            if (Object.keys(zip.files).length === 0) {
+                toast.error('Archival synchronization failed: Evidence unavailable on the server.', { id: toastId });
+                setDownloading(false);
+                return;
+            }
+
+            const content = await zip.generateAsync({ type: 'blob' });
+            const fileName = `${user?.name?.replace(/\s+/g, '_')}_LEDGER_EXPORT.zip`;
+            saveAs(content, fileName);
+            toast.success('Archival ledger successfully exported.', { id: toastId });
+        } catch (error) {
+            console.error('Archival failure', error);
+            toast.error('Critical failure during record synchronization.', { id: toastId });
+        } finally {
+            setDownloading(false);
         }
     };
 
@@ -69,15 +147,26 @@ const MyAchievementsPage = () => {
     return (
         <div className="animate-fade-in">
             {/* Header Suite */}
-            <div className="page-header" style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div className="page-header" style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                     <h2 className="heading-display">Institutional Achievement Registry</h2>
                     <p className="page-subtitle">Unified chronological ledger of verified academic and professional milestones.</p>
                 </div>
-                <Link to="/achievements/upload" className="btn btn-primary" style={{ padding: '0.8rem 2rem', fontWeight: 900 }}>
-                    <Upload size={18} />
-                    <span>Synchronize New Record</span>
-                </Link>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button
+                        className="btn btn-ghost"
+                        onClick={handleDownloadAll}
+                        disabled={downloading || achievements.length === 0}
+                        style={{ padding: '0.8rem 1.5rem', fontWeight: 900, border: '1px solid var(--border-primary)', background: 'white' }}
+                    >
+                        {downloading ? <div className="spinner-sm" /> : <Download size={18} />}
+                        <span>Export Portfolio</span>
+                    </button>
+                    <Link to="/achievements/upload" className="btn btn-primary" style={{ padding: '0.8rem 2rem', fontWeight: 900 }}>
+                        <Upload size={18} />
+                        <span>Synchronize New Record</span>
+                    </Link>
+                </div>
             </div>
 
             {/* Navigation & Control Suite */}

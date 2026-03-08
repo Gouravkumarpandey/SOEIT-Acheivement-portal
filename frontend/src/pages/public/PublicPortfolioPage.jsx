@@ -1,7 +1,7 @@
 import '../../styles/PublicPortfolioPage.css';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { achievementAPI } from '../../services/api';
+import { achievementAPI, STATIC_BASE_URL } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal, Download, Shield } from 'lucide-react';
 import { format } from 'date-fns';
@@ -40,85 +40,44 @@ const PublicPortfolioPage = () => {
     };
 
     const handleDownloadAll = async () => {
-        if (!data || !data.achievements || data.achievements.length === 0) {
-            toast.error('No verified records identified for export protocol.');
-            return;
-        }
-
+        if (downloading) return;
+        const toastId = toast.loading('Synchronizing institutional archive...');
         setDownloading(true);
-        const toastId = toast.loading('Initializing archival protocol: Synchronizing evidentiary records...');
 
         try {
             const zip = new JSZip();
-            const prodBase = 'https://soeit-acheivement-portal.onrender.com';
-            const localBase = 'http://localhost:5000';
 
-            // Gather all proof files across all achievements
             const filesToDownload = [];
             data.achievements.forEach(ach => {
+                const getRelPath = (url) => url?.startsWith('/uploads') ? url : `/uploads/certificates/${url?.split('/').pop()}`;
+
                 if (ach.proofFiles && ach.proofFiles.length > 0) {
                     ach.proofFiles.forEach(file => {
-                        // Normalize pathing: ensure relative URL is clean
-                        const relPath = file.url.startsWith('/uploads') ? file.url : `/uploads/certificates/${file.filename}`;
                         filesToDownload.push({
-                            relPath,
+                            url: `${STATIC_BASE_URL}${getRelPath(file.url)}`,
                             name: `${ach.category}_${decodeURIComponent(file.originalname)}`
                         });
                     });
                 } else if (ach.certificateUrl) {
-                    // Normalize pathing for certificateUrl as well
-                    const relPath = ach.certificateUrl.startsWith('/uploads') ? ach.certificateUrl : `/uploads/certificates/${ach.certificateUrl.split('/').pop()}`;
                     filesToDownload.push({
-                        relPath,
+                        url: `${STATIC_BASE_URL}${getRelPath(ach.certificateUrl)}`,
                         name: `${ach.category}_Certificate.pdf`
                     });
                 }
             });
 
             if (filesToDownload.length === 0) {
-                toast.error('No evidentiary documents identified in cloud registry.');
+                toast.error('No evidentiary documents identified in registry.', { id: toastId });
                 setDownloading(false);
-                toast.dismiss(toastId);
                 return;
             }
 
-            // Fetch all files in parallel with Production -> Local fallback protocol
             const downloadPromises = filesToDownload.map(async (file, index) => {
                 try {
-                    let response;
-                    let success = false;
-
-                    // Node Probe 01: Production Hub (Render)
-                    try {
-                        const prodResponse = await fetch(`${prodBase}${file.relPath}`);
-                        if (prodResponse.ok) {
-                            response = prodResponse;
-                            success = true;
-                        } else {
-                            console.warn(`Production node responded with status ${prodResponse.status} for: ${file.name}`);
-                        }
-                    } catch (e) {
-                        console.warn(`Cloud node unreachable or network error for ${file.name}:`, e.message);
-                    }
-
-                    // Node Probe 02: Local Development Fallback (if prod fails or 404s)
-                    if (!success) {
-                        try {
-                            const localResponse = await fetch(`${localBase}${file.relPath}`);
-                            if (localResponse.ok) {
-                                response = localResponse;
-                                success = true;
-                            } else {
-                                console.warn(`Local node responded with status ${localResponse.status} for: ${file.name}`);
-                            }
-                        } catch (e) {
-                            console.warn(`Local node unreachable or network error for ${file.name}:`, e.message);
-                        }
-                    }
-
-                    if (!success) {
-                        console.error(`Archival sync failure: Record missing on all known nodes [${file.name}]`);
-                        return; // Skip invalid record to maintain ZIP integrity
+                    const response = await fetch(file.url);
+                    if (!response.ok) {
+                        console.error(`Archival sync failed for record: ${file.name} (Status: ${response.status})`);
+                        return;
                     }
 
                     const blob = await response.blob();
@@ -127,31 +86,29 @@ const PublicPortfolioPage = () => {
                     const finalName = `${baseName}_${index}.${extension}`;
                     zip.file(finalName, blob);
                 } catch (err) {
-                    console.error(`Protocol exception for record: ${file.name}`, err);
+                    console.error(`Protocol exception: ${file.name}`, err);
                 }
             });
 
             await Promise.all(downloadPromises);
 
             if (Object.keys(zip.files).length === 0) {
-                toast.error('Synchronization failed: Files not found in production or local storage. Records may have been purged by the server.', { id: toastId });
+                toast.error('Synchronization failed: Records unavailable on the server.', { id: toastId });
                 setDownloading(false);
                 return;
             }
 
             const content = await zip.generateAsync({ type: 'blob' });
-
-            const isFacultyOrAdmin = user?.role === 'admin' || user?.role === 'faculty';
-            const idKey = data.student.enrollmentNo || data.student.enrollment_no || data.student.studentId || data.student.student_id || 'unidentified';
-            const fileName = isFacultyOrAdmin
-                ? `${idKey}_academic_evidence.zip`
-                : `${data.student.name.replace(/\s+/g, '_')}_achievements.zip`;
+            const idKey = data.student.enrollmentNo || data.student.enrollment_no || data.student.studentId || 'SCHOLAR';
+            const fileName = (user?.role === 'admin' || user?.role === 'faculty')
+                ? `${idKey}_EVIDENCE_LEDGER.zip`
+                : `${data.student.name.replace(/\s+/g, '_')}_PORTFOLIO.zip`;
 
             saveAs(content, fileName);
             toast.success('Archival sequence complete. Student records exported.', { id: toastId });
         } catch (error) {
-            console.error('Archival protocol exception:', error);
-            toast.error('Critical failure during multi-node synchronization.', { id: toastId });
+            console.error('Critical archival exception:', error);
+            toast.error('Protocol failure during record synchronization.', { id: toastId });
         } finally {
             setDownloading(false);
         }

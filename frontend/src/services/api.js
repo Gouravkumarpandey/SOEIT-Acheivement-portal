@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://soeit-acheivement-portal.onrender.com';
+export const API_BASE_URL = API_URL.endsWith('/api') ? API_URL : `${API_URL}/api`;
+export const STATIC_BASE_URL = API_URL.endsWith('/api') ? API_URL.replace(/\/api$/, '') : API_URL;
+
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api',
+    baseURL: API_BASE_URL,
     withCredentials: true,
     headers: { 'Content-Type': 'application/json' },
 });
