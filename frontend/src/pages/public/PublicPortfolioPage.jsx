@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { achievementAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal } from 'lucide-react';
+import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal, Download, Shield } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 const LEVEL_COLORS = { International: '#f59e0b', National: '#3b82f6', State: '#8b5cf6', University: '#10b981', College: '#06b6d4', Department: '#6b7280' };
 const CATEGORY_ICONS = { Academic: '🎓', Sports: '🏆', Cultural: '🎭', Technical: '💻', Research: '🔬', Internship: '💼', Certification: '📜', Competition: '🥇', 'Community Service': '🤝', Other: '⭐' };
@@ -15,6 +17,7 @@ const PublicPortfolioPage = () => {
     const { userId } = useParams();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [downloading, setDownloading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedCat, setSelectedCat] = useState('');
 
@@ -34,6 +37,79 @@ const PublicPortfolioPage = () => {
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href);
         toast.success('Portfolio link copied! 🔗');
+    };
+
+    const handleDownloadAll = async () => {
+        if (!data || !data.achievements || data.achievements.length === 0) {
+            toast.error('No verified records identified for export protocol.');
+            return;
+        }
+
+        setDownloading(true);
+        const toastId = toast.loading('Initializing archival protocol: Synchronizing evidentiary records...');
+
+        try {
+            const zip = new JSZip();
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+            // Gather all proof files across all achievements
+            const filesToDownload = [];
+            data.achievements.forEach(ach => {
+                if (ach.proofFiles && ach.proofFiles.length > 0) {
+                    ach.proofFiles.forEach(file => {
+                        filesToDownload.push({
+                            url: file.url.startsWith('http') ? file.url : `${baseUrl}${file.url}`,
+                            name: `${ach.category}_${file.originalname}`
+                        });
+                    });
+                } else if (ach.certificateUrl) {
+                    filesToDownload.push({
+                        url: ach.certificateUrl.startsWith('http') ? ach.certificateUrl : `${baseUrl}${ach.certificateUrl}`,
+                        name: `${ach.category}_Certificate.pdf` // Fallback name
+                    });
+                }
+            });
+
+            if (filesToDownload.length === 0) {
+                toast.error('No evidentiary documents found for direct extraction.');
+                setDownloading(false);
+                toast.dismiss(toastId);
+                return;
+            }
+
+            // Fetch all files in parallel
+            const downloadPromises = filesToDownload.map(async (file, index) => {
+                try {
+                    const response = await fetch(file.url);
+                    const blob = await response.blob();
+                    // Handle duplicate filenames by appending index
+                    const extension = file.name.split('.').pop();
+                    const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
+                    const finalName = `${baseName}_${index}.${extension}`;
+                    zip.file(finalName, blob);
+                } catch (err) {
+                    console.error(`Protocol failure for record: ${file.name}`, err);
+                }
+            });
+
+            await Promise.all(downloadPromises);
+
+            const content = await zip.generateAsync({ type: 'blob' });
+
+            const isFacultyOrAdmin = user?.role === 'admin' || user?.role === 'faculty';
+            const idKey = data.student.enrollmentNo || data.student.enrollment_no || data.student.studentId || data.student.student_id || 'unidentified';
+            const fileName = isFacultyOrAdmin
+                ? `${idKey}_academic_evidence.zip`
+                : `${data.student.name.replace(/\s+/g, '_')}_achievements.zip`;
+
+            saveAs(content, fileName);
+            toast.success('Archival sequence complete. Student records exported.', { id: toastId });
+        } catch (error) {
+            console.error('Archival protocol exception:', error);
+            toast.error('Critical failure during record synchronization.', { id: toastId });
+        } finally {
+            setDownloading(false);
+        }
     };
 
     if (loading) return (
@@ -76,9 +152,17 @@ const PublicPortfolioPage = () => {
                     <ArrowLeft size={16} /> Back to Home
                 </Link>
             </div>
-            {/* Share button */}
-            <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 100 }}>
-                <button className="btn btn-primary btn-sm" onClick={handleShare} style={{ backdropFilter: 'blur(10px)' }}>
+            {/* Action buttons */}
+            <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 100, display: 'flex', gap: '0.75rem' }}>
+                <button
+                    className={`btn ${downloading ? 'btn-ghost' : 'btn-secondary'} btn-sm`}
+                    onClick={handleDownloadAll}
+                    disabled={downloading}
+                    style={{ backdropFilter: 'blur(10px)', fontWeight: 800 }}
+                >
+                    {downloading ? <div className="spinner-sm" /> : <><Download size={14} /> Download Ledger</>}
+                </button>
+                <button className="btn btn-primary btn-sm" onClick={handleShare} style={{ backdropFilter: 'blur(10px)', fontWeight: 800 }}>
                     <Share2 size={14} /> Share Portfolio
                 </button>
             </div>

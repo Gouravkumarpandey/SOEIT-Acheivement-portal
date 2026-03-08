@@ -22,6 +22,7 @@ const EventsPage = () => {
         registrationLink: ''
     });
     const [editingId, setEditingId] = useState(null);
+    const [otherCategory, setOtherCategory] = useState('');
 
     const loadEvents = async () => {
         setLoading(true);
@@ -44,15 +45,21 @@ const EventsPage = () => {
         const actionText = editingId ? 'Updating' : 'Publishing';
         const toastId = toast.loading(`${actionText} institutional event...`);
         try {
+            const finalData = { ...formData };
+            if (formData.category === 'Other' && otherCategory) {
+                finalData.category = otherCategory;
+            }
+
             if (editingId) {
-                await eventAPI.update(editingId, formData);
+                await eventAPI.update(editingId, finalData);
                 toast.success('Event records updated successfully', { id: toastId });
             } else {
-                await eventAPI.create(formData);
+                await eventAPI.create(finalData);
                 toast.success('Institutional event published successfully', { id: toastId });
             }
             setShowAddModal(false);
             setEditingId(null);
+            setOtherCategory('');
             setFormData({ title: '', description: '', category: 'Technical', date: '', venue: '', registrationLink: '' });
             loadEvents();
         } catch (error) {
@@ -62,14 +69,16 @@ const EventsPage = () => {
 
     const handleEditClick = (event) => {
         setEditingId(event._id);
+        const isStandard = ['Technical', 'Cultural', 'Sports', 'Workshop', 'Seminar'].includes(event.category);
         setFormData({
             title: event.title,
             description: event.description,
-            category: event.category,
+            category: isStandard ? event.category : 'Other',
             date: event.date.split('T')[0],
             venue: event.venue,
             registrationLink: event.registrationLink || ''
         });
+        if (!isStandard) setOtherCategory(event.category);
         setShowAddModal(true);
     };
 
@@ -231,8 +240,8 @@ const EventsPage = () => {
                     <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '600px', padding: 0, overflow: 'hidden' }}>
                         <div className="card-header" style={{ padding: '1rem 1.5rem', background: 'var(--brand-700)', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
-                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>{editingId ? 'Modify Event' : 'Publish Activity'}</h3>
-                                <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.8 }}>Event documentation suite.</p>
+                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'white' }}>{editingId ? 'Modify Event' : 'Publish Activity'}</h3>
+                                <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.8, color: 'white' }}>Event documentation suite.</p>
                             </div>
                             <button onClick={() => { setShowAddModal(false); setEditingId(null); }} className="btn btn-ghost" style={{ padding: '0.25rem', color: 'white' }}><XCircle size={20} /></button>
                         </div>
@@ -256,6 +265,12 @@ const EventsPage = () => {
                                         ))}
                                     </select>
                                 </div>
+                                {formData.category === 'Other' && (
+                                    <div className="form-group animate-slide-down" style={{ marginBottom: 0 }}>
+                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Custom Dimension</label>
+                                        <input className="form-control" required value={otherCategory} onChange={e => setOtherCategory(e.target.value)} placeholder="Specify activity type..." style={{ padding: '0.5rem 0.75rem' }} />
+                                    </div>
+                                )}
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div className="form-group" style={{ marginBottom: 0 }}>
                                         <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Date Protocol</label>
