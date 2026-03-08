@@ -37,9 +37,9 @@ exports.deleteHackathon = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'Hackathon result not located' });
         }
 
-        // Only creator or admin can delete
-        if (hackathon.created_by !== req.user.id && req.user.role !== 'admin') {
-            return res.status(403).json({ success: false, message: 'Validation failed: Identity mismatch' });
+        // Authorized roles (Admin/Faculty) as defined in routes can manage all listings
+        if (req.user.role !== 'admin' && req.user.role !== 'faculty') {
+            return res.status(403).json({ success: false, message: 'Institutional permission denied' });
         }
 
         await Hackathon.delete(req.params.id);

@@ -218,11 +218,9 @@ const connectDB = async () => {
 
     db = client;
 
-    await seedDemoUsers(client);
-    console.log('🌱 Demo users seeded');
-
-    await seedHackathons(client);
-    console.log('🏆 Demo hackathons seeded');
+    // Seeding disabled for production environment to prevent demo data persistence
+    // await seedDemoUsers(client);
+    // await seedHackathons(client);
 
   } catch (error) {
     console.error('❌ Turso Connection Failed:', error.message);
