@@ -151,9 +151,53 @@ const liveChallenges = [
 const HackathonsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('All');
+    const [dbHackathons, setDbHackathons] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchHackathons = async () => {
+        try {
+            setLoading(true);
+            const res = await hackathonAPI.getAll();
+            if (res.data.success) {
+                setDbHackathons(res.data.data);
+            }
+        } catch (error) {
+            console.error('Failed to load hackathons');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchHackathons();
+    }, []);
+
+    const allHackathons = useMemo(() => {
+        // Normalize DB hackathons to match hardcoded shape
+        const normalizedDb = dbHackathons.map(h => ({
+            ...h,
+            img: h.img_url || FALLBACK,
+            stats: {
+                students: h.students_count || '0',
+                days: h.deadline_date || 'N/A'
+            },
+            badge: h.badge || 'New',
+            prize: h.prize || 'Check Portal'
+        }));
+
+        const combined = [...normalizedDb];
+        const dbTitles = new Set(normalizedDb.map(h => h.title.toLowerCase()));
+
+        liveChallenges.forEach(h => {
+            if (!dbTitles.has(h.title.toLowerCase())) {
+                combined.push(h);
+            }
+        });
+        return combined;
+    }, [dbHackathons]);
 
     const handleImgError = (e) => {
-        e.target.onerror = null;            // prevent infinite loop
+        e.target.onerror = null;
         e.target.src = FALLBACK;
     };
 
@@ -167,15 +211,15 @@ const HackathonsPage = () => {
         }
     };
 
-    const typeOptions = ['All', ...Array.from(new Set(liveChallenges.map(c => c.type))).sort()];
+    const typeOptions = useMemo(() => ['All', ...Array.from(new Set(allHackathons.map(c => c.type))).sort()], [allHackathons]);
 
     const filteredChallenges = useMemo(() => {
-        return liveChallenges.filter(comp => {
+        return allHackathons.filter(comp => {
             const matchesSearch = comp.title.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesType = filterType === 'All' || comp.type === filterType;
             return matchesSearch && matchesType;
         });
-    }, [searchTerm, filterType]);
+    }, [searchTerm, filterType, allHackathons]);
 
     return (
         <div className="hackathons-page">

@@ -1,10 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const { logActivity, getAllActivities, deleteActivity } = require('../controllers/hackathonController');
+const {
+    getHackathons,
+    createHackathon,
+    deleteHackathon,
+    logActivity,
+    getAppliedHackathons
+} = require('../controllers/hackathonController');
 const { protect, authorize } = require('../middleware/auth');
 
+// Public/Student routes
+router.get('/', protect, getHackathons);
 router.post('/activity', protect, logActivity);
-router.get('/activity', protect, authorize('admin', 'faculty'), getAllActivities);
-router.delete('/activity/:id', protect, authorize('admin', 'faculty'), deleteActivity);
+
+// Faculty/Admin routes
+router.post('/', protect, authorize('admin', 'faculty'), createHackathon);
+router.delete('/:id', protect, authorize('admin', 'faculty'), deleteHackathon);
+router.get('/applied', protect, authorize('admin', 'faculty'), getAppliedHackathons);
 
 module.exports = router;

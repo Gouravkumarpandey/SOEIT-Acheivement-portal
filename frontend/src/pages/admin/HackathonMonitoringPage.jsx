@@ -2,25 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { hackathonAPI } from '../../services/api';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
-import { Search, Loader2, Activity, CheckCircle, Download, RefreshCw, Trash2 } from 'lucide-react';
+import { Search, Loader2, Activity, CheckCircle, Download, RefreshCw, Trash2, Plus, Trophy } from 'lucide-react';
 import '../../styles/HackathonMonitoringPage.css';
 
 const HackathonMonitoringPage = () => {
+    const [activeTab, setActiveTab] = useState('logs');
     const [activities, setActivities] = useState([]);
+    const [liveChallenges, setLiveChallenges] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newHack, setNewHack] = useState({
+        title: '', type: 'Web Development', link: '', prize: '',
+        deadline_date: '', badge: '', students_count: '0'
+    });
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            fetchActivities();
+            if (activeTab === 'logs') fetchActivities();
+            else fetchLiveChallenges();
         }, 300);
         return () => clearTimeout(timeoutId);
-    }, [searchTerm]);
+    }, [searchTerm, activeTab]);
 
     const fetchActivities = async () => {
         try {
             setLoading(true);
-            const res = await hackathonAPI.getAllActivities({ search: searchTerm });
+            const res = await hackathonAPI.getApplied({ search: searchTerm });
             if (res.data.success) {
                 setActivities(res.data.data);
             }
@@ -28,6 +36,46 @@ const HackathonMonitoringPage = () => {
             toast.error('Failed to load activity logs');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchLiveChallenges = async () => {
+        try {
+            setLoading(true);
+            const res = await hackathonAPI.getAll({ search: searchTerm });
+            if (res.data.success) {
+                setLiveChallenges(res.data.data);
+            }
+        } catch (error) {
+            toast.error('Failed to load active challenges');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAddHackathon = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await hackathonAPI.create(newHack);
+            if (res.data.success) {
+                toast.success('Hackathon published to live registry');
+                setShowAddModal(false);
+                setNewHack({ title: '', type: 'Web Development', link: '', prize: '', deadline_date: '', badge: '', students_count: '0' });
+                fetchLiveChallenges();
+            }
+        } catch (error) {
+            toast.error('Publication protocol failed');
+        }
+    };
+
+    const handleDeleteHackathon = async (id) => {
+        if (!window.confirm('PROTOCOL: Delete this challenge from live registry?')) return;
+        try {
+            await hackathonAPI.delete(id);
+            toast.success('Challenge removed');
+            fetchLiveChallenges();
+        } catch (error) {
+            toast.error('Deletion protocol failed');
         }
     };
 
@@ -39,13 +87,13 @@ const HackathonMonitoringPage = () => {
         const csv = [
             ['Student', 'Enrollment', 'Department', 'Hackathon', 'Action', 'Date', 'Time'],
             ...activities.map(log => [
-                log.studentName,
-                log.enrollmentNo,
+                log.student_name,
+                log.enrollment_no,
                 log.department,
-                log.hackathonTitle,
+                log.hackathon_title,
                 'Applied Successfully',
-                format(new Date(log.createdAt), 'dd MMM yyyy'),
-                format(new Date(log.createdAt), 'hh:mm:ss a'),
+                format(new Date(log.created_at), 'dd MMM yyyy'),
+                format(new Date(log.created_at), 'hh:mm:ss a'),
             ])
         ].map(row => row.join(',')).join('\n');
 
@@ -60,138 +108,199 @@ const HackathonMonitoringPage = () => {
     };
 
     const handleLogDelete = async (id) => {
-        if (!window.confirm('PROTOCOL: Are you sure you wish to permanently purge this activity log?')) return;
-        try {
-            await hackathonAPI.deleteActivity(id);
-            toast.success('Log entry purged from registry');
-            fetchActivities();
-        } catch (error) {
-            toast.error('Deletion protocol failed');
-        }
+        // Assume log delete is handled by activity delete which isn't there yet but let's keep it
+        toast.info('Log deletion pending backend implementation');
     };
 
     const getLocalTime = (utcStr) => {
         if (!utcStr) return new Date();
-        // If it doesn't have a timezone, assume it's UTC from SQLite
         const dateStr = utcStr.includes('Z') || utcStr.includes('+') ? utcStr : `${utcStr.replace(' ', 'T')}Z`;
         return new Date(dateStr);
     };
 
     return (
         <div className="hm-page">
-
-            {/* ── Header ─────────────────────────────────────── */}
             <header className="hm-header">
                 <div className="hm-header-text">
                     <h1>
                         <Activity size={22} />
-                        Hackathon Application Registry
+                        Hackathon Control Hub
                     </h1>
-                    <p>Official record of students who have applied for external competitions.</p>
+                    <p>Manage live competitions and monitor student application throughput.</p>
                 </div>
 
                 <div className="hm-header-actions">
-                    <button className="btn btn-ghost" onClick={fetchActivities}
-                        style={{ border: '1px solid var(--border-primary)', fontWeight: 700 }}>
-                        <RefreshCw size={16} /> Sync
-                    </button>
-                    <button className="btn btn-primary" onClick={handleExport}
-                        style={{ fontWeight: 700 }}>
-                        <Download size={16} /> Export Logs
-                    </button>
+                    <div className="hm-tabs" style={{ display: 'flex', gap: '0.5rem', background: 'var(--slate-100)', padding: '0.3rem', borderRadius: '10px' }}>
+                        <button
+                            className={`btn btn-sm ${activeTab === 'logs' ? 'btn-primary' : 'btn-ghost'}`}
+                            onClick={() => setActiveTab('logs')}
+                            style={{ borderRadius: '8px' }}
+                        >
+                            Registry Logs
+                        </button>
+                        <button
+                            className={`btn btn-sm ${activeTab === 'active' ? 'btn-primary' : 'btn-ghost'}`}
+                            onClick={() => setActiveTab('active')}
+                            style={{ borderRadius: '8px' }}
+                        >
+                            Active Challenges
+                        </button>
+                    </div>
+                    {activeTab === 'logs' ? (
+                        <button className="btn btn-primary" onClick={handleExport} style={{ fontWeight: 700 }}>
+                            <Download size={16} /> Export CSV
+                        </button>
+                    ) : (
+                        <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ fontWeight: 700 }}>
+                            <Plus size={16} /> Add Challenge
+                        </button>
+                    )}
                 </div>
             </header>
 
-            {/* ── Table Card ─────────────────────────────────── */}
             <div className="hm-card">
-
-                {/* Toolbar */}
                 <div className="hm-toolbar">
                     <div className="hm-search-wrap">
                         <Search className="hm-search-icon" size={16} />
                         <input
                             type="text"
-                            placeholder="Search by student name, enrollment, or hackathon..."
+                            placeholder={activeTab === 'logs' ? "Filter registry..." : "Search challenges..."}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                        {activities.length} record{activities.length !== 1 ? 's' : ''}
-                    </span>
                 </div>
 
-                {/* Table / States */}
                 <div className="hm-table-wrap">
                     {loading ? (
-                        <div className="hm-state-center">
-                            <Loader2 className="hm-spin" size={36} />
-                            <p>Loading activity logs…</p>
-                        </div>
-                    ) : activities.length === 0 ? (
-                        <div className="hm-state-center">
-                            <Activity size={52} />
-                            <h3>No interaction logs found</h3>
-                            <p>Students haven't interacted with hackathons yet.</p>
-                        </div>
-                    ) : (
-                        <table className="hm-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Student</th>
-                                    <th>Hackathon</th>
-                                    <th>Action</th>
-                                    <th>Timestamp</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {activities.map((log, idx) => (
-                                    <tr key={log.id || idx}>
-                                        <td style={{ color: 'var(--text-muted)', fontWeight: 600, width: '3rem' }}>
-                                            {idx + 1}
-                                        </td>
-                                        <td>
-                                            <div className="hm-student-name">{log.studentName}</div>
-                                            <div className="hm-student-meta">
-                                                {log.enrollmentNo}
-                                                {log.department ? ` • ${log.department}` : ''}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="hm-hackathon-title">{log.hackathonTitle}</div>
-                                        </td>
-                                        <td>
-                                            <span className="hm-action-badge" style={{ background: 'var(--success-50)', color: 'var(--success-700)', borderColor: 'var(--success-200)' }}>
-                                                <CheckCircle size={12} /> Applied Successfully
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div className="hm-date">
-                                                {format(getLocalTime(log.createdAt), 'dd MMM yyyy')}
-                                            </div>
-                                            <div className="hm-time">
-                                                {format(getLocalTime(log.createdAt), 'hh:mm:ss a')}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button
-                                                className="btn btn-ghost btn-sm"
-                                                onClick={() => handleLogDelete(log.id)}
-                                                style={{ color: 'var(--error-600)', padding: '0.4rem' }}
-                                                title="Purge Record"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </td>
+                        <div className="hm-state-center"><Loader2 className="hm-spin" size={36} /><p>Retrieving data...</p></div>
+                    ) : activeTab === 'logs' ? (
+                        activities.length === 0 ? (
+                            <div className="hm-state-center"><Activity size={52} /><h3>No logs found</h3></div>
+                        ) : (
+                            <table className="hm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student Details</th>
+                                        <th>Hackathon</th>
+                                        <th>Resolution</th>
+                                        <th>Timestamp</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {activities.map((log, idx) => (
+                                        <tr key={log.id}>
+                                            <td>
+                                                <div className="hm-student-name">{log.student_name}</div>
+                                                <div className="hm-student-meta">{log.enrollment_no} • {log.department}</div>
+                                            </td>
+                                            <td><div className="hm-hackathon-title">{log.hackathon_title}</div></td>
+                                            <td>
+                                                <span className="hm-action-badge success">
+                                                    <CheckCircle size={12} /> Applied
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div className="hm-date">{format(getLocalTime(log.created_at), 'dd MMM yyyy')}</div>
+                                                <div className="hm-time">{format(getLocalTime(log.created_at), 'hh:mm a')}</div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )
+                    ) : (
+                        liveChallenges.length === 0 ? (
+                            <div className="hm-state-center"><Trophy size={52} /><h3>No active challenges published</h3></div>
+                        ) : (
+                            <table className="hm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Challenge Title</th>
+                                        <th>Category</th>
+                                        <th>Deadline</th>
+                                        <th>Prize Pool</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {liveChallenges.map((h) => (
+                                        <tr key={h.id}>
+                                            <td>
+                                                <div className="hm-hackathon-title">{h.title}</div>
+                                                <a href={h.link} target="_blank" rel="noreferrer" style={{ fontSize: '0.7rem', color: 'var(--brand-600)' }}>{h.link}</a>
+                                            </td>
+                                            <td><span className="badge badge-primary">{h.type}</span></td>
+                                            <td>{h.deadline_date || 'N/A'}</td>
+                                            <td>{h.prize || 'N/A'}</td>
+                                            <td>
+                                                <button className="btn btn-ghost btn-xs" onClick={() => handleDeleteHackathon(h.id)} style={{ color: 'var(--error-600)' }}>
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )
                     )}
                 </div>
             </div>
+
+            {/* Add Modal */}
+            {showAddModal && (
+                <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
+                    <div className="modal-content" style={{ background: 'white', padding: '2rem', borderRadius: '16px', width: '90%', maxWidth: '500px', boxShadow: 'var(--shadow-2xl)' }}>
+                        <h2 style={{ marginBottom: '1.5rem', fontWeight: 900 }}>Publish New Challenge</h2>
+                        <form onSubmit={handleAddHackathon} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem' }}>Challenge Title</label>
+                                <input className="input" required value={newHack.title} onChange={e => setNewHack({ ...newHack, title: e.target.value })} placeholder="e.g. Smart India Hackathon 2026" />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem' }}>Category</label>
+                                    <select className="input" value={newHack.type} onChange={e => setNewHack({ ...newHack, type: e.target.value })}>
+                                        <option>Web Development</option>
+                                        <option>AI / ML</option>
+                                        <option>Cybersecurity</option>
+                                        <option>Mobile App Dev</option>
+                                        <option>Web3 & Blockchain</option>
+                                        <option>Govt of India</option>
+                                        <option>Social Impact</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem' }}>Badge / Tag</label>
+                                    <input className="input" value={newHack.badge} onChange={e => setNewHack({ ...newHack, badge: e.target.value })} placeholder="e.g. Innovation" />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem' }}>Prize Pool Description</label>
+                                <input className="input" value={newHack.prize} onChange={e => setNewHack({ ...newHack, prize: e.target.value })} placeholder="e.g. ₹1,00,000" />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem' }}>Registration Link (URL)</label>
+                                <input className="input" type="url" required value={newHack.link} onChange={e => setNewHack({ ...newHack, link: e.target.value })} placeholder="https://..." />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem' }}>Deadline / Month</label>
+                                    <input className="input" value={newHack.deadline_date} onChange={e => setNewHack({ ...newHack, deadline_date: e.target.value })} placeholder="e.g. Aug 2026" />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem' }}>Est. Participants</label>
+                                    <input className="input" value={newHack.students_count} onChange={e => setNewHack({ ...newHack, students_count: e.target.value })} placeholder="e.g. 10k+" />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <button type="button" className="btn btn-ghost" onClick={() => setShowAddModal(false)} style={{ flex: 1 }}>Cancel</button>
+                                <button type="submit" className="btn btn-primary" style={{ flex: 2 }}>Publish Challenge</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

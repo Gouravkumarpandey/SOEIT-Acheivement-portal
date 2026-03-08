@@ -92,9 +92,11 @@ export const courseAPI = {
 };
 
 export const hackathonAPI = {
+    getAll: (params) => API.get('/hackathons', { params }),
+    create: (data) => API.post('/hackathons', data),
+    delete: (id) => API.delete(`/hackathons/${id}`),
     logActivity: (data) => API.post('/hackathons/activity', data),
-    getAllActivities: (params) => API.get('/hackathons/activity', { params }),
-    deleteActivity: (id) => API.delete(`/hackathons/activity/${id}`),
+    getApplied: (params) => API.get('/hackathons/applied', { params }),
 };
 
 export default API;

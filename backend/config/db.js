@@ -107,6 +107,20 @@ const initSchema = async (client) => {
             updated_at      TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (student_id) REFERENCES users(id)
         )`,
+    `CREATE TABLE IF NOT EXISTS hackathons (
+            id               TEXT PRIMARY KEY,
+            title            TEXT NOT NULL,
+            type             TEXT NOT NULL,
+            img_url          TEXT,
+            prize            TEXT,
+            students_count   TEXT,
+            deadline_date    TEXT,
+            badge            TEXT,
+            link             TEXT NOT NULL,
+            created_by       TEXT NOT NULL,
+            created_at       TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (created_by) REFERENCES users(id)
+        )`,
     `CREATE TABLE IF NOT EXISTS hackathon_activities (
             id               TEXT PRIMARY KEY,
             student_id       TEXT NOT NULL,
@@ -144,6 +158,31 @@ const seedDemoUsers = async (client) => {
   }
 };
 
+const seedHackathons = async (client) => {
+  const existing = await client.execute('SELECT COUNT(*) as cnt FROM hackathons');
+  if (Number(existing.rows[0].cnt) === 0) {
+    const admin = await client.execute({ sql: "SELECT id FROM users WHERE role = 'admin' LIMIT 1" });
+    if (admin.rows.length > 0) {
+      const adminId = admin.rows[0].id;
+      const { nanoid } = await import('nanoid');
+
+      const hacks = [
+        { title: 'Smart India Hackathon 2026', type: 'Govt of India', prize: '₹1,00,000', badge: 'Premier', link: 'https://www.sih.gov.in/', deadline: 'Aug 2026' },
+        { title: 'Google AI Challenge 2026', type: 'AI / ML', prize: '$50,000', badge: 'AI', link: 'https://ai.google/challenges/', deadline: 'Mar 2026' },
+        { title: 'MLH Global Hackathon 2026', type: 'Web Development', prize: '$20,000', badge: 'Web', link: 'https://mlh.io/', deadline: 'Rolling' }
+      ];
+
+      for (const h of hacks) {
+        await client.execute({
+          sql: `INSERT INTO hackathons (id, title, type, prize, badge, link, deadline_date, created_by, students_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [nanoid(), h.title, h.type, h.prize, h.badge, h.link, h.deadline, adminId, '10k+']
+        });
+      }
+    }
+  }
+};
+
 const connectDB = async () => {
   try {
     const url = process.env.TURSO_URL;
@@ -163,6 +202,9 @@ const connectDB = async () => {
 
     await seedDemoUsers(client);
     console.log('🌱 Demo users seeded');
+
+    await seedHackathons(client);
+    console.log('🏆 Demo hackathons seeded');
 
   } catch (error) {
     console.error('❌ Turso Connection Failed:', error.message);

@@ -1,60 +1,75 @@
+const Hackathon = require('../models/Hackathon');
 const HackathonActivity = require('../models/HackathonActivity');
 
-// @desc    Log a student hackathon activity (e.g., clicking on apply/visit)
+// @desc    Get all hackathons
+// @route   GET /api/hackathons
+exports.getHackathons = async (req, res, next) => {
+    try {
+        const hackathons = await Hackathon.findAll();
+        res.status(200).json({ success: true, count: hackathons.length, data: hackathons });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Create a new hackathon
+// @route   POST /api/hackathons
+exports.createHackathon = async (req, res, next) => {
+    try {
+        // Faculty and Admin can create hackathons
+        if (req.user.role !== 'admin' && req.user.role !== 'faculty') {
+            return res.status(403).json({ success: false, message: 'Unauthorized profile' });
+        }
+
+        const hackathon = await Hackathon.create(req.body, req.user.id);
+        res.status(201).json({ success: true, data: hackathon });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Delete a hackathon
+// @route   DELETE /api/hackathons/:id
+exports.deleteHackathon = async (req, res, next) => {
+    try {
+        const hackathon = await Hackathon.findById(req.params.id);
+        if (!hackathon) {
+            return res.status(404).json({ success: false, message: 'Hackathon result not located' });
+        }
+
+        // Only creator or admin can delete
+        if (hackathon.created_by !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Validation failed: Identity mismatch' });
+        }
+
+        await Hackathon.delete(req.params.id);
+        res.status(200).json({ success: true, data: {} });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Log hackathon activity
 // @route   POST /api/hackathons/activity
 exports.logActivity = async (req, res, next) => {
     try {
-        const { hackathonTitle, actionType } = req.body;
-        const studentId = req.user.id; // User must be authenticated
-
-        if (!hackathonTitle) {
-            return res.status(400).json({ success: false, message: 'Hackathon title is required' });
-        }
-
-        const data = {
-            studentId,
-            hackathonTitle,
-            actionType: actionType || 'visit'
-        };
-
-        const activity = await HackathonActivity.create(data);
-        res.status(201).json({ success: true, message: 'Activity logged', data: activity });
+        const activity = await HackathonActivity.create({
+            studentId: req.user.id,
+            hackathonTitle: req.body.hackathonTitle,
+            actionType: req.body.actionType
+        });
+        res.status(201).json({ success: true, data: activity });
     } catch (error) {
         next(error);
     }
 };
 
-// @desc    Get all hackathon activities (Admin/Faculty)
-// @route   GET /api/hackathons/activity
-exports.getAllActivities = async (req, res, next) => {
+// @desc    Get applied hackathons (for admin/faculty monitoring)
+// @route   GET /api/hackathons/applied
+exports.getAppliedHackathons = async (req, res, next) => {
     try {
-        const { department, search } = req.query;
-        const activities = await HackathonActivity.findAllEnriched({ department, search });
-
-        // Format to JS camelCase conventions
-        const transformed = activities.map(a => ({
-            id: a.id,
-            hackathonTitle: a.hackathon_title,
-            actionType: a.action_type,
-            studentName: a.student_name,
-            department: a.department,
-            enrollmentNo: a.enrollment_no,
-            batch: a.batch,
-            createdAt: a.created_at
-        }));
-
-        res.status(200).json({ success: true, count: transformed.length, data: transformed });
-    } catch (error) {
-        next(error);
-    }
-};
-
-// @desc    Delete a hackathon activity log (Admin/Faculty)
-// @route   DELETE /api/hackathons/activity/:id
-exports.deleteActivity = async (req, res, next) => {
-    try {
-        await HackathonActivity.delete(req.params.id);
-        res.status(200).json({ success: true, message: 'Activity log purged successfully' });
+        const activities = await HackathonActivity.findAllEnriched(req.query);
+        res.status(200).json({ success: true, count: activities.length, data: activities });
     } catch (error) {
         next(error);
     }
