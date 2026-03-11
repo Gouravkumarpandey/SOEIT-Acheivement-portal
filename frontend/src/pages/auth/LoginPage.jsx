@@ -36,7 +36,7 @@ const LoginPage = () => {
     const [errors, setErrors] = useState({});
 
     const generateCaptcha = () => {
-        const char = '1234567890';
+        const char = '0123456789';
         let res = '';
         for (let i = 0; i < 4; i++) res += char.charAt(Math.floor(Math.random() * char.length));
         setCaptcha(res);
