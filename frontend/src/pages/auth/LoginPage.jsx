@@ -48,7 +48,11 @@ const LoginPage = () => {
 
     const validate = () => {
         const e = {};
-        if (!form.email) e.email = 'Username is required';
+        if (!form.email) {
+            e.email = 'Username is required';
+        } else if (!/^AJU\//i.test(form.email) && !/^ARKA\/AJU\//i.test(form.email)) {
+            e.email = 'Enrollment No. must start with AJU/';
+        }
         if (!form.password) e.password = 'Password is required';
         if (form.captchaInput !== captcha) e.captchaInput = 'Invalid Captcha';
         setErrors(e);

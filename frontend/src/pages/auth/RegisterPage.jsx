@@ -83,7 +83,12 @@ const RegisterPage = () => {
         if (!form.department) e.department = 'Department is required';
         if (!form.batch) e.batch = 'Batch is required';
         else if (!/^\d{4}-\d{2}$/.test(form.batch)) e.batch = 'Invalid format (e.g. 2022-26)';
-        if (!form.enrollmentNo) e.enrollmentNo = 'Enrollment No. is required';
+
+        if (!form.enrollmentNo) {
+            e.enrollmentNo = 'Enrollment No. is required';
+        } else if (!/^AJU\//i.test(form.enrollmentNo) && !/^ARKA\/AJU\//i.test(form.enrollmentNo)) {
+            e.enrollmentNo = 'Enrollment No. must start with AJU/';
+        }
         setErrors(e);
         return Object.keys(e).length === 0;
     };
