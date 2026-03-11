@@ -234,8 +234,8 @@ const LandingPage = () => {
                         </div>
 
                         <h1 className="hero-title">
-                            Track Your <br />
-                            <span className="text-brand-emphasized">Achievements</span>
+                            Empowering <br />
+                            <span className="text-brand-emphasized">Engineering Excellence</span>
                         </h1>
 
                         <p className="hero-subtitle">
