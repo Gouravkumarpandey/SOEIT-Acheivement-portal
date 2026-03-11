@@ -218,7 +218,7 @@ const RegisterPage = () => {
                         </div>
 
                         <button type="submit" className="btn-arka-jain w-full" disabled={loading} style={{ padding: '1.125rem' }}>
-                            {loading ? 'Processing...' : 'CREATE ACCOUNT'}
+                            {loading ? 'Processing...' : 'SIGN UP'}
                         </button>
                     </form>
 

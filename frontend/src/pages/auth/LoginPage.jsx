@@ -161,13 +161,13 @@ const LoginPage = () => {
                         </div>
 
                         <button type="submit" className="btn-arka-jain" disabled={loading}>
-                            {loading ? 'AUTHENTICATING...' : 'LOGIN'}
+                            {loading ? 'Logging in...' : 'LOGIN'}
                         </button>
                     </form>
 
                     <p className="login-footer-text" style={{ textAlign: 'center', marginTop: '2.5rem' }}>
                         Don't have an account?{' '}
-                        <Link to="/register" className="login-link">Create User</Link>
+                        <Link to="/register" className="login-link">Sign Up</Link>
                     </p>
                 </div>
 

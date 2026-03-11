@@ -85,7 +85,7 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                         </div>
                         <div className="sidebar-text-expand" style={{ minWidth: 0, opacity: 1, transition: 'opacity 0.2s' }}>
                             <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}>SOEIT</div>
-                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Credential Portal</div>
+                            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Achievement Portal</div>
                         </div>
                     </div>
 
@@ -140,13 +140,13 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                         )}
                         <div className="sidebar-text-expand" style={{ minWidth: 0 }}>
                             <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
-                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>{user?.role} RESOLUTION</div>
+                            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>{user?.role}</div>
                         </div>
                     </div>
                 </div>
 
                 <nav className="sidebar-nav" style={{ flex: 1, padding: '1.5rem 0.75rem', overflowY: 'auto' }}>
-                    <div className="sidebar-text-expand" style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--text-muted)', padding: '0 1rem 1rem', opacity: 0.6 }}>Operational Control</div>
+                    <div className="sidebar-text-expand" style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--text-muted)', padding: '0 1rem 1rem', opacity: 0.6 }}>Menu</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         {filteredLinks.map(({ to, icon: Icon, label }) => (
                             <NavLink key={to} to={to} onClick={mobileOpen ? onClose : undefined}
@@ -218,7 +218,7 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                             transition: 'all 0.3s'
                         }}>
                         <LogOut size={20} style={{ flexShrink: 0 }} />
-                        <span className="sidebar-text-expand">Sign Out Portal</span>
+                        <span className="sidebar-text-expand">Logout</span>
                     </button>
                 </div>
             </aside>

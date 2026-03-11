@@ -33,7 +33,7 @@ const StudentManagementPage = () => {
             setTotal(data.total);
             setPages(data.pages);
         } catch {
-            toast.error('Failed to synchronize scholar registry');
+            toast.error('Failed to load students');
         } finally {
             setLoading(false);
         }
@@ -43,11 +43,11 @@ const StudentManagementPage = () => {
 
     const handleDeleteSelected = async () => {
         if (selectedIds.length === 0) return;
-        if (!window.confirm(`Are you sure you want to permanently purge ${selectedIds.length} scholar records? This action is irreversible.`)) return;
+        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} student records? This cannot be undone.`)) return;
         setDeleting(true);
         try {
             await adminAPI.deleteUsers(selectedIds);
-            toast.success('Scholar registry synchronized: Records purged');
+            toast.success('Student records deleted');
             setSelectedIds([]);
             load();
         } catch {
@@ -88,14 +88,14 @@ const StudentManagementPage = () => {
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Students");
                 XLSX.writeFile(wb, `SOEIT_Scholars_${date}.xlsx`);
-                toast.success('Excel protocol: Archive exported');
+                toast.success('Excel exported');
             } else {
                 const doc = new jsPDF('l', 'mm', 'a4');
                 doc.setFillColor(30, 41, 59);
                 doc.rect(0, 0, 297, 30, 'F');
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(20);
-                doc.text('SOEIT SCHOLAR MANAGEMENT - ADMINISTRATIVE ARCHIVE', 148, 15, { align: 'center' });
+                doc.text('SOEIT STUDENT MANAGEMENT REPORT', 148, 15, { align: 'center' });
                 doc.setFontSize(10);
                 doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 148, 22, { align: 'center' });
                 autoTable(doc, {
@@ -109,10 +109,10 @@ const StudentManagementPage = () => {
                     headStyles: { fillColor: [59, 130, 246] },
                 });
                 doc.save(`SOEIT_Scholars_Registry_${date}.pdf`);
-                toast.success('PDF protocol: Archive generated');
+                toast.success('PDF report generated');
             }
         } catch (error) {
-            toast.error('Archive synchronization failed');
+            toast.error('Export failed');
         }
     };
 
@@ -121,24 +121,24 @@ const StudentManagementPage = () => {
             {/* Header Suite */}
             <div className="page-header student-header-suite" style={{ marginBottom: '2.5rem' }}>
                 <div className="header-content">
-                    <h2 className="heading-display">Scholar Registry</h2>
-                    <p className="page-subtitle">Unified surveillance of the institutional scholar population and their cumulative merit yields.</p>
+                    <h2 className="heading-display">Student List</h2>
+                    <p className="page-subtitle">Manage all students and view their total achievements and points.</p>
                 </div>
                 <div className="header-actions">
                     {selectedIds.length > 0 && (
                         <button className="btn btn-danger animate-fade-in" onClick={handleDeleteSelected} disabled={deleting} style={{ fontWeight: 800, padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <XCircle size={18} />
-                            <span>Purge Selected ({selectedIds.length})</span>
+                            <span>Delete Selected ({selectedIds.length})</span>
                         </button>
                     )}
                     <button className="btn btn-ghost" onClick={() => exportStudentData('excel')} style={{ border: '1px solid var(--border-primary)', fontWeight: 800 }}>
                         <Download size={18} />
-                        <span className="hide-mobile">Excel Archive</span>
+                        <span className="hide-mobile">Export Excel</span>
                         <span className="show-mobile">Excel</span>
                     </button>
                     <button className="btn btn-primary" onClick={() => exportStudentData('pdf')} style={{ fontWeight: 800, padding: '0 1.5rem' }}>
                         <Users size={18} />
-                        <span className="hide-mobile">Generate Master Report</span>
+                        <span className="hide-mobile">Generate Report</span>
                         <span className="show-mobile">Report</span>
                     </button>
                 </div>
@@ -148,11 +148,11 @@ const StudentManagementPage = () => {
             <div className="card filter-card" style={{ padding: '1.5rem', marginBottom: '2rem', border: '1px solid var(--border-primary)' }}>
                 <div className="filter-intelligence-grid">
                     <div className="search-wrapper search-wrapper-responsive">
-                        <input className="form-control" placeholder="Search nomenclature, enrollment numbers, or digital identifiers..." value={filters.search} onChange={e => setFilters(p => ({ ...p, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && load()} />
+                        <input className="form-control" placeholder="Search by name, enrollment, or ID..." value={filters.search} onChange={e => setFilters(p => ({ ...p, search: e.target.value }))} onKeyDown={e => e.key === 'Enter' && load()} />
                         <Search size={20} className="search-icon" />
                     </div>
                     <select className="form-control filter-select-responsive" style={{ height: '48px', fontWeight: 700 }} value={filters.department} onChange={e => setFilters(p => ({ ...p, department: e.target.value, page: 1 }))}>
-                        <option value="">All Institutional Departments</option>
+                        <option value="">All Departments</option>
                         {Object.entries(DEPARTMENTS).map(([group, depts]) => (
                             <optgroup key={group} label={group}>
                                 {depts.map(d => <option key={d} value={d}>{d}</option>)}
@@ -160,8 +160,8 @@ const StudentManagementPage = () => {
                         ))}
                     </select>
                     <select className="form-control filter-select-responsive" style={{ height: '48px', fontWeight: 700 }} value={filters.semester} onChange={e => setFilters(p => ({ ...p, semester: e.target.value, page: 1 }))}>
-                        <option value="">All Academic Terms</option>
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester Sequence {s}</option>)}
+                        <option value="">All Semesters</option>
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester {s}</option>)}
                     </select>
                     <button className="btn btn-primary filter-btn-responsive" style={{ height: '48px', width: '48px', padding: 0 }} onClick={load}>
                         <Search size={20} strokeWidth={3} />
@@ -181,8 +181,8 @@ const StudentManagementPage = () => {
                             <div style={{ width: 80, height: 80, background: 'var(--primary-50)', color: 'var(--brand-600)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
                                 <Users size={40} />
                             </div>
-                            <h3 style={{ fontWeight: 900, color: 'var(--text-primary)' }}>No Scholar Matches Synchronized</h3>
-                            <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Refine your search parameters or synchronize the department filter.</p>
+                            <h3 style={{ fontWeight: 900, color: 'var(--text-primary)' }}>No Students Found</h3>
+                            <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Try changing your search or filters.</p>
                         </div>
                     ) : (
                         <>
@@ -192,12 +192,12 @@ const StudentManagementPage = () => {
                                         <th style={{ paddingLeft: '2rem', width: '50px' }}>
                                             <input type="checkbox" checked={students.length > 0 && selectedIds.length === students.length} onChange={toggleSelectAll} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
                                         </th>
-                                        <th>Scholar Identity</th>
-                                        <th>Academic Affiliation</th>
-                                        <th>Communication Endpoint</th>
-                                        <th style={{ textAlign: 'center' }}>Synchronized Units</th>
-                                        <th style={{ textAlign: 'center' }}>Verified Yield</th>
-                                        <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Administration</th>
+                                        <th>Student</th>
+                                        <th>Department</th>
+                                        <th>Email</th>
+                                        <th style={{ textAlign: 'center' }}>Total Achievements</th>
+                                        <th style={{ textAlign: 'center' }}>Points</th>
+                                        <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -253,7 +253,7 @@ const StudentManagementPage = () => {
                             {pages > 1 && (
                                 <div className="pagination-footer-responsive" style={{ borderTop: '1px solid var(--border-primary)', padding: '1.25rem 2rem', background: 'var(--slate-50)' }}>
                                     <div className="pagination-status" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 700 }}>
-                                        SYNCHRONIZED SCHOLARS: <strong style={{ color: 'var(--text-primary)' }}>{total}</strong> REGISTERED ENTITIES
+                                        TOTAL STUDENTS: <strong style={{ color: 'var(--text-primary)' }}>{total}</strong>
                                     </div>
                                     <div className="pagination" style={{ margin: 0, gap: '0.5rem' }}>
                                         <button className="btn btn-ghost pagination-btn-res" onClick={() => setFilters(p => ({ ...p, page: p.page - 1 }))} disabled={filters.page === 1}><ChevronLeft size={18} /></button>

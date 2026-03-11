@@ -17,7 +17,7 @@ const ReportsPage = () => {
     useEffect(() => {
         adminAPI.getReports()
             .then(res => setData(res.data))
-            .catch(() => toast.error('Failed to synchronize analytical stream'))
+            .catch(() => toast.error('Failed to load report data'))
             .finally(() => setLoading(false));
     }, []);
 
@@ -45,20 +45,20 @@ const ReportsPage = () => {
             doc.rect(0, 0, 210, 45, 'F');
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(24);
-            doc.text('SOEIT ACADEMIC PORTAL', 105, 20, { align: 'center' });
+            doc.text('SOEIT ACHIEVEMENT PORTAL', 105, 20, { align: 'center' });
             doc.setFontSize(14);
-            doc.text('Performance & Achievement Analytical Projection', 105, 30, { align: 'center' });
+            doc.text('Performance and Achievement Report', 105, 30, { align: 'center' });
             doc.setFontSize(10);
-            doc.text(`Official Document ID: SOEIT-REP-${date.replace(/\//g, '')} | Date: ${date}`, 105, 38, { align: 'center' });
+            doc.text(`Report ID: SOEIT-REP-${date.replace(/\//g, '')} | Date: ${date}`, 105, 38, { align: 'center' });
 
             let y = 60;
             doc.setTextColor(30, 64, 175);
             doc.setFontSize(16);
-            doc.text('I. INSTITUTIONAL GROWTH METRICS', 14, y);
+            doc.text('I. ACHIEVEMENT TRENDS', 14, y);
             y += 10;
             autoTable(doc, {
                 startY: y,
-                head: [['Analytical Period (Month)', 'Submissions Received', 'Verified Achievements']],
+                head: [['Month', 'Total Submissions', 'Approved Achievements']],
                 body: monthlyData.map(d => [d.name, d.submitted, d.approved]),
                 theme: 'grid',
                 headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -68,11 +68,11 @@ const ReportsPage = () => {
 
             if (y > 220) { doc.addPage(); y = 20; }
             doc.setFontSize(16);
-            doc.text('II. DEPARTMENTAL DISTRIBUTION ANALYSIS', 14, y);
+            doc.text('II. DEPARTMENT STATS', 14, y);
             y += 10;
             autoTable(doc, {
                 startY: y,
-                head: [['Institutional Department', 'Cumulative Achievement Count']],
+                head: [['Department', 'Total Achievement Count']],
                 body: (data?.departmentStats || []).map(d => [d._id, d.count]),
                 theme: 'grid',
                 headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255] },
@@ -81,18 +81,18 @@ const ReportsPage = () => {
 
             if (y > 180) { doc.addPage(); y = 20; }
             doc.setFontSize(16);
-            doc.text('III. ACADEMIC EXCELLENCE RECOGNITION', 14, y);
+            doc.text('III. STUDENT LEADERBOARD', 14, y);
             y += 10;
             autoTable(doc, {
                 startY: y,
-                head: [['Rank', 'Scholar Name', 'Department', 'Institutional Points', 'Records']],
+                head: [['Rank', 'Student Name', 'Department', 'Total Points', 'Achievements']],
                 body: (data?.topPerformers || []).map((p, i) => [i + 1, p.student?.name, p.student?.department, p.totalPoints, p.achievementCount]),
                 theme: 'grid',
                 headStyles: { fillColor: [245, 158, 11], textColor: [255, 255, 255] },
             });
 
-            doc.save(`SOEIT_Academic_Projection_${date.replace(/\//g, '-')}.pdf`);
-            toast.success('Official projection document exported');
+            doc.save(`SOEIT_Academic_Report_${date.replace(/\//g, '-')}.pdf`);
+            toast.success('Report exported successfully');
         } catch (error) {
             toast.error('Projection export failed! ' + error.message);
         }
@@ -130,7 +130,7 @@ const ReportsPage = () => {
 
             const date = new Date().toLocaleDateString().replace(/\//g, '-');
             XLSX.writeFile(wb, `SOEIT_Academic_Report_${date}.xlsx`);
-            toast.success('Excel projection synchronized and exported');
+            toast.success('Excel report exported');
         } catch (error) {
             toast.error('Excel export failed! ' + error.message);
         }
@@ -141,8 +141,8 @@ const ReportsPage = () => {
             {/* Header Suite */}
             <div className="page-header reports-header-suite" style={{ marginBottom: '2.5rem' }}>
                 <div className="reports-header-content">
-                    <h2 className="heading-display">Analytical Intelligence</h2>
-                    <p className="page-subtitle">Unified overview of institutional growth, departmental performance, and excellence metrics.</p>
+                    <h2 className="heading-display">Reports & Analytics</h2>
+                    <p className="page-subtitle">View overall progress, department stats, and top performers.</p>
                 </div>
                 <div className="reports-header-actions" style={{ display: 'flex', gap: '1rem' }}>
                     <button className="btn btn-ghost reports-header-btn" style={{ border: '1px solid var(--border-primary)', fontWeight: 800 }} onClick={exportReportsExcel}>
@@ -152,7 +152,7 @@ const ReportsPage = () => {
                     </button>
                     <button className="btn btn-primary reports-header-btn" onClick={exportReportsPDF}>
                         <Download size={18} />
-                        <span className="hide-mobile">Generate Academic Report</span>
+                        <span className="hide-mobile">Download PDF Report</span>
                         <span className="show-mobile">Report</span>
                     </button>
                 </div>
@@ -161,10 +161,10 @@ const ReportsPage = () => {
             {/* Performance Overview Cards */}
             <div className="reports-stats-grid" style={{ marginBottom: '2.5rem' }}>
                 {[
-                    { label: 'Cumulative Yield', value: data?.topPerformers?.reduce((acc, p) => acc + p.totalPoints, 0) || 0, icon: Star, color: 'var(--brand-600)', bg: 'var(--primary-50)' },
-                    { label: 'Evaluation Density', value: data?.categoryStats?.reduce((acc, c) => acc + c.count, 0) || 0, icon: BarChart3, color: 'var(--purple-600)', bg: 'var(--purple-50)' },
-                    { label: 'Excellence Points', value: data?.topPerformers?.[0]?.totalPoints || 0, icon: Trophy, color: 'var(--warning-600)', bg: 'var(--warning-50)' },
-                    { label: 'Active Domains', value: data?.categoryStats?.length || 0, icon: Award, color: 'var(--success-600)', bg: 'var(--success-50)' },
+                    { label: 'Total Achievements', value: data?.categoryStats?.reduce((acc, c) => acc + c.count, 0) || 0, icon: BarChart3, color: 'var(--brand-600)', bg: 'var(--primary-50)' },
+                    { label: 'Total Points', value: data?.topPerformers?.reduce((acc, p) => acc + p.totalPoints, 0) || 0, icon: Star, color: 'var(--purple-600)', bg: 'var(--purple-50)' },
+                    { label: 'Highest Points', value: data?.topPerformers?.[0]?.totalPoints || 0, icon: Trophy, color: 'var(--warning-600)', bg: 'var(--warning-50)' },
+                    { label: 'Categories', value: data?.categoryStats?.length || 0, icon: Award, color: 'var(--success-600)', bg: 'var(--success-50)' },
                 ].map(({ label, value, icon: Icon, color, bg }) => (
                     <div key={label} className="card stats-card-res" style={{ padding: '1.5rem', border: '1px solid var(--border-primary)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
@@ -182,7 +182,7 @@ const ReportsPage = () => {
             <div className="reports-charts-ecosystem" style={{ marginBottom: '2rem' }}>
                 <div className="card chart-card-res" style={{ border: '1px solid var(--border-primary)' }}>
                     <div className="card-header" style={{ borderBottom: '1px solid var(--border-primary)', padding: '1.5rem' }}>
-                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Longitudinal Submission Analytics</h4>
+                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Monthly Trends</h4>
                     </div>
                     <div className="card-body chart-body-res" style={{ padding: '2rem 1rem 1rem 1rem' }}>
                         <ResponsiveContainer width="100%" height={300}>
@@ -194,8 +194,8 @@ const ReportsPage = () => {
                                 <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12, fontWeight: 700 }} tickLine={false} axisLine={false} dy={10} />
                                 <YAxis tick={{ fill: '#64748b', fontSize: 12, fontWeight: 700 }} tickLine={false} axisLine={false} />
                                 <Tooltip contentStyle={{ background: '#fff', border: 'none', borderRadius: 12, boxShadow: 'var(--shadow-xl)' }} />
-                                <Area type="monotone" dataKey="submitted" stroke="var(--brand-700)" strokeWidth={3} fill="url(#gradSub)" name="Registry Input" dot={{ r: 4, fill: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                                <Area type="monotone" dataKey="approved" stroke="var(--success-600)" strokeWidth={3} fill="url(#gradApp)" name="Verified Output" dot={{ r: 4, fill: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                                <Area type="monotone" dataKey="submitted" stroke="var(--brand-700)" strokeWidth={3} fill="url(#gradSub)" name="Submissions" dot={{ r: 4, fill: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                                <Area type="monotone" dataKey="approved" stroke="var(--success-600)" strokeWidth={3} fill="url(#gradApp)" name="Approved" dot={{ r: 4, fill: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
@@ -203,7 +203,7 @@ const ReportsPage = () => {
 
                 <div className="card chart-card-res" style={{ border: '1px solid var(--border-primary)' }}>
                     <div className="card-header" style={{ borderBottom: '1px solid var(--border-primary)', padding: '1.5rem' }}>
-                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Categorical Distribution</h4>
+                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Achievements by Category</h4>
                     </div>
                     <div className="card-body chart-body-res" style={{ padding: '1.5rem' }}>
                         <ResponsiveContainer width="100%" height={300}>
@@ -236,8 +236,8 @@ const ReportsPage = () => {
                             <Trophy size={24} color="#fff" strokeWidth={2.5} />
                         </div>
                         <div>
-                            <h4 style={{ fontSize: '1.25rem', fontWeight: 900, margin: 0 }}>Excellence Leaderboard</h4>
-                            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Elite scholars classified by verified institutional point distribution.</p>
+                            <h4 style={{ fontSize: '1.25rem', fontWeight: 900, margin: 0 }}>Top Students</h4>
+                            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Top ranking students based on their total points.</p>
                         </div>
                     </div>
                 </div>
@@ -246,10 +246,10 @@ const ReportsPage = () => {
                         <thead>
                             <tr>
                                 <th style={{ paddingLeft: '2rem', width: '80px' }}>Rank</th>
-                                <th style={{ minWidth: '220px' }}>Scholar Profile</th>
-                                <th style={{ minWidth: '150px' }}>Focus Department</th>
-                                <th style={{ textAlign: 'center', minWidth: '120px' }}>Verified Units</th>
-                                <th style={{ textAlign: 'right', paddingRight: '2rem', minWidth: '180px' }}>Institutional Points</th>
+                                <th style={{ minWidth: '220px' }}>Student</th>
+                                <th style={{ minWidth: '150px' }}>Department</th>
+                                <th style={{ textAlign: 'center', minWidth: '120px' }}>Achievements</th>
+                                <th style={{ textAlign: 'right', paddingRight: '2rem', minWidth: '180px' }}>Total Points</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -278,7 +278,7 @@ const ReportsPage = () => {
                                                 {p.student?.name?.charAt(0) || 'S'}
                                             </div>
                                             <div>
-                                                <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{p.student?.name || 'Unknown Scholar'}</div>
+                                                <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{p.student?.name || 'Unknown Student'}</div>
                                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>ID: {p.student?.studentId || 'N/A'}</div>
                                             </div>
                                         </div>
@@ -288,13 +288,13 @@ const ReportsPage = () => {
                                     </td>
                                     <td style={{ textAlign: 'center' }}>
                                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--text-secondary)' }}>
-                                            {p.achievementCount} <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>Records</span>
+                                            {p.achievementCount} <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>Achievements</span>
                                         </div>
                                     </td>
                                     <td style={{ textAlign: 'right', paddingRight: '2rem' }}>
                                         <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--brand-700)', letterSpacing: '-0.02em' }}>
                                             {p.totalPoints}
-                                            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', marginLeft: '0.5rem', opacity: 0.6 }}>PTS RESOLUTION</span>
+                                            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', marginLeft: '0.5rem', opacity: 0.6 }}>POINTS</span>
                                         </div>
                                     </td>
                                 </tr>

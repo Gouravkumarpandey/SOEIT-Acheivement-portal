@@ -31,8 +31,8 @@ const InternshipOpportunitiesPage = () => {
     return (
         <div className="animate-fade-in">
             <div className="page-header" style={{ marginBottom: '2.5rem' }}>
-                <h2 className="heading-display">Institutional Placement Registry</h2>
-                <p className="page-subtitle">Verified professional opportunities synchronized via SOEIT faculty and corporate corridors.</p>
+                <h2 className="heading-display">Internship Postings</h2>
+                <p className="page-subtitle">Internship jobs from our faculty and partner companies.</p>
             </div>
 
             <div className="card" style={{ marginBottom: '2.5rem', border: '1px solid var(--border-primary)' }}>
@@ -40,7 +40,7 @@ const InternshipOpportunitiesPage = () => {
                     <div className="search-wrapper">
                         <input
                             className="form-control"
-                            placeholder="Filter by Nomenclature, Designation, or Geographic Node..."
+                            placeholder="Search by company or role..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                         />
@@ -56,8 +56,8 @@ const InternshipOpportunitiesPage = () => {
             ) : postings.length === 0 ? (
                 <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
                     <Briefcase size={64} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
-                    <h3 style={{ fontWeight: 800 }}>Dormant Registry</h3>
-                    <p style={{ color: 'var(--text-muted)' }}>Check the chronology later for new professional broadcast signals.</p>
+                    <h3 style={{ fontWeight: 800 }}>No internships found</h3>
+                    <p style={{ color: 'var(--text-muted)' }}>Check back later for new internship jobs.</p>
                 </div>
             ) : (
                 <div className="grid-res grid-res-3" style={{ gap: '1.5rem' }}>
@@ -81,11 +81,11 @@ const InternshipOpportunitiesPage = () => {
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                                         <Clock size={14} />
-                                        <span>Deadline Resolution: {post.deadline || 'Not specified'}</span>
+                                        <span>Apply before: {post.deadline || 'Not specified'}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                                         <Briefcase size={14} />
-                                        <span>Compensation Dynamics: {post.stipend || 'Unpaid/Discussable'}</span>
+                                        <span>Stipend: {post.stipend || 'Unpaid/Discussable'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -96,7 +96,7 @@ const InternshipOpportunitiesPage = () => {
                                     style={{ fontSize: '0.85rem', fontWeight: 800 }}
                                     onClick={() => setSelectedPosting(post)}
                                 >
-                                    Examine Specification
+                                    View Details
                                 </button>
                                 {post.apply_link && (
                                     <a
@@ -106,7 +106,7 @@ const InternshipOpportunitiesPage = () => {
                                         className="btn btn-primary w-full"
                                         style={{ fontSize: '0.85rem', fontWeight: 800, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                                     >
-                                        Initiate Application Protocol
+                                        Apply Now
                                         <ExternalLink size={14} />
                                     </a>
                                 )}
@@ -128,7 +128,7 @@ const InternshipOpportunitiesPage = () => {
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <div className="badge" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>Posted by {selectedPosting.creator?.name}</div>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.7, marginTop: '0.5rem', fontWeight: 700 }}>VERIFIED OFFICIAL</div>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.7, marginTop: '0.5rem', fontWeight: 700 }}>VERIFIED</div>
                                 </div>
                             </div>
                         </div>
@@ -144,21 +144,21 @@ const InternshipOpportunitiesPage = () => {
                                     <div style={{ fontWeight: 800 }}>{selectedPosting.stipend || 'Not specified'}</div>
                                 </div>
                                 <div>
-                                    <label style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Deadline Resolution</label>
-                                    <div style={{ fontWeight: 800 }}>{selectedPosting.deadline || 'Rolling basis'}</div>
+                                    <label style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Deadline</label>
+                                    <div style={{ fontWeight: 800 }}>{selectedPosting.deadline || 'No deadline'}</div>
                                 </div>
                             </div>
 
                             <div style={{ marginBottom: '2rem' }}>
-                                <h5 style={{ fontWeight: 900, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Opportunity Specification</h5>
+                                <h5 style={{ fontWeight: 900, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Description</h5>
                                 <div style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
-                                    {selectedPosting.description || 'No detailed description provided.'}
+                                    {selectedPosting.description || 'No description available.'}
                                 </div>
                             </div>
 
                             {selectedPosting.requirements && (
                                 <div style={{ marginBottom: '2rem' }}>
-                                    <h5 style={{ fontWeight: 900, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Technical Prerequisites</h5>
+                                    <h5 style={{ fontWeight: 900, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Requirements</h5>
                                     <div style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
                                         {selectedPosting.requirements}
                                     </div>
@@ -167,7 +167,7 @@ const InternshipOpportunitiesPage = () => {
                         </div>
 
                         <div style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border-primary)', display: 'flex', gap: '1rem', background: 'var(--slate-50)' }}>
-                            <button className="btn btn-ghost w-full" style={{ padding: '1rem', fontWeight: 800 }} onClick={() => setSelectedPosting(null)}>Close View</button>
+                            <button className="btn btn-ghost w-full" style={{ padding: '1rem', fontWeight: 800 }} onClick={() => setSelectedPosting(null)}>Close</button>
                             {selectedPosting.apply_link && (
                                 <a
                                     href={selectedPosting.apply_link}
@@ -176,7 +176,7 @@ const InternshipOpportunitiesPage = () => {
                                     className="btn btn-primary w-full"
                                     style={{ padding: '1rem', fontWeight: 800, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                                 >
-                                    Proceed to Application Portal
+                                    Apply Now
                                     <ExternalLink size={18} />
                                 </a>
                             )}

@@ -45,10 +45,10 @@ const StudentDashboard = () => {
     }, []);
 
     const statCards = [
-        { label: 'Total Dossier Submissions', value: stats?.stats?.all ?? 0, icon: Trophy, color: 'var(--brand-600)', bg: 'var(--primary-50)', delta: 'Verified Institutional Record' },
-        { label: 'Validated Credentials', value: stats?.stats?.approved ?? 0, icon: CheckCircle, color: 'var(--success-500)', bg: 'var(--success-50)', delta: 'Authorized by Faculty' },
-        { label: 'Evaluation Queue', value: stats?.stats?.pending ?? 0, icon: Clock, color: 'var(--warning-500)', bg: 'var(--warning-50)', delta: 'Pending Verification' },
-        { label: 'Institutional Merit Score', value: stats?.stats?.totalPoints ?? 0, icon: Award, color: '#8b5cf6', bg: '#f5f3ff', delta: 'Cumulative Performance' },
+        { label: 'Total Achievements', value: stats?.stats?.all ?? 0, icon: Trophy, color: 'var(--brand-600)', bg: 'var(--primary-50)', delta: 'Total Records' },
+        { label: 'Approved Achievements', value: stats?.stats?.approved ?? 0, icon: CheckCircle, color: 'var(--success-500)', bg: 'var(--success-50)', delta: 'Verified by Faculty' },
+        { label: 'Pending Verification', value: stats?.stats?.pending ?? 0, icon: Clock, color: 'var(--warning-500)', bg: 'var(--warning-50)', delta: 'Awaiting Review' },
+        { label: 'Total Points', value: stats?.stats?.totalPoints ?? 0, icon: Award, color: '#8b5cf6', bg: '#f5f3ff', delta: 'Accumulated Score' },
     ];
 
     const categoryData = stats?.stats?.byCategory?.map(d => ({ name: d._id, count: d.count })) || [];
@@ -73,18 +73,18 @@ const StudentDashboard = () => {
             {/* Scholar Identity Header */}
             <div className="page-header dashboard-header-suite" style={{ marginBottom: '2.5rem' }}>
                 <div className="dashboard-header-content">
-                    <h2 className="heading-display">Scholar Performance Suite</h2>
-                    <p className="page-subtitle">Unified tracking of institutional achievements, certifications, and academic impact.</p>
+                    <h2 className="heading-display">Student Performance Dashboard</h2>
+                    <p className="page-subtitle">Track your achievements, certifications, and academic progress here.</p>
                 </div>
                 <div className="header-actions" style={{ display: 'flex', gap: '0.75rem' }}>
                     <Link to={`/portfolio/${user?.id || user?._id}`} className="btn btn-secondary dashboard-header-btn" style={{ border: '1px solid var(--border-primary)' }}>
                         <Globe size={18} />
-                        <span className="hide-mobile">View Public Showcase</span>
+                        <span className="hide-mobile">View Public Portfolio</span>
                         <span className="show-mobile">Portfolio</span>
                     </Link>
                     <Link to="/achievements/upload" className="btn btn-primary dashboard-header-btn">
                         <Upload size={18} />
-                        <span className="hide-mobile">Upload New Credential</span>
+                        <span className="hide-mobile">Upload New Achievement</span>
                         <span className="show-mobile">Upload</span>
                     </Link>
                 </div>
@@ -103,10 +103,10 @@ const StudentDashboard = () => {
                         <div className="banner-meta-row" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
                             <div className="banner-meta-item" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success-500)' }}></div>
-                                <span style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{user?.department} DOMAIN</span>
+                                <span style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{user?.department} Department</span>
                             </div>
                             <div className="meta-divider" style={{ width: '1px', height: '14px', background: 'var(--border-primary)' }}></div>
-                            <span className="banner-meta-text" style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ACADEMIC COHORT: {user?.batch || '2024'}</span>
+                            <span className="banner-meta-text" style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>BATCH: {user?.batch || '2024'}</span>
                             <div className="meta-divider" style={{ width: '1px', height: '14px', background: 'var(--border-primary)' }}></div>
                             <span className="banner-meta-text" style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SEMESTER: {user?.semester || 'N/A'}</span>
                         </div>
@@ -137,8 +137,8 @@ const StudentDashboard = () => {
             <div className="dashboard-analytical-distribution" style={{ marginBottom: '2.5rem' }}>
                 <div className="card analytical-card-res" style={{ padding: '2rem' }}>
                     <div className="card-header analytical-header" style={{ marginBottom: '2rem', padding: 0 }}>
-                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Institutional Achievement Trend</h4>
-                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Categorical analysis of verified credentials.</p>
+                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Achievement Distribution</h4>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Overview of achievements by category.</p>
                     </div>
                     <div className="analytical-chart-wrap">
                         {categoryData.length > 0 ? (
@@ -156,7 +156,7 @@ const StudentDashboard = () => {
                         ) : (
                             <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                                 <Trophy size={48} style={{ color: 'var(--slate-200)', marginBottom: '1rem' }} />
-                                <p style={{ color: 'var(--text-muted)', fontWeight: 700 }}>No categorical data synchronized.</p>
+                                <p style={{ color: 'var(--text-muted)', fontWeight: 700 }}>No data to show yet.</p>
                             </div>
                         )}
                     </div>
@@ -164,8 +164,8 @@ const StudentDashboard = () => {
 
                 <div className="card analytical-card-res" style={{ padding: '2rem' }}>
                     <div className="card-header analytical-header" style={{ marginBottom: '2rem', padding: 0 }}>
-                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Impact Recognition</h4>
-                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Global vs Departmental recognition distribution.</p>
+                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Recognition Level</h4>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Distribution of achievements by level.</p>
                     </div>
                     <div className="analytical-chart-wrap">
                         {levelData.length > 0 ? (
@@ -183,7 +183,7 @@ const StudentDashboard = () => {
                         ) : (
                             <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                                 <Award size={48} style={{ color: 'var(--slate-200)', marginBottom: '1rem' }} />
-                                <p style={{ color: 'var(--text-muted)', fontWeight: 700 }}>Insufficient recognition data.</p>
+                                <p style={{ color: 'var(--text-muted)', fontWeight: 700 }}>No level data found.</p>
                             </div>
                         )}
                     </div>
@@ -194,11 +194,11 @@ const StudentDashboard = () => {
             <div className="card recent-chronology-card" style={{ overflow: 'hidden' }}>
                 <div className="card-header chronology-header" style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--border-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--slate-50)' }}>
                     <div className="chronology-header-content">
-                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Recent Chronology Submissions</h4>
-                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Review the latest entries in your institutional portfolio.</p>
+                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Recent Activity</h4>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>View your most recently uploaded achievements.</p>
                     </div>
                     <Link to="/achievements" className="btn btn-ghost btn-sm chronology-action-btn" style={{ fontWeight: 800 }}>
-                        <span>Full Registry</span>
+                        <span>View All</span>
                         <ArrowUpRight size={14} />
                     </Link>
                 </div>
@@ -208,11 +208,11 @@ const StudentDashboard = () => {
                         <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid var(--border-primary)' }}>
-                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Achievement Profile</th>
-                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Department Tag</th>
-                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Impact Resolution</th>
-                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Verification Status</th>
-                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Registry Date</th>
+                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Achievement</th>
+                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Category</th>
+                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Level</th>
+                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Status</th>
+                                    <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -220,7 +220,7 @@ const StudentDashboard = () => {
                                     <tr key={a._id} style={{ borderBottom: '1px solid var(--border-primary)', transition: 'background 0.2s ease' }} className="hover-slate">
                                         <td style={{ padding: '1.25rem 2rem', fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{a.title}</td>
                                         <td style={{ padding: '1.25rem 2rem' }}><span className="badge badge-primary" style={{ fontWeight: 800 }}>{a.category}</span></td>
-                                        <td style={{ padding: '1.25rem 2rem', fontWeight: 600, fontSize: '0.85rem' }}>{a.level} Resolution</td>
+                                        <td style={{ padding: '1.25rem 2rem', fontWeight: 600, fontSize: '0.85rem' }}>{a.level}</td>
                                         <td style={{ padding: '1.25rem 2rem' }}><StatusBadge status={a.status} /></td>
                                         <td style={{ padding: '1.25rem 2rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.85rem' }}>{format(new Date(a.createdAt), 'MMM dd, yyyy')}</td>
                                     </tr>
@@ -232,9 +232,9 @@ const StudentDashboard = () => {
                             <div style={{ width: 80, height: 80, background: 'var(--primary-50)', color: 'var(--brand-700)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
                                 <TrendingUp size={40} />
                             </div>
-                            <h3 style={{ fontWeight: 800, marginBottom: '0.5rem' }}>Portfolio Initialization Required</h3>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto 2rem auto' }}>You have not synchronized any achievement records with the institutional database.</p>
-                            <Link to="/achievements/upload" className="btn btn-primary" style={{ padding: '0.8rem 2.5rem', fontWeight: 900 }}>Initiate First Submission</Link>
+                            <h3 style={{ fontWeight: 800, marginBottom: '0.5rem' }}>No achievements found</h3>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto 2rem auto' }}>You haven't uploaded any achievements yet.</p>
+                            <Link to="/achievements/upload" className="btn btn-primary" style={{ padding: '0.8rem 2.5rem', fontWeight: 900 }}>Upload Now</Link>
                         </div>
                     )}
                 </div>

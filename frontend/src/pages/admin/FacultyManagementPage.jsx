@@ -18,7 +18,7 @@ const FacultyManagementPage = () => {
             const { data } = await adminAPI.getFaculty({ search });
             setFaculty(data.data);
         } catch {
-            toast.error('Failed to synchronize faculty directory');
+            toast.error('Failed to load faculty list');
         } finally {
             setLoading(false);
         }
@@ -31,10 +31,10 @@ const FacultyManagementPage = () => {
     const toggleStatus = async (id, currentStatus) => {
         try {
             await adminAPI.manageUser(id, { isActive: !currentStatus });
-            toast.success(`Access ${!currentStatus ? 'synchronized' : 'revoked'} successfully`);
+            toast.success(`Access ${!currentStatus ? 'granted' : 'disabled'} successfully`);
             loadFaculty();
         } catch {
-            toast.error('Failed to update faculty authorization status');
+            toast.error('Failed to update access status');
         }
     };
 
@@ -53,16 +53,16 @@ const FacultyManagementPage = () => {
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "SOEIT_Faculty");
                 XLSX.writeFile(wb, `SOEIT_Faculty_Roster_${date}.xlsx`);
-                toast.success('Excel protocol: Archive exported');
+                toast.success('Excel exported');
             } else {
                 const doc = new jsPDF();
                 doc.setFillColor(30, 64, 175);
                 doc.rect(0, 0, 210, 30, 'F');
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(22);
-                doc.text('SOEIT FACULTY DIRECTORY', 105, 16, { align: 'center' });
+                doc.text('SOEIT FACULTY LIST', 105, 16, { align: 'center' });
                 doc.setFontSize(10);
-                doc.text(`Official Faculty Authorization Records - ${new Date().toLocaleDateString()}`, 105, 23, { align: 'center' });
+                doc.text(`Official Faculty List - ${new Date().toLocaleDateString()}`, 105, 23, { align: 'center' });
                 autoTable(doc, {
                     startY: 40,
                     head: [['Faculty Name', 'Employee ID', 'Official Email', 'Department', 'Status']],
@@ -71,10 +71,10 @@ const FacultyManagementPage = () => {
                     headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255], fontStyle: 'bold' },
                 });
                 doc.save(`SOEIT_Institutional_Faculty_Roster_${date}.pdf`);
-                toast.success('PDF protocol: Archive generated');
+                toast.success('PDF report generated');
             }
         } catch (error) {
-            toast.error('Archive synchronization failed');
+            toast.error('Export failed');
         }
     };
 
@@ -85,17 +85,17 @@ const FacultyManagementPage = () => {
             {/* Header Suite */}
             <div className="page-header faculty-header-suite">
                 <div>
-                    <h2 className="heading-display">Faculty Administration</h2>
-                    <p className="page-subtitle">Governance of institutional access, departmental roles, and authentication status for faculty associates.</p>
+                    <h2 className="heading-display">Faculty Management</h2>
+                    <p className="page-subtitle">Manage faculty access, departments, and account status.</p>
                 </div>
                 <div className="faculty-header-actions">
                     <button className="btn btn-ghost faculty-action-btn" onClick={() => exportFacultyData('excel')} style={{ border: '1px solid var(--border-primary)' }}>
                         <Download size={18} />
-                        <span>Excel Archive</span>
+                        <span>Export Excel</span>
                     </button>
                     <button className="btn btn-primary faculty-action-btn" onClick={() => exportFacultyData('pdf')}>
                         <Users size={18} />
-                        <span>Generate Master Roster</span>
+                        <span>Generate Report</span>
                     </button>
                 </div>
             </div>
@@ -104,11 +104,11 @@ const FacultyManagementPage = () => {
             <div className="card faculty-filter-box">
                 <div className="faculty-filter-controls">
                     <div className="search-wrapper faculty-search-wrapper">
-                        <input className="form-control" placeholder="Search faculty nomenclature, institutional emails, or professional identifiers..." value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && loadFaculty()} />
+                        <input className="form-control" placeholder="Search by name, email, or ID..." value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && loadFaculty()} />
                         <Search size={20} className="search-icon" />
                     </div>
                     <button className="btn btn-primary faculty-execute-btn" onClick={loadFaculty}>
-                        Execute Query
+                        Search
                     </button>
                 </div>
             </div>
@@ -125,18 +125,18 @@ const FacultyManagementPage = () => {
                             <div style={{ width: 80, height: 80, background: 'var(--primary-50)', color: 'var(--brand-600)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
                                 <Users size={40} />
                             </div>
-                            <h3 style={{ fontWeight: 900, color: 'var(--text-primary)' }}>No Faculty Records Synchronized</h3>
-                            <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Refine your search parameters or synchronize the central directory.</p>
+                            <h3 style={{ fontWeight: 900, color: 'var(--text-primary)' }}>No Faculty Found</h3>
+                            <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Try changing your search or filters.</p>
                         </div>
                     ) : (
                         <table className="table">
                             <thead>
                                 <tr>
-                                    <th style={{ paddingLeft: '2rem' }}>Faculty Associate</th>
-                                    <th>Authentication Endpoint</th>
-                                    <th>Institutional Department</th>
-                                    <th style={{ textAlign: 'center' }}>Authorization Status</th>
-                                    <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Administration</th>
+                                    <th style={{ paddingLeft: '2rem' }}>Faculty Name</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th style={{ textAlign: 'center' }}>Status</th>
+                                    <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -168,7 +168,7 @@ const FacultyManagementPage = () => {
                                         </td>
                                         <td style={{ textAlign: 'center' }}>
                                             <span className={`badge ${f.isActive ? 'badge-success' : 'badge-error'}`} style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0.4rem 0.75rem' }}>
-                                                {f.isActive ? 'Authorized' : 'Suspended'}
+                                                {f.isActive ? 'Active' : 'Inactive'}
                                             </span>
                                         </td>
                                         <td style={{ textAlign: 'right', paddingRight: '2rem' }}>

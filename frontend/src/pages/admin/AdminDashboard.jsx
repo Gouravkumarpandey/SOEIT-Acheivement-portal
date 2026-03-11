@@ -19,7 +19,7 @@ const AdminDashboard = () => {
                 const res = await adminAPI.getDashboard();
                 setData(res.data);
             } catch {
-                toast.error('Failed to synchronize administrative intelligence stream');
+                toast.error('Failed to load dashboard data');
             } finally {
                 setLoading(false);
             }
@@ -28,10 +28,10 @@ const AdminDashboard = () => {
     }, []);
 
     const statCards = [
-        { label: 'Scholar Registry', value: data?.stats?.totalStudents ?? 0, icon: Users, color: 'var(--brand-600)', bg: 'var(--primary-50)', delta: 'Active academic enrollments', iconColor: 'var(--brand-700)' },
-        { label: 'Faculty Roster', value: data?.stats?.totalFaculties ?? 0, icon: Shield, color: 'var(--indigo-600)', bg: 'var(--indigo-50)', delta: 'Authorized institutional staff', iconColor: 'var(--indigo-700)' },
-        { label: 'Total Achievements', value: data?.stats?.totalAchievements ?? 0, icon: Trophy, color: 'var(--success-600)', bg: 'var(--success-50)', delta: `Verified: ${data?.stats?.approvedCount ?? 0} units`, iconColor: 'var(--success-700)' },
-        { label: 'Review Queue', value: data?.stats?.pendingCount ?? 0, icon: Clock, color: 'var(--warning-500)', bg: 'var(--warning-50)', delta: 'Pending reconciliation', iconColor: 'var(--warning-700)' },
+        { label: 'Total Students', value: data?.stats?.totalStudents ?? 0, icon: Users, color: 'var(--brand-600)', bg: 'var(--primary-50)', delta: 'Active students', iconColor: 'var(--brand-700)' },
+        { label: 'Total Faculty', value: data?.stats?.totalFaculties ?? 0, icon: Shield, color: 'var(--indigo-600)', bg: 'var(--indigo-50)', delta: 'Total teaching staff', iconColor: 'var(--indigo-700)' },
+        { label: 'Total Achievements', value: data?.stats?.totalAchievements ?? 0, icon: Trophy, color: 'var(--success-600)', bg: 'var(--success-50)', delta: `Approved: ${data?.stats?.approvedCount ?? 0}`, iconColor: 'var(--success-700)' },
+        { label: 'Pending Review', value: data?.stats?.pendingCount ?? 0, icon: Clock, color: 'var(--warning-500)', bg: 'var(--warning-50)', delta: 'Waiting for approval', iconColor: 'var(--warning-700)' },
     ];
 
     const trendData = (data?.monthlyTrend || []).map(d => ({
@@ -58,12 +58,12 @@ const AdminDashboard = () => {
             {/* Header Context Suite */}
             <div className="page-header admin-header-suite">
                 <div className="admin-header-content">
-                    <h2 className="heading-display">Administrative Oversight</h2>
-                    <p className="page-subtitle">Unified surveillance of institutional achievements, departmental growth, and evaluation performance metrics.</p>
+                    <h2 className="heading-display">Admin Dashboard</h2>
+                    <p className="page-subtitle">Overview of student achievements, department growth, and performance metrics.</p>
                 </div>
                 <div className="admin-header-sync">
                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success-500)', boxShadow: '0 0 0 4px var(--success-50)' }}></div>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>REAL-TIME SYNCHRONIZATION</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>LIVE DATA</span>
                 </div>
             </div>
 
@@ -76,7 +76,7 @@ const AdminDashboard = () => {
                                 <Icon size={24} style={{ color: iconColor }} strokeWidth={2.5} />
                             </div>
                             <div style={{ padding: '0.4rem 0.6rem', background: 'var(--slate-50)', borderRadius: '8px', border: '1px solid var(--border-primary)', fontSize: '0.7rem', fontWeight: 900, color: 'var(--text-muted)' }}>
-                                ANALYTICS
+                                DATA
                             </div>
                         </div>
                         <div style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: '0.5rem', letterSpacing: '-0.03em' }}>{value.toLocaleString()}</div>
@@ -94,9 +94,9 @@ const AdminDashboard = () => {
                 {/* Submission Longitudinal Trend */}
                 <div className="card admin-chart-card-res">
                     <div className="card-header admin-chart-header">
-                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Submission Longitudinal Trend</h4>
+                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Yearly Submission Trend</h4>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', fontWeight: 900, color: 'var(--brand-600)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            <BarChart3 size={16} /> 12-Month Resolution
+                            <BarChart3 size={16} /> Last 12 Months
                         </div>
                     </div>
                     <div className="card-body admin-chart-body">
@@ -120,7 +120,7 @@ const AdminDashboard = () => {
                 {/* Domain Distribution Intelligence */}
                 <div className="card admin-chart-card-res">
                     <div className="card-header admin-chart-header">
-                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Domain Yield Analysis</h4>
+                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Category Breakdown</h4>
                     </div>
                     <div className="card-body admin-domain-body">
                         <ResponsiveContainer width="100%" height={320}>
@@ -150,7 +150,7 @@ const AdminDashboard = () => {
             <div className="admin-charts-ecosystem-alt">
                 <div className="card admin-chart-card-res">
                     <div className="card-header admin-chart-header">
-                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Departmental Compliance Performance</h4>
+                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Department Progress</h4>
                     </div>
                     <div className="card-body admin-chart-body">
                         <ResponsiveContainer width="100%" height={320}>
@@ -158,8 +158,8 @@ const AdminDashboard = () => {
                                 <XAxis dataKey="_id" tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 900 }} tickLine={false} axisLine={false} dy={15} />
                                 <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 900 }} tickLine={false} axisLine={false} />
                                 <Tooltip cursor={{ fill: 'var(--slate-50)', radius: 8 }} contentStyle={{ background: '#fff', border: '1px solid var(--border-primary)', borderRadius: 14, boxShadow: 'var(--shadow-xl)' }} />
-                                <Bar dataKey="count" name="Cumulative Yield" fill="var(--slate-200)" radius={[6, 6, 0, 0]} barSize={28} />
-                                <Bar dataKey="approved" name="Verified Yield" fill="var(--brand-600)" radius={[6, 6, 0, 0]} barSize={28} />
+                                <Bar dataKey="count" name="Total Submissions" fill="var(--slate-200)" radius={[6, 6, 0, 0]} barSize={28} />
+                                <Bar dataKey="approved" name="Approved Submissions" fill="var(--brand-600)" radius={[6, 6, 0, 0]} barSize={28} />
                                 <Legend align="right" verticalAlign="top" wrapperStyle={{ top: -25, paddingBottom: '20px' }} iconSize={12} formatter={v => <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{v}</span>} />
                             </BarChart>
                         </ResponsiveContainer>
@@ -168,9 +168,9 @@ const AdminDashboard = () => {
 
                 <div className="card admin-chart-card-res">
                     <div className="card-header admin-chart-header">
-                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Critical Review Queue</h4>
+                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Recent Pending Requests</h4>
                         <Link to="/admin/verify" className="btn btn-ghost admin-sync-btn">
-                            <span>AUDIT REGISTRY</span> <Award size={16} strokeWidth={2.5} />
+                            <span>VIEW ALL</span> <Award size={16} strokeWidth={2.5} />
                         </Link>
                     </div>
                     <div className="card-body admin-queue-body">
@@ -179,8 +179,8 @@ const AdminDashboard = () => {
                                 <div style={{ width: 80, height: 80, background: 'var(--success-50)', color: 'var(--success-600)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
                                     <CheckCircle size={40} strokeWidth={1.5} />
                                 </div>
-                                <h5 style={{ fontWeight: 900, margin: '0 0 0.75rem 0', color: 'var(--text-primary)', fontSize: '1.25rem' }}>Registry Synchronized</h5>
-                                <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>All pending evaluations have been formally executed.</p>
+                                <h5 style={{ fontWeight: 900, margin: '0 0 0.75rem 0', color: 'var(--text-primary)', fontSize: '1.25rem' }}>All Caught Up!</h5>
+                                <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>All pending requests have been reviewed.</p>
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

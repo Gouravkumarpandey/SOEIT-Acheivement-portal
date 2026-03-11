@@ -49,7 +49,7 @@ const AllAchievementsPage = () => {
             setTotal(data.total);
             setPages(data.pages);
         } catch {
-            toast.error('Failed to synchronize institutional records');
+            toast.error('Failed to load achievements');
         } finally {
             setLoading(false);
         }
@@ -59,7 +59,7 @@ const AllAchievementsPage = () => {
 
     const exportAchievements = (type) => {
         if (achievements.length === 0) {
-            toast.error('No empirical records available for export');
+            toast.error('No records available to export');
             return;
         }
 
@@ -68,7 +68,7 @@ const AllAchievementsPage = () => {
             if (type === 'excel') {
                 const excelData = achievements.map(a => ({
                     'Achievement Title': a.title,
-                    'Scholar Name': a.student?.name,
+                    'Student Name': a.student?.name,
                     'ID/Enrollment': a.student?.idNumber || 'N/A',
                     'Department': a.student?.department,
                     'Category': a.category,
@@ -81,20 +81,20 @@ const AllAchievementsPage = () => {
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Achievements");
                 XLSX.writeFile(wb, `SOEIT_Achievements_${date}.xlsx`);
-                toast.success('Excel archive: Achievement registry exported');
+                toast.success('Excel: Achievements exported');
             } else {
                 const doc = new jsPDF('l', 'mm', 'a4');
                 doc.setFillColor(30, 41, 59);
                 doc.rect(0, 0, 297, 30, 'F');
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(20);
-                doc.text('SOEIT INSTITUTIONAL ACHIEVEMENT REPOSITORY', 148, 15, { align: 'center' });
+                doc.text('SOEIT ACHIEVEMENT LIST', 148, 15, { align: 'center' });
                 doc.setFontSize(10);
                 doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 148, 22, { align: 'center' });
 
                 autoTable(doc, {
                     startY: 40,
-                    head: [['Achievement Record', 'Scholar', 'Department', 'Category', 'Status', 'Points', 'Date']],
+                    head: [['Achievement', 'Student', 'Department', 'Category', 'Status', 'Points', 'Date']],
                     body: achievements.map(a => [
                         a.title,
                         a.student?.name,
@@ -107,11 +107,11 @@ const AllAchievementsPage = () => {
                     theme: 'grid',
                     headStyles: { fillColor: [59, 130, 246] },
                 });
-                doc.save(`SOEIT_Achievements_Registry_${date}.pdf`);
-                toast.success('PDF report: Achievement registry generated');
+                doc.save(`SOEIT_Achievements_List_${date}.pdf`);
+                toast.success('PDF report generated');
             }
         } catch (error) {
-            toast.error('Registry export failure');
+            toast.error('Failed to export records');
         }
     };
 
@@ -120,13 +120,13 @@ const AllAchievementsPage = () => {
             {/* Professional Header */}
             <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
-                    <h2 className="heading-display">Institutional Achievement Repository</h2>
-                    <p className="page-subtitle">Historical ledger containing all validated and pending achievements across SOEIT.</p>
+                    <h2 className="heading-display">All Student Achievements</h2>
+                    <p className="page-subtitle">View and manage all uploaded achievements in one place.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <button className="btn btn-ghost" onClick={() => exportAchievements('excel')} style={{ border: '1px solid var(--border-primary)', fontWeight: 800 }}>
                         <Download size={18} />
-                        <span className="hide-mobile">Excel Archive</span>
+                        <span className="hide-mobile">Export Excel</span>
                         <span className="show-mobile">Excel</span>
                     </button>
                     <button className="btn btn-primary" onClick={() => exportAchievements('pdf')} style={{ fontWeight: 800 }}>
@@ -144,7 +144,7 @@ const AllAchievementsPage = () => {
                         <div className="search-wrapper filter-search">
                             <input
                                 className="form-control"
-                                placeholder="Search records or student names..."
+                                placeholder="Search by achievement or student name..."
                                 value={filters.search}
                                 onChange={e => setFilters(p => ({ ...p, search: e.target.value }))}
                                 onKeyDown={e => e.key === 'Enter' && load()}
@@ -193,23 +193,23 @@ const AllAchievementsPage = () => {
                     ) : achievements.length === 0 ? (
                         <div className="empty-state" style={{ padding: '6rem' }}>
                             <Trophy size={64} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                            <h3>No institutional records match your query</h3>
-                            <p>Try refining your search parameters or adjusting active filters.</p>
+                            <h3>No records found</h3>
+                            <p>Try searching for something else or changing filters.</p>
                         </div>
                     ) : (
                         <>
                             <table className="table">
                                 <thead>
                                     <tr>
-                                        <th style={{ paddingLeft: '1.5rem' }}>Achievement Record</th>
-                                        <th>Student Affiliate</th>
+                                        <th style={{ paddingLeft: '1.5rem' }}>Achievement</th>
+                                        <th>Student</th>
                                         <th>Department</th>
-                                        <th>Functional Category</th>
-                                        <th>Impact Level</th>
+                                        <th>Category</th>
+                                        <th>Level</th>
                                         <th style={{ textAlign: 'center' }}>Status</th>
                                         <th>Points</th>
-                                        <th style={{ textAlign: 'center' }}>Review</th>
-                                        <th style={{ textAlign: 'right', paddingRight: '1.5rem' }}>Date Recorded</th>
+                                        <th style={{ textAlign: 'center' }}>Action</th>
+                                        <th style={{ textAlign: 'right', paddingRight: '1.5rem' }}>Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -268,7 +268,7 @@ const AllAchievementsPage = () => {
                             {pages > 1 && (
                                 <div style={{ borderTop: '1px solid var(--border-primary)', padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                        Exhibiting <strong>{achievements.length}</strong> of <strong>{total}</strong> historical records
+                                        Showing <strong>{achievements.length}</strong> of <strong>{total}</strong> records
                                     </div>
                                     <div className="pagination" style={{ margin: 0 }}>
                                         <button className="page-btn" onClick={() => setFilters(p => ({ ...p, page: p.page - 1 }))} disabled={filters.page === 1}><ChevronLeft size={16} /></button>

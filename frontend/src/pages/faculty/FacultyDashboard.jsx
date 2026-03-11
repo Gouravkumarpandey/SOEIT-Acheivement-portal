@@ -30,7 +30,7 @@ const FacultyDashboard = () => {
                 const res = await adminAPI.getDashboard();
                 setStats(res.data);
             } catch {
-                toast.error('Failed to synchronize portal operations');
+                toast.error('Failed to load dashboard data');
             }
         };
         loadStats();
@@ -49,7 +49,7 @@ const FacultyDashboard = () => {
                 const res = await adminAPI.getStudents(params);
                 setStudents(res.data.data);
             } catch {
-                toast.error('Failed to load scholar directory');
+                toast.error('Failed to load students');
             } finally {
                 setLoading(false);
             }
@@ -59,7 +59,7 @@ const FacultyDashboard = () => {
 
     const exportToPDF = () => {
         if (students.length === 0) {
-            toast.error('No empirical data available for export');
+            toast.error('No data to export');
             return;
         }
 
@@ -73,11 +73,11 @@ const FacultyDashboard = () => {
         doc.setFontSize(14);
         doc.setTextColor(30, 58, 138); // blue-900
         doc.text('DEPARTMENT OF ENGINEERING & IT', 105, 30, { align: 'center' });
-        doc.text('Faculty Oversight Achievement Report', 105, 40, { align: 'center' });
+        doc.text('Student Achievement Report', 105, 40, { align: 'center' });
 
         doc.setFontSize(10);
         doc.setTextColor(100, 116, 139); // slate-500
-        doc.text(`Generation Timestamp: ${timestamp}`, 105, 48, { align: 'center' });
+        doc.text(`Generated on: ${timestamp}`, 105, 48, { align: 'center' });
 
         doc.setDrawColor(226, 232, 240);
         doc.line(20, 55, 190, 55);
@@ -94,7 +94,7 @@ const FacultyDashboard = () => {
 
         autoTable(doc, {
             startY: 65,
-            head: [['#', 'Scholar Name', 'Enrollment ID', 'Academic Unit', 'Total', 'Verified', 'Score']],
+            head: [['#', 'Student Name', 'Enrollment No', 'Semester & Section', 'Total', 'Approved', 'Score']],
             body: tableData,
             headStyles: { fillColor: [30, 58, 138], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
             bodyStyles: { fontSize: 9, halign: 'center' },
@@ -102,22 +102,22 @@ const FacultyDashboard = () => {
             alternateRowStyles: { fillColor: [248, 250, 252] },
         });
 
-        const filename = `SOEIT_Faculty_Report_${new Date().getTime()}.pdf`;
+        const filename = `Student_Achievement_Report_${new Date().getTime()}.pdf`;
         doc.save(filename);
-        toast.success('Professional report exported successfully');
+        toast.success('Report exported successfully');
     };
 
     const exportToExcel = () => {
         if (students.length === 0) {
-            toast.error('No empirical data available for export');
+            toast.error('No data to export');
             return;
         }
 
         try {
             const excelData = students.map((s, i) => ({
                 'S.No': i + 1,
-                'Scholar Name': s.name,
-                'Enrollment ID': s.enrollmentNo || s.studentId,
+                'Student Name': s.name,
+                'Enrollment No': s.enrollmentNo || s.studentId,
                 'Department': s.department,
                 'Semester': s.semester || 'N/A',
                 'Section': s.section || 'N/A',
@@ -132,10 +132,10 @@ const FacultyDashboard = () => {
             XLSX.utils.book_append_sheet(wb, ws, "Scholar Analytics");
 
             const date = new Date().toLocaleDateString().replace(/\//g, '-');
-            XLSX.writeFile(wb, `SOEIT_Faculty_Oversight_${date}.xlsx`);
-            toast.success('Excel analytics synchronized and exported');
+            XLSX.writeFile(wb, `Student_Achievement_Report_${date}.xlsx`);
+            toast.success('Excel exported successfully');
         } catch (error) {
-            toast.error('Excel export failure');
+            toast.error('Failed to export Excel');
         }
     };
 
@@ -143,25 +143,25 @@ const FacultyDashboard = () => {
         e.preventDefault();
         try {
             await noticeAPI.create(noticeData);
-            toast.success('Official notification broadcast successfully!');
+            toast.success('Notice sent successfully!');
             setShowNoticeModal(false);
             setNoticeData({ title: '', content: '', priority: 'Medium' });
         } catch {
-            toast.error('Strategic communication failure');
+            toast.error('Failed to send notice');
         }
     };
 
     const handleDeleteSelected = async () => {
         if (selectedIds.length === 0) return;
-        if (!window.confirm(`Are you sure you want to permanently purge ${selectedIds.length} scholar records? This action is irreversible.`)) return;
+        if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} students? This action is irreversible.`)) return;
         setDeleting(true);
         try {
             await adminAPI.deleteUsers(selectedIds);
-            toast.success('Scholar registry synchronized: Records purged');
+            toast.success('Students deleted successfully');
             setSelectedIds([]);
             loadStudents();
         } catch {
-            toast.error('Registry synchronization failure');
+            toast.error('Failed to delete students');
         } finally {
             setDeleting(false);
         }
@@ -177,9 +177,9 @@ const FacultyDashboard = () => {
     };
 
     const statCards = [
-        { label: 'Scholar Registry', value: stats?.stats?.totalStudents ?? 0, icon: Users, color: 'var(--brand-600)', bg: 'var(--primary-50)' },
-        { label: 'Evaluation Queue', value: stats?.stats?.pendingCount ?? 0, icon: Clock, color: 'var(--warning-500)', bg: 'rgba(245,158,11,0.08)' },
-        { label: 'Verified Records', value: stats?.stats?.approvedCount ?? 0, icon: CheckCircle, color: 'var(--success-600)', bg: 'var(--success-50)' },
+        { label: 'Total Students', value: stats?.stats?.totalStudents ?? 0, icon: Users, color: 'var(--brand-600)', bg: 'var(--primary-50)' },
+        { label: 'Pending Requests', value: stats?.stats?.pendingCount ?? 0, icon: Clock, color: 'var(--warning-500)', bg: 'rgba(245,158,11,0.08)' },
+        { label: 'Approved Achievements', value: stats?.stats?.approvedCount ?? 0, icon: CheckCircle, color: 'var(--success-600)', bg: 'var(--success-50)' },
         { label: 'Total Submissions', value: stats?.stats?.totalAchievements ?? 0, icon: Trophy, color: 'var(--brand-600)', bg: 'var(--primary-50)' },
     ];
 
@@ -199,8 +199,8 @@ const FacultyDashboard = () => {
             {/* Header Suite */}
             <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
-                    <h2 className="heading-display">Faculty Command Center</h2>
-                    <p className="page-subtitle">Administrative oversight, scholar progress tracking, and institutional broadcasting.</p>
+                    <h2 className="heading-display">Faculty Dashboard</h2>
+                    <p className="page-subtitle">Manage students, track progress, and send notices.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <button className="btn btn-ghost" onClick={exportToExcel} style={{ border: '1px solid var(--border-primary)', fontWeight: 800 }}>
@@ -210,7 +210,7 @@ const FacultyDashboard = () => {
                     </button>
                     <button className="btn btn-secondary" onClick={exportToPDF} style={{ fontWeight: 800 }}>
                         <Download size={18} />
-                        <span>Export Analytics</span>
+                        <span>Export PDF</span>
                     </button>
                     <button className="btn btn-primary" onClick={() => navigate('/admin/verify')} style={{ fontWeight: 800, background: 'var(--success-600)', borderColor: 'var(--success-700)' }}>
                         <CheckCircle size={18} />
@@ -218,7 +218,7 @@ const FacultyDashboard = () => {
                     </button>
                     <button className="btn btn-primary" onClick={() => setShowNoticeModal(true)} style={{ fontWeight: 800 }}>
                         <GraduationCap size={18} />
-                        <span>Dispatch Notice</span>
+                        <span>Send Notice</span>
                     </button>
                 </div>
             </div>
@@ -231,7 +231,7 @@ const FacultyDashboard = () => {
                             <div style={{ width: 44, height: 44, background: bg, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Icon size={22} color={color} />
                             </div>
-                            <div className="badge badge-brand" style={{ fontSize: '0.6rem' }}>SYNCHRONIZED</div>
+                            <div className="badge badge-brand" style={{ fontSize: '0.6rem' }}>UPDATED</div>
                         </div>
                         <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{value.toLocaleString()}</div>
                         <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{label}</div>
@@ -243,7 +243,7 @@ const FacultyDashboard = () => {
             <div className="card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Academic Cohort Selection</h4>
+                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Select Semester</h4>
                         <div style={{ height: '1px', flex: 1, background: 'var(--border-primary)' }}></div>
                     </div>
 
@@ -255,7 +255,7 @@ const FacultyDashboard = () => {
                                 className={`btn ${semester === 'all' ? 'btn-primary' : 'btn-ghost'}`}
                                 style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem' }}
                             >
-                                Complete Registry
+                                All Students
                             </button>
                             {semesters.map(sem => (
                                 <button
@@ -288,7 +288,7 @@ const FacultyDashboard = () => {
                                     backgroundSize: '1.2em'
                                 }}
                             >
-                                <option value="all">Complete Registry</option>
+                                <option value="all">All Students</option>
                                 {semesters.map(sem => (
                                     <option key={sem.id} value={sem.id}>{sem.label}</option>
                                 ))}
@@ -297,7 +297,7 @@ const FacultyDashboard = () => {
                         {selectedIds.length > 0 && (
                             <button className="btn btn-danger animate-fade-in" onClick={handleDeleteSelected} disabled={deleting} style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <XCircle size={16} />
-                                Purge Selected ({selectedIds.length})
+                                Delete Selected ({selectedIds.length})
                             </button>
                         )}
                     </div>
@@ -306,7 +306,7 @@ const FacultyDashboard = () => {
                         <div className="animate-fade-in" style={{ padding: '1rem', background: 'var(--primary-50)', borderRadius: '12px', border: '1px solid var(--primary-100)', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <Filter size={16} className="text-brand" />
-                                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-700)' }}>Section Resolution:</span>
+                                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-700)' }}>Select Section:</span>
                             </div>
 
                             {/* Desktop Version: Button Group */}
@@ -353,12 +353,12 @@ const FacultyDashboard = () => {
             <div className="card">
                 <div className="card-header" style={{ padding: '1.25rem 1.75rem', borderBottom: '1px solid var(--border-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>
-                        Scholar Directory — {semester === 'all' ? 'Institutional View' : `Semester ${semester}`} {section !== 'all' ? `(Section ${section})` : ''}
+                        Student List — {semester === 'all' ? 'All Students' : `Semester ${semester}`} {section !== 'all' ? `(Section ${section})` : ''}
                     </h4>
                     <div className="search-wrapper" style={{ width: '350px' }}>
                         <input
                             className="form-control"
-                            placeholder="Identify scholars by nomenclature or ID..."
+                            placeholder="Search by name or ID..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -373,11 +373,11 @@ const FacultyDashboard = () => {
                                 <th style={{ paddingLeft: '1.75rem', width: '50px' }}>
                                     <input type="checkbox" checked={students.length > 0 && selectedIds.length === students.length} onChange={toggleSelectAll} style={{ width: '18px', height: '18px', cursor: 'pointer' }} />
                                 </th>
-                                <th>Scholar Profile</th>
-                                <th className="desktop-only text-center">Academic Compliance</th>
-                                <th className="desktop-only text-center">Verification Matrix</th>
-                                <th className="text-center">Cumulative Pts</th>
-                                <th className="text-right">Operations</th>
+                                <th>Student Profile</th>
+                                <th className="desktop-only text-center">Batch & Semester</th>
+                                <th className="desktop-only text-center">Achievements</th>
+                                <th className="text-center">Total Points</th>
+                                <th className="text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -390,8 +390,8 @@ const FacultyDashboard = () => {
                                     <td colSpan="6">
                                         <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
                                             <UsersRound size={48} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
-                                            <h5 style={{ fontWeight: 800, margin: '0 0 0.5rem 0' }}>No Records Extracted</h5>
-                                            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>The requested scholar cohort yielded zero results from the database.</p>
+                                            <h5 style={{ fontWeight: 800, margin: '0 0 0.5rem 0' }}>No Students Found</h5>
+                                            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>No students found for the selected criteria.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -421,12 +421,12 @@ const FacultyDashboard = () => {
                                         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
                                             <div>
                                                 <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-primary)' }}>{student.achievementCounts?.total || 0}</div>
-                                                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Sum</div>
+                                                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Total</div>
                                             </div>
                                             <div style={{ width: '1px', background: 'var(--border-primary)' }}></div>
                                             <div>
                                                 <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--success-600)' }}>{student.achievementCounts?.approved || 0}</div>
-                                                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Val</div>
+                                                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Approved</div>
                                             </div>
                                         </div>
                                     </td>
@@ -452,19 +452,19 @@ const FacultyDashboard = () => {
                     <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '600px', padding: 0, overflow: 'hidden', boxShadow: 'var(--shadow-xl)', borderRadius: '20px', border: 'none' }}>
                         <div className="card-header" style={{ padding: '1.75rem', background: 'var(--brand-700)', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none' }}>
                             <div>
-                                <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em' }}>Broadcast Institutional Notice</h3>
-                                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.9, color: '#ffffff', fontWeight: 500 }}>Formal communication suite for academic oversight.</p>
+                                <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em' }}>Send New Notice</h3>
+                                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.9, color: '#ffffff', fontWeight: 500 }}>Send a notice to all students.</p>
                             </div>
                             <button onClick={() => setShowNoticeModal(false)} className="btn btn-ghost" style={{ padding: '0.5rem', color: '#ffffff', background: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}><X size={24} /></button>
                         </div>
                         <div className="card-body" style={{ padding: '2rem' }}>
                             <form onSubmit={handlePostNotice} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Communication Title</label>
-                                    <input className="form-control" placeholder="Identify the core subject of this broadcast..." required value={noticeData.title} onChange={e => setNoticeData({ ...noticeData, title: e.target.value })} />
+                                    <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Notice Title</label>
+                                    <input className="form-control" placeholder="Enter title here..." required value={noticeData.title} onChange={e => setNoticeData({ ...noticeData, title: e.target.value })} />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Priority Resolution</label>
+                                    <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Priority</label>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
                                         {['Low', 'Medium', 'High', 'Urgent'].map(p => (
                                             <button key={p} type="button" onClick={() => setNoticeData({ ...noticeData, priority: p })}
@@ -476,16 +476,16 @@ const FacultyDashboard = () => {
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Broadcast Content</label>
-                                    <textarea className="form-control" rows="6" placeholder="Document the description of the institutional notice..." required style={{ resize: 'none' }} value={noticeData.content} onChange={e => setNoticeData({ ...noticeData, content: e.target.value })} />
+                                    <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Message</label>
+                                    <textarea className="form-control" rows="6" placeholder="Enter your message here..." required style={{ resize: 'none' }} value={noticeData.content} onChange={e => setNoticeData({ ...noticeData, content: e.target.value })} />
                                 </div>
                                 <div style={{ padding: '1rem', background: 'var(--error-50)', borderRadius: '12px', border: '1px solid var(--error-100)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Clock size={20} className="text-danger" />
                                     <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--error-800)', fontWeight: 700 }}>
-                                        PROTOCOL: Execution will trigger an immediate SMTP broadcast to all active scholar endpoints.
+                                        Note: This will send an email to all active students.
                                     </p>
                                 </div>
-                                <button type="submit" className="btn btn-primary" style={{ padding: '1.25rem', fontWeight: 800 }}>Publish Broadcast & Execute Email Protocol</button>
+                                <button type="submit" className="btn btn-primary" style={{ padding: '1.25rem', fontWeight: 800 }}>Send Notice</button>
                             </form>
                         </div>
                     </div>
@@ -519,12 +519,12 @@ const FacultyDashboard = () => {
                                 {selectedStudent.name.charAt(0)}
                             </div>
                             <h3 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em' }}>{selectedStudent.name}</h3>
-                            <p style={{ margin: '0.6rem 0 0 0', fontSize: '0.95rem', opacity: 0.95, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{selectedStudent.enrollmentNo || 'Institutional Entry: ' + selectedStudent._id.slice(-6).toUpperCase()}</p>
+                            <p style={{ margin: '0.6rem 0 0 0', fontSize: '0.95rem', opacity: 0.95, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{selectedStudent.enrollmentNo || 'ID: ' + selectedStudent._id.slice(-6).toUpperCase()}</p>
                         </div>
                         <div className="card-body" style={{ padding: '2rem' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
                                 <div style={{ padding: '1.25rem 1rem', background: 'var(--slate-50)', borderRadius: '16px', textAlign: 'center', border: '1px solid var(--border-primary)' }}>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.35rem', letterSpacing: '0.05em' }}>Academic Unit</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.35rem', letterSpacing: '0.05em' }}>Semester</div>
                                     <div style={{ fontWeight: 900, color: 'var(--text-primary)', fontSize: '1rem' }}>Sem {selectedStudent.semester} • {selectedStudent.section}</div>
                                 </div>
                                 <div style={{ padding: '1.25rem 1rem', background: 'var(--slate-50)', borderRadius: '16px', textAlign: 'center', border: '1px solid var(--border-primary)' }}>
@@ -535,28 +535,28 @@ const FacultyDashboard = () => {
 
                             <div style={{ borderTop: '2px solid var(--border-primary)', paddingTop: '2rem', marginBottom: '2.5rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <h5 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.075em' }}>Performance Analytics</h5>
+                                    <h5 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 900, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.075em' }}>Achievement Summary</h5>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', textAlign: 'center' }}>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontSize: '2rem', fontWeight: 950, color: 'var(--success-600)', lineHeight: 1 }}>{selectedStudent.achievementCounts?.approved || 0}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', fontWeight: 800, marginTop: '0.5rem', opacity: 0.8 }}>VERIFIED</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', fontWeight: 800, marginTop: '0.5rem', opacity: 0.8 }}>APPROVED</div>
                                     </div>
                                     <div style={{ width: '2px', background: 'var(--border-primary)', alignSelf: 'stretch' }}></div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontSize: '2rem', fontWeight: 950, color: 'var(--warning-500)', lineHeight: 1 }}>{selectedStudent.achievementCounts?.pending || 0}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', fontWeight: 800, marginTop: '0.5rem', opacity: 0.8 }}>REVIEW</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', fontWeight: 800, marginTop: '0.5rem', opacity: 0.8 }}>PENDING</div>
                                     </div>
                                     <div style={{ width: '2px', background: 'var(--border-primary)', alignSelf: 'stretch' }}></div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontSize: '2rem', fontWeight: 950, color: 'var(--brand-600)', lineHeight: 1 }}>{selectedStudent.achievementCounts?.points || 0}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', fontWeight: 800, marginTop: '0.5rem', opacity: 0.8 }}>TOTAL PTS</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', fontWeight: 800, marginTop: '0.5rem', opacity: 0.8 }}>TOTAL POINTS</div>
                                     </div>
                                 </div>
                             </div>
 
                             <div style={{ display: 'flex', gap: '1rem' }}>
-                                <button className="btn btn-ghost w-full" style={{ padding: '1rem', fontWeight: 700 }} onClick={() => setSelectedStudent(null)}>Terminate View</button>
+                                <button className="btn btn-ghost w-full" style={{ padding: '1rem', fontWeight: 700 }} onClick={() => setSelectedStudent(null)}>Close</button>
                                 <button className="btn btn-primary w-full" style={{ padding: '1rem', fontWeight: 800 }} onClick={() => navigate(`/portfolio/${selectedStudent._id}`)}>Full Portfolio</button>
                             </div>
                         </div>

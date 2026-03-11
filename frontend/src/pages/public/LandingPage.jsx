@@ -230,12 +230,12 @@ const LandingPage = () => {
                     <div className="hero-content">
                         <div className="hero-badge">
                             <Shield size={14} />
-                            <span className="hero-badge-text">Official SOEIT Technical Ecosystem</span>
+                            <span className="hero-badge-text">Official SOEIT Student Portal</span>
                         </div>
 
                         <h1 className="hero-title">
-                            Empowering <br />
-                            <span className="text-brand-emphasized">Engineering Excellence</span>
+                            Track Your <br />
+                            <span className="text-brand-emphasized">Achievements</span>
                         </h1>
 
                         <p className="hero-subtitle">

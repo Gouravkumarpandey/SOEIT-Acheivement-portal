@@ -36,7 +36,7 @@ const ProfilePage = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        if (file.size > 2 * 1024 * 1024) { toast.error('Image dimensions or size exceeds theoretical limits (Max 2MB)'); return; }
+        if (file.size > 2 * 1024 * 1024) { toast.error('Image size should be less than 2MB'); return; }
         setProfileImage(file);
         setImagePreview(URL.createObjectURL(file));
     };
@@ -50,9 +50,9 @@ const ProfilePage = () => {
             if (profileImage) fd.append('profileImage', profileImage);
             const { data } = await authAPI.updateProfile(fd);
             updateUser(data.user);
-            toast.success('Institutional Personnel Identity synchronized successfully');
+            toast.success('Profile updated successfully');
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Identity synchronization failed');
+            toast.error(err.response?.data?.message || 'Failed to update profile');
         } finally {
             setLoading(false);
         }
@@ -60,7 +60,7 @@ const ProfilePage = () => {
 
     const handlePasswordChange = async (e) => {
         e.preventDefault();
-        if (pwForm.newPassword !== pwForm.confirmPassword) { toast.error('Security mismatch: New passwords are not identical'); return; }
+        if (pwForm.newPassword !== pwForm.confirmPassword) { toast.error('Passwords do not match'); return; }
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordRegex.test(pwForm.newPassword)) {
@@ -71,10 +71,10 @@ const ProfilePage = () => {
         setPwLoading(true);
         try {
             await authAPI.changePassword({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword });
-            toast.success('Security protocol updated: Password rotated');
+            toast.success('Password changed successfully');
             setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Security protocol execution failed');
+            toast.error(err.response?.data?.message || 'Failed to change password');
         } finally {
             setPwLoading(false);
         }
@@ -108,7 +108,7 @@ const ProfilePage = () => {
                     <div className="profile-info-main" style={{ flex: 1 }}>
                         <div className="name-badge-container" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.625rem', flexWrap: 'wrap' }}>
                             <h2 className="profile-full-name" style={{ fontSize: '2.25rem', fontWeight: 900, margin: 0, letterSpacing: '-0.04em', lineHeight: 1.1, color: 'var(--brand-700)' }}>{user?.name}</h2>
-                            <div className="verified-badge" style={{ padding: '0.35rem 0.85rem', background: 'white', border: '1px solid var(--brand-200)', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--brand-600)', boxShadow: 'var(--shadow-sm)' }}>VERIFIED OFFICIAL</div>
+                            <div className="verified-badge" style={{ padding: '0.35rem 0.85rem', background: 'white', border: '1px solid var(--brand-200)', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--brand-600)', boxShadow: 'var(--shadow-sm)' }}>VERIFIED</div>
                         </div>
 
                         <div className="contact-info-grid" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
@@ -125,7 +125,7 @@ const ProfilePage = () => {
                         <div className="metadata-badges-container" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                             <div style={{ padding: '0.5rem 1rem', background: 'white', color: 'var(--brand-700)', borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em', border: '1px solid var(--brand-200)', boxShadow: 'var(--shadow-sm)' }}>{user?.department}</div>
                             <div style={{ padding: '0.5rem 1rem', background: 'var(--primary-100)', color: 'var(--primary-700)', borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em', border: '1px solid var(--primary-200)' }}>{user?.role}</div>
-                            {user?.batch && <div style={{ padding: '0.5rem 1rem', background: 'var(--success-50)', color: 'var(--success-600)', borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em', border: '1px solid var(--success-100)' }}>COHORT {user.batch}</div>}
+                            {user?.batch && <div style={{ padding: '0.5rem 1rem', background: 'var(--success-50)', color: 'var(--success-600)', borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em', border: '1px solid var(--success-100)' }}>BATCH {user.batch}</div>}
                         </div>
                     </div>
                 </div>
@@ -169,19 +169,19 @@ const ProfilePage = () => {
                                 {user?.role === 'student' && (
                                     <>
                                         <div className="form-group">
-                                            <label className="form-label field-label-res">Institutional Batch *</label>
-                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="XXXX-XX (e.g., 2022-26)" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
+                                            <label className="form-label field-label-res">Batch *</label>
+                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 2022-26" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
                                         </div>
                                         <div className="form-group">
-                                            <label className="form-label field-label-res">Semester Resolution</label>
+                                            <label className="form-label field-label-res">Semester</label>
                                             <select className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} value={form.semester} onChange={e => setForm(p => ({ ...p, semester: e.target.value }))}>
-                                                <option value="">Resolution Sequence</option>
-                                                {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester Matrix {s}</option>)}
+                                                <option value="">Select Semester</option>
+                                                {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester {s}</option>)}
                                             </select>
                                         </div>
                                         <div className="form-group span-full-res" style={{ gridColumn: 'span 2' }}>
-                                            <label className="form-label field-label-res">Academic Section Marker</label>
-                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="Section Indicator (e.g., Alpha-7)" value={form.section} onChange={e => setForm(p => ({ ...p, section: e.target.value }))} />
+                                            <label className="form-label field-label-res">Section</label>
+                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. A" value={form.section} onChange={e => setForm(p => ({ ...p, section: e.target.value }))} />
                                         </div>
                                     </>
                                 )}
@@ -197,7 +197,7 @@ const ProfilePage = () => {
                         <div className="connectivity-sidebar-res" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                             <div className="card connectivity-card" style={{ padding: '2.5rem', borderRadius: '24px', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
                                 <div style={{ marginBottom: '2rem' }}>
-                                    <h4 className="sidebar-section-title" style={{ margin: 0, fontWeight: 950, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Global Connectivity</h4>
+                                    <h4 className="sidebar-section-title" style={{ margin: 0, fontWeight: 950, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Social Links</h4>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                     {/* LinkedIn */}
@@ -236,7 +236,7 @@ const ProfilePage = () => {
                             </div>
 
                             <button type="submit" className="btn btn-primary" style={{ height: '64px', fontWeight: 950, fontSize: '1.1rem', borderRadius: '20px', boxShadow: 'var(--shadow-lg)' }} disabled={loading}>
-                                {loading ? <div className="spinner-sm" /> : <><Save size={22} strokeWidth={3} /><span>COMMIT IDENTITY UPDATES</span></>}
+                                {loading ? <div className="spinner-sm" /> : <><Save size={22} strokeWidth={3} /><span>UPDATE PROFILE</span></>}
                             </button>
                         </div>
                     </div>
@@ -248,8 +248,8 @@ const ProfilePage = () => {
                             <div style={{ width: 80, height: 80, background: 'var(--primary-50)', color: 'var(--brand-700)', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem auto', border: '1px solid var(--primary-100)' }}>
                                 <Shield size={40} strokeWidth={1.5} />
                             </div>
-                            <h4 style={{ margin: 0, fontWeight: 950, fontSize: '1.75rem', color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>Security Protocol Rotation</h4>
-                            <p style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 600, maxWidth: '400px', margin: '0.75rem auto 0 auto', lineHeight: 1.5 }}>Execute periodic cryptographic rotation to maintain absolute integrity of your institutional credentials.</p>
+                            <h4 style={{ margin: 0, fontWeight: 950, fontSize: '1.75rem', color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>Change Password</h4>
+                            <p style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 600, maxWidth: '400px', margin: '0.75rem auto 0 auto', lineHeight: 1.5 }}>Change your password regularly to keep your account safe.</p>
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
@@ -289,12 +289,12 @@ const ProfilePage = () => {
                             <div style={{ padding: '1.5rem', background: 'var(--warning-50)', borderRadius: '16px', border: '1px solid var(--warning-100)', marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
                                 <div style={{ color: 'var(--warning-600)', flexShrink: 0 }}><Shield size={20} strokeWidth={3} /></div>
                                 <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--warning-800)', fontWeight: 800, lineHeight: 1.5 }}>
-                                    Warning: Successful execution of this protocol will invalidate all active session tokens across registered endpoints.
+                                    Note: Changing your password will log you out of all other devices.
                                 </p>
                             </div>
 
                             <button type="submit" className="btn btn-primary" style={{ height: '64px', fontWeight: 950, fontSize: '1.1rem', borderRadius: '20px', marginTop: '1rem', boxShadow: 'var(--shadow-lg)' }} disabled={pwLoading}>
-                                {pwLoading ? <div className="spinner-sm" /> : <><Key size={22} strokeWidth={2.5} /><span>ENFORCE PROTOCOL UPDATE</span></>}
+                                {pwLoading ? <div className="spinner-sm" /> : <><Key size={22} strokeWidth={2.5} /><span>UPDATE PASSWORD</span></>}
                             </button>
                         </div>
                     </div>

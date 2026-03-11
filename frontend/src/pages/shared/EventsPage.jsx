@@ -30,7 +30,7 @@ const EventsPage = () => {
             const { data } = await eventAPI.getAll({ category: selectedCategory });
             setEvents(data.data);
         } catch (error) {
-            toast.error('Failed to synchronize event database');
+            toast.error('Failed to load events');
         } finally {
             setLoading(false);
         }
@@ -55,7 +55,7 @@ const EventsPage = () => {
                 toast.success('Event records updated successfully', { id: toastId });
             } else {
                 await eventAPI.create(finalData);
-                toast.success('Institutional event published successfully', { id: toastId });
+                toast.success('Event added successfully', { id: toastId });
             }
             setShowAddModal(false);
             setEditingId(null);
@@ -63,7 +63,7 @@ const EventsPage = () => {
             setFormData({ title: '', description: '', category: 'Technical', date: '', venue: '', registrationLink: '' });
             loadEvents();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Event synchronization failed', { id: toastId });
+            toast.error(error.response?.data?.message || 'Failed to save event', { id: toastId });
         }
     };
 
@@ -83,13 +83,13 @@ const EventsPage = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('PROTOCOL: Are you sure you wish to remove this institutional event from the registry?')) return;
+        if (!window.confirm('Are you sure you want to delete this event?')) return;
         try {
             await eventAPI.delete(id);
-            toast.success('Event records purged from database');
+            toast.success('Event deleted');
             loadEvents();
         } catch (error) {
-            toast.error('Deletion protocol failed');
+            toast.error('Failed to delete event');
         }
     };
 
@@ -109,13 +109,13 @@ const EventsPage = () => {
             {/* Page Header Suite */}
             <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
-                    <h2 className="heading-display">Institutional Event Hub</h2>
-                    <p className="page-subtitle">Centralized tracking of academic workshops, technical symposiums, and cultural fests.</p>
+                    <h2 className="heading-display">Campus Events</h2>
+                    <p className="page-subtitle">View all upcoming workshops, seminars, and fests on campus.</p>
                 </div>
                 {isStaff && (
                     <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
                         <Plus size={18} />
-                        <span>Publish New Event</span>
+                        <span>Add New Event</span>
                     </button>
                 )}
             </div>
@@ -171,8 +171,8 @@ const EventsPage = () => {
                     <div style={{ width: 80, height: 80, background: 'var(--primary-50)', color: 'var(--brand-700)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
                         <Calendar size={40} />
                     </div>
-                    <h3 style={{ fontWeight: 800, marginBottom: '0.5rem' }}>No Active Events Found</h3>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto' }}>The institutional registry currently contains no records matching this category resolution.</p>
+                    <h3 style={{ fontWeight: 800, marginBottom: '0.5rem' }}>No Events Found</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto' }}>No events found in this category.</p>
                 </div>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
@@ -223,8 +223,8 @@ const EventsPage = () => {
                                     </div>
                                     {isStaff && (user?.role === 'admin' || event.createdBy?._id === user?._id) && (
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button onClick={() => handleEditClick(event)} className="btn btn-ghost btn-sm" style={{ padding: '0.4rem', color: 'var(--brand-600)' }} title="Modify Registry"><Edit size={16} /></button>
-                                            <button onClick={() => handleDelete(event._id)} className="btn btn-ghost btn-sm" style={{ padding: '0.4rem', color: 'var(--error-600)' }} title="Purge Record"><Trash2 size={16} /></button>
+                                            <button onClick={() => handleEditClick(event)} className="btn btn-ghost btn-sm" style={{ padding: '0.4rem', color: 'var(--brand-600)' }} title="Edit"><Edit size={16} /></button>
+                                            <button onClick={() => handleDelete(event._id)} className="btn btn-ghost btn-sm" style={{ padding: '0.4rem', color: 'var(--error-600)' }} title="Delete"><Trash2 size={16} /></button>
                                         </div>
                                     )}
                                 </div>
@@ -240,19 +240,19 @@ const EventsPage = () => {
                     <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '600px', padding: 0, overflow: 'hidden' }}>
                         <div className="card-header" style={{ padding: '1rem 1.5rem', background: 'var(--brand-700)', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
-                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'white' }}>{editingId ? 'Modify Event' : 'Publish Activity'}</h3>
-                                <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.8, color: 'white' }}>Event documentation suite.</p>
+                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'white' }}>{editingId ? 'Edit Event' : 'Add Event'}</h3>
+                                <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.8, color: 'white' }}>Fill in the event details below.</p>
                             </div>
                             <button onClick={() => { setShowAddModal(false); setEditingId(null); }} className="btn btn-ghost" style={{ padding: '0.25rem', color: 'white' }}><XCircle size={20} /></button>
                         </div>
                         <div className="card-body" style={{ padding: '1.25rem 1.5rem' }}>
                             <form onSubmit={handleAddEvent} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Event Nomenclature</label>
-                                    <input className="form-control" style={{ padding: '0.5rem 0.75rem' }} required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="Identify the core subject..." />
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Event Title</label>
+                                    <input className="form-control" style={{ padding: '0.5rem 0.75rem' }} required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="Enter event name..." />
                                 </div>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Category Resolution</label>
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Category</label>
                                     <select
                                         className="form-control"
                                         required
@@ -267,30 +267,30 @@ const EventsPage = () => {
                                 </div>
                                 {formData.category === 'Other' && (
                                     <div className="form-group animate-slide-down" style={{ marginBottom: 0 }}>
-                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Custom Dimension</label>
-                                        <input className="form-control" required value={otherCategory} onChange={e => setOtherCategory(e.target.value)} placeholder="Specify activity type..." style={{ padding: '0.5rem 0.75rem' }} />
+                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Custom Category</label>
+                                        <input className="form-control" required value={otherCategory} onChange={e => setOtherCategory(e.target.value)} placeholder="Enter category type..." style={{ padding: '0.5rem 0.75rem' }} />
                                     </div>
                                 )}
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div className="form-group" style={{ marginBottom: 0 }}>
-                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Date Protocol</label>
+                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Date</label>
                                         <input type="date" className="form-control" style={{ padding: '0.5rem 0.75rem' }} required value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} />
                                     </div>
                                     <div className="form-group" style={{ marginBottom: 0 }}>
-                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Venue Location</label>
-                                        <input className="form-control" style={{ padding: '0.5rem 0.75rem' }} required value={formData.venue} onChange={e => setFormData({ ...formData, venue: e.target.value })} placeholder="e.g. Audit Hall 01" />
+                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Venue</label>
+                                        <input className="form-control" style={{ padding: '0.5rem 0.75rem' }} required value={formData.venue} onChange={e => setFormData({ ...formData, venue: e.target.value })} placeholder="e.g. Auditorium" />
                                     </div>
                                 </div>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
-                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>External Registration (Optional)</label>
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Registration Link (Optional)</label>
                                     <input type="url" className="form-control" style={{ padding: '0.5rem 0.75rem' }} value={formData.registrationLink} onChange={e => setFormData({ ...formData, registrationLink: e.target.value })} placeholder="https://external-link.com" />
                                 </div>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
                                     <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.25rem' }}>Description</label>
-                                    <textarea className="form-control" required rows="3" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Document objectives..." style={{ resize: 'none', padding: '0.5rem 0.75rem' }} />
+                                    <textarea className="form-control" required rows="3" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Enter event details..." style={{ resize: 'none', padding: '0.5rem 0.75rem' }} />
                                 </div>
                                 <button type="submit" className="btn btn-primary" style={{ padding: '0.8rem', fontWeight: 900, marginTop: '0.5rem' }}>
-                                    {editingId ? 'Modify Event Registry' : 'Publish Activity & Notify'}
+                                    {editingId ? 'Save Changes' : 'Add Event'}
                                 </button>
                             </form>
                         </div>

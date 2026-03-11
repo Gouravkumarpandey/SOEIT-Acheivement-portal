@@ -47,7 +47,7 @@ const MyAchievementsPage = () => {
             setTotal(data.total);
             setPages(data.pages);
         } catch {
-            toast.error('Identity protocol failed: Records unavailable');
+            toast.error('Failed to load achievements');
         } finally {
             setLoading(false);
         }
@@ -55,7 +55,7 @@ const MyAchievementsPage = () => {
 
     const handleDownloadAll = async () => {
         if (downloading || achievements.length === 0) return;
-        const toastId = toast.loading('Synchronizing personal institutional archive...');
+        const toastId = toast.loading('Preparing your certificates...');
         setDownloading(true);
 
         try {
@@ -94,7 +94,7 @@ const MyAchievementsPage = () => {
             });
 
             if (filesToDownload.length === 0) {
-                toast.error('No certificates detected for export.', { id: toastId });
+                toast.error('No certificates found to download.', { id: toastId });
                 setDownloading(false);
                 return;
             }
@@ -143,7 +143,7 @@ const MyAchievementsPage = () => {
             }
         } catch (error) {
             console.error('Archival failure', error);
-            toast.error('Critical failure during record synchronization.', { id: toastId });
+            toast.error('Failed to download certificates.', { id: toastId });
         } finally {
             setDownloading(false);
         }
@@ -158,13 +158,13 @@ const MyAchievementsPage = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Security protocol: Permanent elimination of this record required?')) return;
+        if (!window.confirm('Are you sure you want to delete this achievement?')) return;
         try {
             await achievementAPI.delete(id);
-            toast.success('Credential protocol: Record eliminated');
+            toast.success('Achievement deleted');
             load();
         } catch {
-            toast.error('Elimination protocol failed');
+            toast.error('Failed to delete achievement');
         }
     };
 
@@ -173,8 +173,8 @@ const MyAchievementsPage = () => {
             {/* Header Suite */}
             <div className="page-header" style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
-                    <h2 className="heading-display">Institutional Achievement Registry</h2>
-                    <p className="page-subtitle">Unified chronological ledger of verified academic and professional milestones.</p>
+                    <h2 className="heading-display">My Achievements</h2>
+                    <p className="page-subtitle">View and manage all your submitted achievements and certificates.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <button
@@ -184,11 +184,11 @@ const MyAchievementsPage = () => {
                         style={{ padding: '0.8rem 1.5rem', fontWeight: 900, border: '1px solid var(--border-primary)', background: 'white' }}
                     >
                         {downloading ? <div className="spinner-sm" /> : <Download size={18} />}
-                        <span>Export Portfolio</span>
+                        <span>Download All</span>
                     </button>
                     <Link to="/achievements/upload" className="btn btn-primary" style={{ padding: '0.8rem 2rem', fontWeight: 900 }}>
                         <Upload size={18} />
-                        <span>Synchronize New Record</span>
+                        <span>Add Achievement</span>
                     </Link>
                 </div>
             </div>
@@ -199,7 +199,7 @@ const MyAchievementsPage = () => {
                     <div className="search-wrapper filter-search achievements-search-wrap">
                         <input
                             className="form-control"
-                            placeholder="Query by record title..."
+                            placeholder="Search by title..."
                             value={filters.search}
                             onChange={e => setFilters(p => ({ ...p, search: e.target.value }))}
                         />
@@ -212,8 +212,8 @@ const MyAchievementsPage = () => {
                     </select>
 
                     <select className="form-control filter-select achievements-select" value={filters.category} onChange={e => setFilters(p => ({ ...p, category: e.target.value, page: 1 }))}>
-                        <option value="">Functional Category</option>
-                        {CATEGORIES.slice(1).map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+                        <option value="">Category</option>
+                        {CATEGORIES.slice(1).map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
 
                     <div className="achievements-filter-actions">
@@ -241,10 +241,10 @@ const MyAchievementsPage = () => {
                             <div style={{ width: 100, height: 100, background: 'var(--primary-50)', color: 'var(--brand-700)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem auto' }}>
                                 <GraduationCap size={48} />
                             </div>
-                            <h3 style={{ fontWeight: 900, fontSize: '1.5rem', marginBottom: '0.75rem' }}>Registry Initialization Required</h3>
-                            <p style={{ color: 'var(--text-muted)', fontWeight: 600, maxWidth: '450px', margin: '0 auto 2.5rem auto' }}>No achievement records have been synchronized with the institutional database for the current query.</p>
+                            <h3 style={{ fontWeight: 900, fontSize: '1.5rem', marginBottom: '0.75rem' }}>No Achievements Found</h3>
+                            <p style={{ color: 'var(--text-muted)', fontWeight: 600, maxWidth: '450px', margin: '0 auto 2.5rem auto' }}>You haven't added any achievements yet.</p>
                             <Link to="/achievements/upload" className="btn btn-primary" style={{ padding: '0.8rem 2.5rem', fontWeight: 900 }}>
-                                Initiate First Submission
+                                Add Your First Achievement
                             </Link>
                         </div>
                     ) : (
@@ -252,13 +252,13 @@ const MyAchievementsPage = () => {
                             <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
                                     <tr style={{ borderBottom: '2px solid var(--border-primary)', background: 'var(--slate-50)' }}>
-                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Record Nomenclature</th>
-                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Domain</th>
-                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Resolution</th>
-                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Registry Date</th>
-                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Verification</th>
-                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Yield</th>
-                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'right', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Suite</th>
+                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Achievement Title</th>
+                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Category</th>
+                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Level</th>
+                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Date</th>
+                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Status</th>
+                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'left', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Points</th>
+                                        <th style={{ padding: '1.25rem 2rem', textAlign: 'right', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -266,10 +266,10 @@ const MyAchievementsPage = () => {
                                         <tr key={a._id} style={{ borderBottom: '1px solid var(--border-primary)', transition: 'background 0.2s ease' }} className="hover-slate">
                                             <td style={{ padding: '1.25rem 2rem' }}>
                                                 <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{a.title}</div>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>{a.institution || 'Institutional Record'}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>{a.institution || 'Achievement Record'}</div>
                                             </td>
                                             <td style={{ padding: '1.25rem 2rem' }}><span className="badge badge-primary" style={{ fontWeight: 800, textTransform: 'uppercase' }}>{a.category}</span></td>
-                                            <td style={{ padding: '1.25rem 2rem' }}><span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)' }}>{a.level} Resolution</span></td>
+                                            <td style={{ padding: '1.25rem 2rem' }}><span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)' }}>{a.level}</span></td>
                                             <td style={{ padding: '1.25rem 2rem' }}><span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>{format(new Date(a.date || a.createdAt), 'MMM dd, yyyy')}</span></td>
                                             <td style={{ padding: '1.25rem 2rem' }}><StatusBadge status={a.status} /></td>
                                             <td style={{ padding: '1.25rem 2rem' }}>
@@ -279,7 +279,7 @@ const MyAchievementsPage = () => {
                                                         {a.points}
                                                     </div>
                                                 ) : (
-                                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700 }}>PENDING YIELD</span>
+                                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700 }}>PENDING</span>
                                                 )}
                                             </td>
                                             <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
@@ -306,7 +306,7 @@ const MyAchievementsPage = () => {
                             {pages > 1 && (
                                 <div style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--slate-50)' }}>
                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 700 }}>
-                                        SYNCHRONIZED: <span style={{ color: 'var(--text-primary)' }}>{achievements.length}</span> / <span style={{ color: 'var(--text-primary)' }}>{total}</span> DOSSIERS
+                                        Showing <span style={{ color: 'var(--text-primary)' }}>{achievements.length}</span> of <span style={{ color: 'var(--text-primary)' }}>{total}</span> achievements
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button className="btn btn-ghost" style={{ padding: '0.5rem', height: '40px', width: '40px', background: 'white', border: '1px solid var(--border-primary)' }} onClick={() => setFilters(p => ({ ...p, page: p.page - 1 }))} disabled={filters.page === 1}><ChevronLeft size={18} /></button>
