@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { getDb } = require('../config/db');
 
@@ -99,7 +99,7 @@ const User = {
         const id = await genId();
 
         // Hash password
-        const salt = await bcrypt.genSalt(12);
+        const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(data.password, salt);
 
         await db.execute({

@@ -15,6 +15,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const { connectDB } = require('./config/db');
+const compression = require('compression');
 const errorHandler = require('./middleware/errorHandler');
 
 // Route imports
@@ -33,6 +34,10 @@ const projectRoutes = require('./routes/projectRoutes');
 connectDB();
 
 const app = express();
+
+// High Performance Middleware
+app.use(compression({ level: 6, threshold: 1024 })); // O(1) Compression for faster payloads
+app.set('etag', 'strong'); // Leverage browser caching
 
 // Security middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));

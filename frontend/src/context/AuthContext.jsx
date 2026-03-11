@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+    const navigate = useNavigate();
     const [user, setUser] = useState(() => {
         const saved = localStorage.getItem('soeit_user');
         try {
@@ -55,11 +57,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        try { await authAPI.logout(); } catch { }
+        // Optimistic Logout: Clear instantly for O(1) perceived latency
         localStorage.removeItem('soeit_token');
         localStorage.removeItem('soeit_user');
         setUser(null);
-        window.location.href = '/';
+        navigate('/login', { replace: true });
+        
+        // Fire & forget: Handle server-side session cleanup in background
+        try { await authAPI.logout(); } catch (e) { console.debug('Bg Logout sync failed:', e.message); }
     };
 
     const updateUser = (updatedUser) => {

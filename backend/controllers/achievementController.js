@@ -13,17 +13,17 @@ exports.createAchievement = async (req, res, next) => {
         const proofFiles = [];
 
         if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                // Persistent Database Storage: Save buffer to 'files' table
+            const uploadPromises = req.files.map(async (file) => {
                 const fileId = await FileModel.upload(file.buffer, file.originalname, file.mimetype);
-
-                proofFiles.push({
+                return {
                     id: fileId,
                     filename: file.filename || file.originalname,
                     originalname: file.originalname,
                     url: `/api/achievements/files/${fileId}`,
-                });
-            }
+                };
+            });
+            const uploadedFiles = await Promise.all(uploadPromises);
+            proofFiles.push(...uploadedFiles);
         }
 
         const achievement = await Achievement.create({

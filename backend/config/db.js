@@ -179,7 +179,20 @@ const initSchema = async (client) => {
             created_at       TEXT DEFAULT (datetime('now')),
             updated_at       TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (student_id) REFERENCES users(id)
-        )`
+        )`,
+    // Indexing for high-speed performance (O(1) lookups)
+    `CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)`,
+    `CREATE INDEX IF NOT EXISTS idx_users_dept ON users(department)`,
+    `CREATE INDEX IF NOT EXISTS idx_users_active ON users(is_active)`,
+    `CREATE INDEX IF NOT EXISTS idx_users_batch ON users(batch)`,
+    `CREATE INDEX IF NOT EXISTS idx_achievements_student ON achievements(student_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_achievements_status ON achievements(status)`,
+    `CREATE INDEX IF NOT EXISTS idx_achievements_category ON achievements(category)`,
+    `CREATE INDEX IF NOT EXISTS idx_notices_author ON notices(created_by)`,
+    `CREATE INDEX IF NOT EXISTS idx_courses_student ON courses(student_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_projects_student ON projects(student_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_internships_student ON internships(student_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_events_author ON events(created_by)`
   ], 'write');
 };
 

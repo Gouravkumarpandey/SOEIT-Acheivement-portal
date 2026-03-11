@@ -130,8 +130,8 @@ exports.changePassword = async (req, res, next) => {
 
         user.password = newPassword;
         // Re-hash and save
-        const bcrypt = require('bcryptjs');
-        const salt = await bcrypt.genSalt(12);
+        const bcrypt = require('bcrypt');
+        const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
         await user.save();
 
@@ -178,8 +178,8 @@ exports.resetPassword = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character' });
         }
 
-        const bcrypt = require('bcryptjs');
-        const salt = await bcrypt.genSalt(12);
+        const bcrypt = require('bcrypt');
+        const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(req.body.password, salt);
         user.resetPasswordToken = null;
         user.resetPasswordExpire = null;

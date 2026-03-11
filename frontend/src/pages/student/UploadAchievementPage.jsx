@@ -66,7 +66,7 @@ const UploadAchievementPage = () => {
             clearInterval(interval);
             setProgress(100);
             toast.success('Credential synchronized: Pending faculty verification');
-            setTimeout(() => navigate('/achievements'), 800);
+            navigate('/achievements');
         } catch (err) {
             clearInterval(interval);
             setProgress(0);

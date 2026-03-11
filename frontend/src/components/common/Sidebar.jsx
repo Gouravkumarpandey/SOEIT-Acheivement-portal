@@ -152,7 +152,7 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                     <div className="sidebar-text-expand" style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--text-muted)', padding: '0 1rem 1rem', opacity: 0.6 }}>Menu</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         {filteredLinks.map(({ to, icon: Icon, label }) => (
-                            <NavLink key={to} to={to} onClick={mobileOpen ? onClose : undefined}
+                            <NavLink key={to} to={to} onClick={mobileOpen ? onClose : undefined} end
                                 className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
                                 style={({ isActive }) => ({
                                     display: 'flex',
