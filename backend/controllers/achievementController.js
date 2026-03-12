@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Course = require('../models/Course');
 const HackathonActivity = require('../models/HackathonActivity');
 const FileModel = require('../models/File');
+const { cache, clearCache } = require('../utils/cache');
 
 // @desc    Create achievement
 // @route   POST /api/achievements
@@ -35,6 +36,12 @@ exports.createAchievement = async (req, res, next) => {
             certificateUrl: proofFiles.length > 0 ? proofFiles[0].url : '',
         });
 
+        // Invalidate caches
+        clearCache('/api/achievements/stats');
+        clearCache('/api/achievements/my');
+        clearCache(`/api/achievements/portfolio/${req.user.id}`);
+        if (isPublic) clearCache('/api/achievements/public-students');
+
         res.status(201).json({
             success: true,
             message: 'Achievement submitted successfully! Awaiting verification.',
@@ -45,20 +52,42 @@ exports.createAchievement = async (req, res, next) => {
     }
 };
 
-/** SERVE FILE FROM DATABASE */
+/** SERVE FILE FROM DATABASE (with Memory Cache Optimization) */
 exports.serveFile = async (req, res, next) => {
     try {
-        const file = await FileModel.findById(req.params.id);
+        const fileId = req.params.id;
+        const cacheKey = `file_${fileId}`;
+
+        // Check if file data is in memory cache
+        const cachedFile = cache.get(cacheKey);
+        
+        if (cachedFile) {
+            res.set('Content-Type', cachedFile.mimetype);
+            res.set('Content-Disposition', `inline; filename="${cachedFile.filename}"`);
+            res.set('Cache-Control', 'public, max-age=86400');
+            return res.send(cachedFile.data);
+        }
+
+        const file = await FileModel.findById(fileId);
         if (!file) {
             return res.status(404).json({ success: false, message: 'Record not found in database' });
         }
 
+        // Prepare file data
+        const fileBuffer = Buffer.from(file.data);
+
+        // Store in cache for 10 minutes (600s) to balance memory usage
+        cache.set(cacheKey, {
+            data: fileBuffer,
+            mimetype: file.mimetype,
+            filename: file.filename
+        }, 600);
+
         res.set('Content-Type', file.mimetype);
         res.set('Content-Disposition', `inline; filename="${file.filename}"`);
-        res.set('Cache-Control', 'public, max-age=86400'); // Cache for 24h
+        res.set('Cache-Control', 'public, max-age=86400'); // Browser Cache for 24h
 
-        // Send buffer data from DB
-        res.send(Buffer.from(file.data));
+        res.send(fileBuffer);
     } catch (error) {
         next(error);
     }
@@ -133,6 +162,14 @@ exports.updateAchievement = async (req, res, next) => {
         }
 
         const updated = await Achievement.findByIdAndUpdate(req.params.id, updates, { new: true });
+        
+        // Invalidate caches
+        clearCache('/api/achievements/stats');
+        clearCache('/api/achievements/my');
+        clearCache(`/api/achievements/portfolio/${req.user.id}`);
+        clearCache('/api/achievements/public-students');
+        clearCache(`/api/achievements/${req.params.id}`);
+
         res.status(200).json({ success: true, message: 'Achievement updated successfully', data: updated });
     } catch (error) {
         next(error);
@@ -149,6 +186,14 @@ exports.deleteAchievement = async (req, res, next) => {
             return res.status(403).json({ success: false, message: 'Not authorized' });
         }
         await achievement.deleteOne();
+        
+        // Invalidate caches
+        clearCache('/api/achievements/stats');
+        clearCache('/api/achievements/my');
+        clearCache(`/api/achievements/portfolio/${achievement.studentId}`);
+        clearCache('/api/achievements/public-students');
+        clearCache(`/api/achievements/${req.params.id}`);
+
         res.status(200).json({ success: true, message: 'Achievement deleted successfully' });
     } catch (error) {
         next(error);

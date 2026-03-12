@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const sendEmail = require('../utils/sendEmail');
 const getEmailTemplate = require('../utils/emailTemplates');
+const { clearCache } = require('../utils/cache');
 
 // @desc    Create new event
 // @route   POST /api/events
@@ -66,6 +67,9 @@ exports.createEvent = async (req, res, next) => {
             }).catch(err => console.error('Email failed:', err));
         }
 
+        // Invalidate cache
+        clearCache('/api/events');
+
         res.status(201).json({ success: true, message: 'Event created and notifications sent', data: event });
     } catch (error) {
         next(error);
@@ -103,6 +107,10 @@ exports.updateEvent = async (req, res, next) => {
         }
 
         const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        
+        // Invalidate cache
+        clearCache('/api/events');
+
         res.status(200).json({ success: true, message: 'Event updated successfully', data: updated });
     } catch (error) {
         next(error);
@@ -123,6 +131,10 @@ exports.deleteEvent = async (req, res, next) => {
         }
 
         await event.deleteOne();
+        
+        // Invalidate cache
+        clearCache('/api/events');
+
         res.status(200).json({ success: true, message: 'Event removed' });
     } catch (error) {
         next(error);

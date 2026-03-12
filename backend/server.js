@@ -90,12 +90,15 @@ if (process.env.NODE_ENV === 'development') {
 // Serve static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+const { getStats } = require('./utils/cache');
+
 // Health check
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         success: true,
         message: 'SOEIT Achievements Portal API is running',
         database: 'Turso (LibSQL)',
+        cache: getStats(),
         version: '2.0.0',
         timestamp: new Date().toISOString(),
     });

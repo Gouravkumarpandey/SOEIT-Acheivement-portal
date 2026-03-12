@@ -4,6 +4,7 @@ const Verification = require('../models/Verification');
 const { getDb } = require('../config/db');
 const sendEmail = require('../utils/sendEmail');
 const getEmailTemplate = require('../utils/emailTemplates');
+const { clearCache } = require('../utils/cache');
 
 // @desc    Admin dashboard stats
 // @route   GET /api/admin/dashboard
@@ -220,6 +221,15 @@ exports.verifyAchievement = async (req, res, next) => {
             }
         }
 
+        // Invalidate admin and public caches
+        clearCache('/api/admin/dashboard');
+        clearCache('/api/admin/achievements');
+        clearCache('/api/achievements/stats');
+        clearCache('/api/achievements/public-students');
+        if (updated && updated.studentId) {
+            clearCache(`/api/achievements/portfolio/${updated.studentId}`);
+        }
+
         res.status(200).json({ success: true, message: `Achievement ${action} successfully`, data: updated });
     } catch (error) {
         next(error);
@@ -402,6 +412,11 @@ exports.manageUser = async (req, res, next) => {
 
         const userObj = user.toObject ? user.toObject() : { ...user };
         delete userObj.password;
+
+        // Invalidate caches
+        clearCache('/api/admin/students');
+        clearCache('/api/achievements/public-students');
+
         res.status(200).json({ success: true, message: 'User updated successfully', user: userObj });
     } catch (error) {
         next(error);

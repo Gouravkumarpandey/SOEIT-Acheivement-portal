@@ -196,16 +196,16 @@ const initSchema = async (client) => {
     `CREATE INDEX IF NOT EXISTS idx_users_dept ON users(department)`,
     `CREATE INDEX IF NOT EXISTS idx_users_active ON users(is_active)`,
     `CREATE INDEX IF NOT EXISTS idx_users_batch ON users(batch)`,
-    `CREATE INDEX IF NOT EXISTS idx_achievements_student ON achievements(student_id)`,
-    `CREATE INDEX IF NOT EXISTS idx_achievements_status ON achievements(status)`,
-    `CREATE INDEX IF NOT EXISTS idx_achievements_category ON achievements(category)`,
+    `CREATE INDEX IF NOT EXISTS idx_achievements_student_status ON achievements(student_id, status)`,
+    `CREATE INDEX IF NOT EXISTS idx_achievements_public_status ON achievements(is_public, status)`,
+    `CREATE INDEX IF NOT EXISTS idx_achievements_category_status ON achievements(category, status)`,
     `CREATE INDEX IF NOT EXISTS idx_notices_author ON notices(created_by)`,
     `CREATE INDEX IF NOT EXISTS idx_courses_student ON courses(student_id)`,
     `CREATE INDEX IF NOT EXISTS idx_projects_student ON projects(student_id)`,
     `CREATE INDEX IF NOT EXISTS idx_internships_student ON internships(student_id)`,
     `CREATE INDEX IF NOT EXISTS idx_events_author ON events(created_by)`,
-    `CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id)`,
-    `CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(is_read)`
+    `CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, is_read)`,
+    `CREATE INDEX IF NOT EXISTS idx_files_created ON files(created_at)`
   ], 'write');
 };
 

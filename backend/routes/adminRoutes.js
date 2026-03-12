@@ -12,12 +12,13 @@ const {
     deleteUsers,
 } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/auth');
+const { cacheMiddleware } = require('../utils/cache');
 
 router.use(protect, authorize('admin', 'faculty'));
 
-router.get('/dashboard', getDashboardStats);
-router.get('/achievements/pending', getPendingAchievements);
-router.get('/achievements', getAllAchievements);
+router.get('/dashboard', cacheMiddleware(10), getDashboardStats);
+router.get('/achievements/pending', cacheMiddleware(30), getPendingAchievements);
+router.get('/achievements', cacheMiddleware(30), getAllAchievements);
 router.get('/faculty', authorize('admin'), getFaculty);
 router.put('/achievements/:id/verify', verifyAchievement);
 router.get('/students', getStudents);

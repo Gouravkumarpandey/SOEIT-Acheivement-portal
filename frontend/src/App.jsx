@@ -1,3 +1,4 @@
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
@@ -6,56 +7,64 @@ import DashboardLayout from './components/common/DashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
 import ScrollToTopButton from './components/common/ScrollToTopButton';
 
+// Loading Component
+const PageLoader = () => (
+  <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}>
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <p style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>Loading fast...</p>
+    </div>
+  </div>
+);
+
 // Public Pages
-import LandingPage from './pages/public/LandingPage';
-import AboutPage from './pages/public/AboutPage';
-import HowItWorksPage from './pages/public/HowItWorksPage';
-import ContactPage from './pages/public/ContactPage';
-import PublicPortfolioPage from './pages/public/PublicPortfolioPage';
-import PublicPortfoliosPage from './pages/public/PublicPortfoliosPage';
-import PrivacyPolicy from './pages/public/PrivacyPolicy';
-import TermsOfService from './pages/public/TermsOfService';
-import Support from './pages/public/Support';
-import UserManual from './pages/public/UserManual';
+const LandingPage = lazy(() => import('./pages/public/LandingPage'));
+const AboutPage = lazy(() => import('./pages/public/AboutPage'));
+const HowItWorksPage = lazy(() => import('./pages/public/HowItWorksPage'));
+const ContactPage = lazy(() => import('./pages/public/ContactPage'));
+const PublicPortfolioPage = lazy(() => import('./pages/public/PublicPortfolioPage'));
+const PublicPortfoliosPage = lazy(() => import('./pages/public/PublicPortfoliosPage'));
+const PrivacyPolicy = lazy(() => import('./pages/public/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./pages/public/TermsOfService'));
+const Support = lazy(() => import('./pages/public/Support'));
+const UserManual = lazy(() => import('./pages/public/UserManual'));
+const FeaturesPage = lazy(() => import('./pages/public/FeaturesPage'));
 
 // Auth Pages
-import LoginPage from './pages/auth/LoginPage';
-import AdminLoginPage from './pages/auth/AdminLoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
+const AdminLoginPage = lazy(() => import('./pages/auth/AdminLoginPage'));
+const RegisterPage = lazy(() => import('./pages/auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'));
 
 // Student Pages
-import StudentDashboard from './pages/student/StudentDashboard';
-import MyAchievementsPage from './pages/student/MyAchievementsPage';
-import UploadAchievementPage from './pages/student/UploadAchievementPage';
-import ProfilePage from './pages/student/ProfilePage';
-import MyCoursesPage from './pages/student/MyCoursesPage';
-import StudentCoursesPage from './pages/admin/StudentCoursesPage';
-import MyInternshipsPage from './pages/student/MyInternshipsPage';
-import InternshipOpportunitiesPage from './pages/student/InternshipOpportunitiesPage';
-import HackathonsPage from './pages/student/HackathonsPage';
-import MyProjectsPage from './pages/student/MyProjectsPage';
+const StudentDashboard = lazy(() => import('./pages/student/StudentDashboard'));
+const MyAchievementsPage = lazy(() => import('./pages/student/MyAchievementsPage'));
+const UploadAchievementPage = lazy(() => import('./pages/student/UploadAchievementPage'));
+const ProfilePage = lazy(() => import('./pages/student/ProfilePage'));
+const MyCoursesPage = lazy(() => import('./pages/student/MyCoursesPage'));
+const StudentCoursesPage = lazy(() => import('./pages/admin/StudentCoursesPage'));
+const MyInternshipsPage = lazy(() => import('./pages/student/MyInternshipsPage'));
+const InternshipOpportunitiesPage = lazy(() => import('./pages/student/InternshipOpportunitiesPage'));
+const HackathonsPage = lazy(() => import('./pages/student/HackathonsPage'));
+const MyProjectsPage = lazy(() => import('./pages/student/MyProjectsPage'));
 
 // Admin Pages
-import AdminDashboard from './pages/admin/AdminDashboard';
-import VerifyAchievementsPage from './pages/admin/VerifyAchievementsPage';
-import AllAchievementsPage from './pages/admin/AllAchievementsPage';
-import StudentManagementPage from './pages/admin/StudentManagementPage';
-import ReportsPage from './pages/admin/ReportsPage';
-import FacultyManagementPage from './pages/admin/FacultyManagementPage';
-import HackathonMonitoringPage from './pages/admin/HackathonMonitoringPage';
-import StudentInternshipsPage from './pages/admin/StudentInternshipsPage';
-import StudentProjectsPage from './pages/admin/StudentProjectsPage';
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const VerifyAchievementsPage = lazy(() => import('./pages/admin/VerifyAchievementsPage'));
+const AllAchievementsPage = lazy(() => import('./pages/admin/AllAchievementsPage'));
+const StudentManagementPage = lazy(() => import('./pages/admin/StudentManagementPage'));
+const ReportsPage = lazy(() => import('./pages/admin/ReportsPage'));
+const FacultyManagementPage = lazy(() => import('./pages/admin/FacultyManagementPage'));
+const HackathonMonitoringPage = lazy(() => import('./pages/admin/HackathonMonitoringPage'));
+const StudentInternshipsPage = lazy(() => import('./pages/admin/StudentInternshipsPage'));
+const StudentProjectsPage = lazy(() => import('./pages/admin/StudentProjectsPage'));
 
 // Faculty Pages
-import FacultyDashboard from './pages/faculty/FacultyDashboard';
-import ManagePostingsPage from './pages/faculty/ManagePostingsPage';
+const FacultyDashboard = lazy(() => import('./pages/faculty/FacultyDashboard'));
+const ManagePostingsPage = lazy(() => import('./pages/faculty/ManagePostingsPage'));
 
 // Shared Pages
-import EventsPage from './pages/shared/EventsPage';
-
-// Features page (inline)
-import FeaturesPage from './pages/public/FeaturesPage';
+const EventsPage = lazy(() => import('./pages/shared/EventsPage'));
 
 function App() {
   return (
@@ -80,78 +89,80 @@ function App() {
           }}
         />
 
-        <Routes>
-          {/* Public Marketing Routes */}
-          <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/features" element={<FeaturesPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/portfolio/:userId" element={<PublicPortfolioPage />} />
-          <Route path="/public-portfolio" element={<PublicPortfoliosPage />} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public Marketing Routes */}
+            <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/portfolio/:userId" element={<PublicPortfolioPage />} />
+            <Route path="/public-portfolio" element={<PublicPortfoliosPage />} />
 
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/manual" element={<UserManual />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/manual" element={<UserManual />} />
 
-          {/* Auth Routes (redirect if logged in) */}
-          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/admin-login" element={<PublicRoute><AdminLoginPage /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-          <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+            {/* Auth Routes (redirect if logged in) */}
+            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+            <Route path="/admin-login" element={<PublicRoute><AdminLoginPage /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+            <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
 
-          {/* Shared Authenticated Routes (All Roles) */}
-          <Route element={<ProtectedRoute allowedRoles={['student', 'admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/events" element={<EventsPage />} />
-          </Route>
+            {/* Shared Authenticated Routes (All Roles) */}
+            <Route element={<ProtectedRoute allowedRoles={['student', 'admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/events" element={<EventsPage />} />
+            </Route>
 
-          {/* Student Specific Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['student']}><DashboardLayout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<StudentDashboard />} />
-            <Route path="/achievements" element={<MyAchievementsPage />} />
-            <Route path="/achievements/upload" element={<UploadAchievementPage />} />
-            <Route path="/achievements/edit/:id" element={<UploadAchievementPage />} />
-            <Route path="/courses" element={<MyCoursesPage />} />
-            <Route path="/internships" element={<MyInternshipsPage />} />
-            <Route path="/internship-opportunities" element={<InternshipOpportunitiesPage />} />
-            <Route path="/hackathons" element={<HackathonsPage />} />
-            <Route path="/projects" element={<MyProjectsPage />} />
-          </Route>
+            {/* Student Specific Routes */}
+            <Route element={<ProtectedRoute allowedRoles={['student']}><DashboardLayout /></ProtectedRoute>}>
+              <Route path="/dashboard" element={<StudentDashboard />} />
+              <Route path="/achievements" element={<MyAchievementsPage />} />
+              <Route path="/achievements/upload" element={<UploadAchievementPage />} />
+              <Route path="/achievements/edit/:id" element={<UploadAchievementPage />} />
+              <Route path="/courses" element={<MyCoursesPage />} />
+              <Route path="/internships" element={<MyInternshipsPage />} />
+              <Route path="/internship-opportunities" element={<InternshipOpportunitiesPage />} />
+              <Route path="/hackathons" element={<HackathonsPage />} />
+              <Route path="/projects" element={<MyProjectsPage />} />
+            </Route>
 
-          {/* Admin / Faculty Shared Management Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
-            <Route path="/admin/verify" element={<VerifyAchievementsPage />} />
-            <Route path="/admin/achievements" element={<AllAchievementsPage />} />
-            <Route path="/admin/students" element={<StudentManagementPage />} />
-            <Route path="/admin/reports" element={<ReportsPage />} />
-            <Route path="/admin/courses" element={<StudentCoursesPage />} />
-            <Route path="/admin/internships" element={<StudentInternshipsPage />} />
-            <Route path="/admin/projects" element={<StudentProjectsPage />} />
-            <Route path="/faculty/projects" element={<StudentProjectsPage />} />
-            <Route path="/admin/manage-internships" element={<ManagePostingsPage />} />
-            <Route path="/faculty/manage-internships" element={<ManagePostingsPage />} />
-            <Route path="/admin/hackathons" element={<HackathonMonitoringPage />} />
-          </Route>
+            {/* Admin / Faculty Shared Management Routes */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/faculty/dashboard" element={<FacultyDashboard />} />
+              <Route path="/admin/verify" element={<VerifyAchievementsPage />} />
+              <Route path="/admin/achievements" element={<AllAchievementsPage />} />
+              <Route path="/admin/students" element={<StudentManagementPage />} />
+              <Route path="/admin/reports" element={<ReportsPage />} />
+              <Route path="/admin/courses" element={<StudentCoursesPage />} />
+              <Route path="/admin/internships" element={<StudentInternshipsPage />} />
+              <Route path="/admin/projects" element={<StudentProjectsPage />} />
+              <Route path="/faculty/projects" element={<StudentProjectsPage />} />
+              <Route path="/admin/manage-internships" element={<ManagePostingsPage />} />
+              <Route path="/faculty/manage-internships" element={<ManagePostingsPage />} />
+              <Route path="/admin/hackathons" element={<HackathonMonitoringPage />} />
+            </Route>
 
-          {/* Admin Exclusive Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['admin']}><DashboardLayout /></ProtectedRoute>}>
-            <Route path="/admin/faculty" element={<FacultyManagementPage />} />
-          </Route>
+            {/* Admin Exclusive Routes */}
+            <Route element={<ProtectedRoute allowedRoles={['admin']}><DashboardLayout /></ProtectedRoute>}>
+              <Route path="/admin/faculty" element={<FacultyManagementPage />} />
+            </Route>
 
-          {/* Catch All */}
-          <Route path="*" element={
-            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', gap: '1rem' }}>
-              <div style={{ fontSize: '6rem', fontWeight: 900, fontFamily: 'Space Grotesk', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>404</div>
-              <h2 style={{ color: 'var(--text-secondary)' }}>Page Not Found</h2>
-              <p style={{ color: 'var(--text-muted)' }}>The page you're looking for doesn't exist.</p>
-              <a href="/" className="btn btn-primary">Go Home</a>
-            </div>
-          } />
-        </Routes>
+            {/* Catch All */}
+            <Route path="*" element={
+              <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', gap: '1rem' }}>
+                <div style={{ fontSize: '6rem', fontWeight: 900, fontFamily: 'Space Grotesk', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>404</div>
+                <h2 style={{ color: 'var(--text-secondary)' }}>Page Not Found</h2>
+                <p style={{ color: 'var(--text-muted)' }}>The page you're looking for doesn't exist.</p>
+                <a href="/" className="btn btn-primary">Go Home</a>
+              </div>
+            } />
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );

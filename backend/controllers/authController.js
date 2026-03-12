@@ -2,6 +2,7 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const FileModel = require('../models/File');
+const { clearCache } = require('../utils/cache');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
@@ -107,6 +108,11 @@ exports.updateProfile = async (req, res, next) => {
         }
 
         const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true });
+        
+        // Invalidate cache
+        clearCache('/api/auth/profile');
+        clearCache(`/api/achievements/portfolio/${req.user.id}`);
+        
         res.status(200).json({ success: true, message: 'Profile updated successfully', user });
     } catch (error) {
         next(error);

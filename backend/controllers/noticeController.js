@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const sendEmail = require('../utils/sendEmail');
 const getEmailTemplate = require('../utils/emailTemplates');
+const { clearCache } = require('../utils/cache');
 
 // @desc    Create new notice
 // @route   POST /api/notices
@@ -61,6 +62,9 @@ exports.createNotice = async (req, res, next) => {
             }).catch(err => console.error('Notice Email failed:', err));
         }
 
+        // Invalidate cache
+        clearCache('/api/notices');
+
         res.status(201).json({ success: true, message: 'Notice posted and students notified', data: notice });
     } catch (error) {
         next(error);
@@ -93,6 +97,10 @@ exports.deleteNotice = async (req, res, next) => {
         }
 
         await notice.deleteOne();
+        
+        // Invalidate cache
+        clearCache('/api/notices');
+
         res.status(200).json({ success: true, message: 'Notice deleted' });
     } catch (error) {
         next(error);

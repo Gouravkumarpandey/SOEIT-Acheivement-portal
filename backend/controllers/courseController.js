@@ -1,5 +1,6 @@
 const Course = require('../models/Course');
 const User = require('../models/User');
+const { clearCache } = require('../utils/cache');
 
 // @desc    Add a course (Student)
 // @route   POST /api/courses
@@ -22,6 +23,10 @@ exports.addCourse = async (req, res, next) => {
         };
 
         const course = await Course.create(data);
+        
+        // Invalidate cache
+        clearCache('/api/courses');
+        
         res.status(201).json({ success: true, message: 'Ongoing course initialized in registry', data: course });
     } catch (error) {
         next(error);
@@ -52,6 +57,10 @@ exports.updateProgress = async (req, res, next) => {
         }
 
         const updatedCourse = await Course.updateProgress(courseId, progress, status, completionDate);
+        
+        // Invalidate cache
+        clearCache('/api/courses');
+
         res.status(200).json({ success: true, message: 'Analytical progress synchronized', data: updatedCourse });
     } catch (error) {
         next(error);
@@ -68,6 +77,10 @@ exports.deleteCourse = async (req, res, next) => {
         }
 
         await Course.delete(req.params.id);
+        
+        // Invalidate cache
+        clearCache('/api/courses');
+
         res.status(200).json({ success: true, message: 'Analytical record purged from institutional registry' });
     } catch (error) {
         next(error);
