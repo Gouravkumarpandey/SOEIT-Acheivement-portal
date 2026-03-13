@@ -325,17 +325,22 @@ exports.getStudentStats = async (req, res, next) => {
         const db = require('../config/db').getDb();
 
         // High Performance: Combine all count and points queries into ONE SQL execution
-        const [quickStats, byCategory, byLevel, recent] = await Promise.all([
+        const [quickStats, userBatch, byCategory, byLevel, recent] = await Promise.all([
             db.execute({
                 sql: `SELECT 
                     COUNT(*) as total,
                     SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) as approved,
                     SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending,
                     SUM(CASE WHEN status='rejected' THEN 1 ELSE 0 END) as rejected,
-                    SUM(CASE WHEN status='approved' THEN points ELSE 0 END) as totalPoints
+                    SUM(CASE WHEN status='approved' THEN points ELSE 0 END) as totalPoints,
+                    -- Points for Year 1 & 2 (assuming batch starts in batch year)
+                    SUM(CASE WHEN status='approved' AND (strftime('%Y', date) - SUBSTR(?, 1, 4)) < 2 THEN points ELSE 0 END) as year1and2Points,
+                    -- Points for Year 3 & 4
+                    SUM(CASE WHEN status='approved' AND (strftime('%Y', date) - SUBSTR(?, 1, 4)) >= 2 THEN points ELSE 0 END) as year3and4Points
                   FROM achievements WHERE student_id = ?`,
-                args: [studentId]
+                args: [req.user.batch, req.user.batch, studentId]
             }),
+            User.findById(studentId),
             Achievement.aggregate([
                 { $match: { studentId } },
                 { $group: { _id: '$category', count: { $sum: 1 } } },
@@ -348,6 +353,9 @@ exports.getStudentStats = async (req, res, next) => {
         ]);
 
         const statsRow = quickStats.rows[0] || {};
+        const year12 = Number(statsRow.year1and2Points || 0);
+        const year34 = Number(statsRow.year3and4Points || 0);
+        const totalPoints = Number(statsRow.totalPoints || 0);
 
         res.status(200).json({
             success: true,
@@ -356,7 +364,12 @@ exports.getStudentStats = async (req, res, next) => {
                 approved: Number(statsRow.approved || 0),
                 pending: Number(statsRow.pending || 0),
                 rejected: Number(statsRow.rejected || 0),
-                totalPoints: Number(statsRow.totalPoints || 0),
+                totalPoints,
+                year1and2Points: year12,
+                year3and4Points: year34,
+                pointsRequired: 100,
+                year12Required: 40,
+                isQualified: totalPoints >= 100 && year12 >= 40,
                 byCategory,
                 byLevel,
             },

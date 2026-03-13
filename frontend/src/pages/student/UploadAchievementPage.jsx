@@ -5,9 +5,19 @@ import { achievementAPI } from '../../services/api';
 import { Upload, X, File, Image, AlertCircle, CheckCircle, Award } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const CATEGORIES = ['Academic', 'Sports', 'Cultural', 'Technical', 'Research', 'Internship', 'Certification', 'Competition', 'Community Service', 'Other'];
-const LEVELS = ['International', 'National', 'State', 'University', 'College', 'Department', 'Other'];
-const POINTS_MAP = { International: 100, National: 75, State: 50, University: 30, College: 20, Department: 10, Other: 10 };
+const CATEGORIES = [
+    'Communication Skills', 
+    'Hardware Skills', 
+    'Technical Skill Development', 
+    'National Initiatives', 
+    'Sports & Games', 
+    'Cultural Activities', 
+    'Leadership & Management', 
+    'Professional Self Initiatives', 
+    'Entrepreneurship', 
+    'Community Outreach Activities'
+];
+const LEVELS = ['Level I (College)', 'Level II (Zonal)', 'Level III (State/University)', 'Level IV (National)', 'Level V (International)'];
 
 const UploadAchievementPage = () => {
     const navigate = useNavigate();
@@ -211,18 +221,17 @@ const UploadAchievementPage = () => {
                     <div className="evidence-sidebar-res" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                         {/* Impact Level Merit Indicator */}
                         {form.level && (
-                            <div className="card animate-slide-up" style={{ padding: '1.5rem', background: 'linear-gradient(135deg, var(--brand-700), var(--brand-900))', color: 'white', border: 'none' }}>
+                            <div className="card animate-slide-up" style={{ padding: '1.5rem', background: 'rgba(var(--brand-rgb), 0.05)', border: '1px solid var(--brand-200)', borderRadius: '16px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.15)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <div style={{ width: 44, height: 44, background: 'var(--brand-600)', color: 'white', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <Award size={24} />
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Merit Evaluation</div>
-                                        <div style={{ fontSize: '1.1rem', fontWeight: 900 }}>{form.level === 'Other' ? (form.otherLevel || 'Custom') : form.level} Resolution</div>
-                                    </div>
-                                    <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 900 }}>{POINTS_MAP[form.level]}</div>
-                                        <div style={{ fontSize: '0.65rem', fontWeight: 800, opacity: 0.7 }}>PTS</div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--brand-600)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Institutional Merit</div>
+                                        <div style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--text-primary)' }}>Point Allocation Pending</div>
+                                        <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.4, fontWeight: 600 }}>
+                                            Faculty will award points based on established criteria for <strong>{form.level.split(' ')[0]}</strong> milestones upon verification.
+                                        </p>
                                     </div>
                                 </div>
                             </div>

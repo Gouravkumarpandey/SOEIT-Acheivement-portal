@@ -5,6 +5,8 @@ const genId = async () => {
     return nanoid();
 };
 
+const { calculatePoints } = require('../utils/scoring');
+
 const pointsMap = {
     International: 100, National: 75, State: 50,
     University: 30, College: 20, Department: 10,
@@ -117,7 +119,7 @@ const Achievement = {
     create: async (data) => {
         const db = getDb();
         const id = await genId();
-        const pts = pointsMap[data.level] || 10;
+        const pts = calculatePoints(data);
 
         await db.execute({
             sql: `INSERT INTO achievements
@@ -251,6 +253,17 @@ const Achievement = {
         }
 
         if (setParts.length) {
+            // Recalculate points if category or level updated
+            if (updates.category || updates.level || updates.title || updates.description) {
+                const current = await Achievement.findById(id);
+                if (current) {
+                    const newData = { ...current, ...updates };
+                    const newPoints = calculatePoints(newData);
+                    setParts.push(`points = ?`);
+                    args.push(newPoints);
+                }
+            }
+            
             setParts.push(`updated_at = datetime('now')`);
             args.push(id);
             await db.execute({ sql: `UPDATE achievements SET ${setParts.join(', ')} WHERE id = ?`, args });
