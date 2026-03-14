@@ -14,11 +14,12 @@ const Course = {
 
         await db.execute({
             sql: `INSERT INTO courses 
-                (id, student_id, course_name, platform, status, progress, start_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                (id, student_id, course_name, platform, status, progress, start_date, course_link, sync_credentials)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             args: [
                 id, data.studentId, data.courseName, data.platform,
-                data.status || 'Ongoing', data.progress || 0, data.startDate || new Date().toISOString()
+                data.status || 'Ongoing', data.progress || 0, data.startDate || new Date().toISOString(),
+                data.courseLink || '', data.syncCredentials || '{}'
             ],
         });
 
@@ -52,6 +53,24 @@ const Course = {
                 WHERE id=?`,
             args: [progress, status, completionDate || null, id],
         });
+        return Course.findById(id);
+    },
+
+    /** SYNC PROGRESS FROM EXTERNAL */
+    sync: async (id, progress, status, credentials = null) => {
+        const db = getDb();
+        let sql = `UPDATE courses SET progress=?, status=?, last_synced_at=datetime('now'), updated_at=datetime('now')`;
+        const args = [progress, status];
+
+        if (credentials) {
+            sql += `, sync_credentials=?`;
+            args.push(JSON.stringify(credentials));
+        }
+
+        sql += ` WHERE id=?`;
+        args.push(id);
+
+        await db.execute({ sql, args });
         return Course.findById(id);
     },
 

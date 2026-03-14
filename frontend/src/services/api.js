@@ -91,6 +91,7 @@ export const courseAPI = {
     add: (data) => API.post('/courses', data),
     getMy: () => API.get('/courses/my'),
     updateProgress: (id, data) => API.put(`/courses/${id}/progress`, data),
+    syncProgress: (id, credentials) => API.post(`/courses/${id}/sync`, credentials),
     delete: (id) => API.delete(`/courses/${id}`),
     getAll: (params) => API.get('/courses', { params }),
     // New Assignment APIs

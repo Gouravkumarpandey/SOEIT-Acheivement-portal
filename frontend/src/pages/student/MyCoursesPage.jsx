@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { courseAPI } from '../../services/api';
-import { Plus, Trash2, BookOpen, Clock, CheckCircle2, Book, GraduationCap, ExternalLink, XCircle } from 'lucide-react';
+import { Plus, Trash2, BookOpen, Clock, CheckCircle2, Book, GraduationCap, ExternalLink, XCircle, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const MyCoursesPage = () => {
@@ -8,6 +8,7 @@ const MyCoursesPage = () => {
     const [assignedCourses, setAssignedCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [syncingId, setSyncingId] = useState(null);
     const [newCourse, setNewCourse] = useState({ courseName: '', platform: '', customPlatform: '', courseLink: '', progress: 0 });
 
     const loadData = async () => {
@@ -51,15 +52,17 @@ const MyCoursesPage = () => {
         }
     };
 
-    const handleUpdateProgress = async (id, currentProgress) => {
-        const nextProgress = Math.min(100, currentProgress + 10);
-        const status = nextProgress === 100 ? 'Completed' : 'Ongoing';
+    const handleSyncProgress = async (id, platform) => {
+        setSyncingId(id);
+        const toastId = toast.loading(`Connecting to ${platform} institutional API...`);
         try {
-            await courseAPI.updateProgress(id, { progress: nextProgress, status });
-            toast.success(`Progress synchronized: ${nextProgress}%`);
+            const res = await courseAPI.syncProgress(id, {}); // Empty creds for now, handled by backend simulation/keys
+            toast.success(`Progress synchronized: ${res.data.data.progress}%`, { id: toastId });
             loadData();
-        } catch {
-            toast.error('Progress synchronization failed');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Synchronization protocol failed', { id: toastId });
+        } finally {
+            setSyncingId(null);
         }
     };
 
@@ -89,7 +92,11 @@ const MyCoursesPage = () => {
 
             {/* Assigned by Faculty Section */}
             <div style={{ marginBottom: '3.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', 
+                    gap: '1.5rem' 
+                }}>
                     <GraduationCap size={24} style={{ color: 'var(--brand-600)' }} />
                     <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Courses Assigned to You</h3>
                     {assignedCourses.length > 0 && (
@@ -203,13 +210,22 @@ const MyCoursesPage = () => {
 
                             <div style={{ display: 'flex', gap: '0.75rem' }}>
                                 <button
-                                    className="btn btn-secondary w-full"
-                                    style={{ fontSize: '0.8rem', fontWeight: 800, padding: '0.75rem', borderRadius: '10px' }}
-                                    onClick={() => handleUpdateProgress(course.id, course.progress)}
-                                    disabled={course.progress >= 100}
+                                    className="btn btn-primary w-full"
+                                    style={{ fontSize: '0.8rem', fontWeight: 800, padding: '0.75rem', borderRadius: '10px', gap: '0.5rem' }}
+                                    onClick={() => handleSyncProgress(course.id, course.platform)}
+                                    disabled={syncingId === course.id || course.progress >= 100}
                                 >
-                                    <Clock size={16} />
-                                    <span>Update Progress</span>
+                                    {syncingId === course.id ? (
+                                        <>
+                                            <div className="spinner-sm" style={{ width: 14, height: 14 }} />
+                                            <span>Syncing...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <RefreshCw size={16} />
+                                            <span>Sync Progress</span>
+                                        </>
+                                    )}
                                 </button>
                                 {course.course_link && (
                                     <a 
@@ -222,6 +238,11 @@ const MyCoursesPage = () => {
                                     >
                                         <ExternalLink size={18} />
                                     </a>
+                                )}
+                                {course.last_synced_at && (
+                                    <div style={{ position: 'absolute', bottom: '0.5rem', right: '1.75rem', fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                        Last Synced: {new Date(course.last_synced_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
                                 )}
                                 {course.progress === 100 && (
                                     <div style={{ position: 'absolute', top: '1.25rem', right: '4rem', background: 'var(--success-50)', color: 'var(--success-700)', padding: '0.2rem 0.6rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -247,7 +268,7 @@ const MyCoursesPage = () => {
                                 <XCircle size={22} />
                             </button>
                         </div>
-                        <div className="modal-body">
+                        <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
                             <form onSubmit={handleAddCourse} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 <div className="form-group">
                                     <label className="form-label" style={{ fontWeight: 800, fontSize: '0.85rem' }}>Course Name</label>
@@ -271,11 +292,32 @@ const MyCoursesPage = () => {
                                         onChange={e => setNewCourse({ ...newCourse, platform: e.target.value })}
                                     >
                                         <option value="">Select Platform</option>
-                                        <option value="Coursera">Coursera</option>
-                                        <option value="NPTEL">NPTEL</option>
-                                        <option value="Udemy">Udemy</option>
-                                        <option value="LinkedIn Learning">LinkedIn Learning</option>
-                                        <option value="Internshala">Internshala</option>
+                                        <optgroup label="Premier Platforms">
+                                            <option value="Coursera">Coursera</option>
+                                            <option value="Udemy">Udemy</option>
+                                            <option value="edX">edX</option>
+                                            <option value="NPTEL">NPTEL / Swayam</option>
+                                            <option value="LinkedIn Learning">LinkedIn Learning</option>
+                                        </optgroup>
+                                        <optgroup label="Technical & Coding">
+                                            <option value="freeCodeCamp">freeCodeCamp</option>
+                                            <option value="Codecademy">Codecademy</option>
+                                            <option value="GeeksforGeeks">GeeksforGeeks</option>
+                                            <option value="W3Schools">W3Schools</option>
+                                            <option value="Scalar Academy">Scalar Academy</option>
+                                            <option value="GUVI">GUVI</option>
+                                        </optgroup>
+                                        <optgroup label="Skills & Career">
+                                            <option value="Pluralsight">Pluralsight</option>
+                                            <option value="Udacity">Udacity</option>
+                                            <option value="DataCamp">DataCamp</option>
+                                            <option value="Simplilearn">Simplilearn</option>
+                                            <option value="UpGrad">UpGrad</option>
+                                            <option value="FutureLearn">FutureLearn</option>
+                                            <option value="Great Learning">Great Learning</option>
+                                            <option value="Intellipaat">Intellipaat</option>
+                                            <option value="Khan Academy">Khan Academy</option>
+                                        </optgroup>
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
@@ -305,9 +347,12 @@ const MyCoursesPage = () => {
                                     />
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                                    <button type="button" className="btn btn-secondary" style={{ flex: 1, height: '54px', borderRadius: '14px', fontWeight: 800 }} onClick={() => setShowAddModal(false)}>Cancel</button>
-                                    <button type="submit" className="btn btn-primary" style={{ flex: 2, height: '54px', borderRadius: '14px', fontWeight: 800, fontSize: '1rem' }}>Add Course</button>
+                                {/* Buffer space to ensure dropdown opens downwards */}
+                                <div style={{ height: '120px' }} />
+
+                                 <div className="modal-actions-responsive">
+                                    <button type="button" className="btn btn-secondary cancel-btn" onClick={() => setShowAddModal(false)}>Cancel</button>
+                                    <button type="submit" className="btn btn-primary submit-btn">Add Course</button>
                                 </div>
                             </form>
                         </div>

@@ -2,6 +2,7 @@ const Course = require('../models/Course');
 const CourseAssignment = require('../models/CourseAssignment');
 const User = require('../models/User');
 const { clearCache } = require('../utils/cache');
+const syncEngine = require('../utils/syncEngine');
 
 // @desc    Add a course (Student)
 // @route   POST /api/courses
@@ -68,6 +69,33 @@ exports.updateProgress = async (req, res, next) => {
     }
 };
 
+// @desc    Sync course progress from external platform (Student)
+// @route   POST /api/courses/:id/sync
+exports.syncCourse = async (req, res, next) => {
+    try {
+        const courseId = req.params.id;
+        const credentials = req.body; 
+
+        const course = await Course.findById(courseId);
+        if (!course || course.student_id !== req.user.id) {
+            return res.status(404).json({ success: false, message: 'Record not found' });
+        }
+
+        const result = await syncEngine.syncProgress(course.platform, course.course_name, course.course_link, credentials);
+        const updatedCourse = await Course.sync(courseId, result.progress, result.status, credentials);
+        
+        clearCache('/api/courses');
+
+        res.status(200).json({ 
+            success: true, 
+            message: `Progress synchronized from ${course.platform}`, 
+            data: updatedCourse 
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Delete course (Student)
 // @route   DELETE /api/courses/:id
 exports.deleteCourse = async (req, res, next) => {
@@ -105,7 +133,8 @@ exports.getAllCourses = async (req, res, next) => {
             studentName: c.student_name,
             department: c.department,
             enrollmentNo: c.enrollment_no,
-            updatedAt: c.updated_at
+            updatedAt: c.updated_at,
+            lastSyncedAt: c.last_synced_at
         }));
 
         res.status(200).json({ success: true, count: transformed.length, data: transformed });

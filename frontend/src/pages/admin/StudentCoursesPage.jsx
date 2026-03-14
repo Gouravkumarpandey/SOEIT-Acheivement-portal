@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { courseAPI } from '../../services/api';
-import { Search, Filter, BookOpen, GraduationCap, ChevronLeft, ChevronRight, Activity, Eye, Plus, Trash2, User, Book, Hash } from 'lucide-react';
+import { Search, Filter, BookOpen, GraduationCap, ChevronLeft, ChevronRight, Activity, Eye, Plus, Trash2, User, Book, Hash, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -217,7 +217,15 @@ const StudentCoursesPage = () => {
                                                         <div style={{ flex: 1, height: '6px', background: 'var(--slate-100)', borderRadius: '3px', overflow: 'hidden' }}>
                                                             <div style={{ width: `${course.progress}%`, height: '100%', background: 'var(--brand-600)' }} />
                                                         </div>
-                                                        <span style={{ fontSize: '0.8rem', fontWeight: 900 }}>{course.progress}%</span>
+                                                        <div style={{ textAlign: 'right' }}>
+                                                            <div style={{ fontSize: '0.8rem', fontWeight: 900 }}>{course.progress}%</div>
+                                                            {course.lastSyncedAt && (
+                                                                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
+                                                                    <RefreshCw size={8} />
+                                                                    {new Date(course.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td style={{ textAlign: 'center' }}>

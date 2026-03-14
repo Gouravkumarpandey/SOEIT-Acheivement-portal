@@ -100,6 +100,9 @@ const initSchema = async (client) => {
             platform        TEXT NOT NULL,
             status          TEXT DEFAULT 'Ongoing',
             progress        INTEGER DEFAULT 0,
+            course_link     TEXT DEFAULT '',
+            last_synced_at  TEXT,
+            sync_credentials TEXT DEFAULT '{}',
             start_date      TEXT,
             completion_date TEXT,
             certificate_url TEXT,
@@ -226,9 +229,12 @@ const initSchema = async (client) => {
   // migration for existing systems
   try {
     await client.execute(`ALTER TABLE course_assignments ADD COLUMN course_link TEXT DEFAULT ''`);
-    console.log('✅ Migration: added course_link to course_assignments');
+    await client.execute(`ALTER TABLE courses ADD COLUMN course_link TEXT DEFAULT ''`);
+    await client.execute(`ALTER TABLE courses ADD COLUMN last_synced_at TEXT`);
+    await client.execute(`ALTER TABLE courses ADD COLUMN sync_credentials TEXT DEFAULT '{}'`);
+    console.log('✅ Migration: added sync columns to courses table');
   } catch (err) {
-    // column likely exists or other non-critical error
+    // columns likely exist
   }
 };
 

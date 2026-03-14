@@ -9,7 +9,8 @@ const {
     assignCourse,
     getAssignedCourses,
     getMyAssignedCourses,
-    deleteAssignment
+    deleteAssignment,
+    syncCourse
 } = require('../controllers/courseController');
 const { protect, authorize } = require('../middleware/auth');
 const { cacheMiddleware } = require('../utils/cache');
@@ -26,6 +27,7 @@ router.delete('/assignments/:id', authorize('admin', 'faculty'), deleteAssignmen
 router.post('/', authorize('student'), addCourse);
 router.get('/my', authorize('student'), cacheMiddleware(60), getMyCourses);
 router.put('/:id/progress', authorize('student'), updateProgress);
+router.post('/:id/sync', authorize('student'), syncCourse);
 router.delete('/:id', authorize('student'), deleteCourse);
 
 // Admin / Faculty Routes

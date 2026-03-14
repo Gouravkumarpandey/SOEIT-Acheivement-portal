@@ -497,6 +497,10 @@ textarea.form-control {
   grid-template-columns: repeat(var(--cols, 4), 1fr);
 }
 
+.grid-res-3 {
+  grid-template-columns: repeat(var(--cols, 3), 1fr);
+}
+
 .grid-res-2 {
   grid-template-columns: repeat(var(--cols, 2), 1fr);
 }
@@ -507,12 +511,14 @@ textarea.form-control {
   }
 }
 
-@media (max-width: 768px) {
-  .grid-res-4 {
-    --cols: 1;
+@media (max-width: 1024px) {
+  .grid-res-3 {
+    --cols: 2;
   }
+}
 
-  .grid-res-2 {
+@media (max-width: 768px) {
+  .grid-res-4, .grid-res-3, .grid-res-2 {
     --cols: 1;
   }
 }
@@ -1520,14 +1526,35 @@ textarea.form-control {
   flex: 1;
 }
 
-.modal-footer {
-  padding: 1.25rem 1.5rem;
-  border-top: 1px solid var(--border-primary);
+.modal-actions-responsive {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  background: var(--bg-secondary);
-  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.modal-actions-responsive .btn {
+  height: 54px;
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+.modal-actions-responsive .cancel-btn {
+  flex: 1;
+}
+
+.modal-actions-responsive .submit-btn {
+  flex: 2;
+}
+
+@media (max-width: 480px) {
+  .modal-actions-responsive {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+  
+  .modal-actions-responsive .btn {
+    width: 100%;
+  }
 }
 
 /* ===================== FILE UPLOAD ===================== */
