@@ -30,13 +30,13 @@ const UploadAchievementPage = () => {
 
     const validate = () => {
         const e = {};
-        if (!form.title.trim()) e.title = 'Institutional title is mandatory';
-        if (!form.category) e.category = 'Classification required';
-        if (form.category === 'Other' && !form.otherCategory.trim()) e.otherCategory = 'Specific domain required';
-        if (!form.description.trim()) e.description = 'Description required';
-        if (!form.level) e.level = 'Impact resolution required';
-        if (form.level === 'Other' && !form.otherLevel.trim()) e.otherLevel = 'Specific impact level required';
-        if (!form.date) e.date = 'Registry date required';
+        if (!form.title.trim()) e.title = 'Achievement title is required';
+        if (!form.category) e.category = 'Category is required';
+        if (form.category === 'Other' && !form.otherCategory.trim()) e.otherCategory = 'Please specify category';
+        if (!form.description.trim()) e.description = 'Description is required';
+        if (!form.level) e.level = 'Level is required';
+        if (form.level === 'Other' && !form.otherLevel.trim()) e.otherLevel = 'Please specify level';
+        if (!form.date) e.date = 'Date is required';
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -47,7 +47,7 @@ const UploadAchievementPage = () => {
         const dropped = Array.from(e.dataTransfer?.files || e.target.files || []);
         const valid = dropped.filter(f => f.size <= 100 * 1024 * 1024);
         const invalid = dropped.filter(f => f.size > 100 * 1024 * 1024);
-        if (invalid.length) toast.error(`Security protocol: ${invalid.length} file(s) exceed 100MB limit`);
+        if (invalid.length) toast.error(`Error: ${invalid.length} file(s) exceed 100MB limit`);
         setFiles(prev => [...prev, ...valid].slice(0, 5));
     }, []);
 
@@ -75,12 +75,12 @@ const UploadAchievementPage = () => {
             await achievementAPI.create(fd);
             clearInterval(interval);
             setProgress(100);
-            toast.success('Credential synchronized: Pending faculty verification');
+            toast.success('Achievement uploaded successfully: Pending faculty verification');
             navigate('/achievements');
         } catch (err) {
             clearInterval(interval);
             setProgress(0);
-            toast.error(err.response?.data?.message || 'Synchronization protocol failed');
+            toast.error(err.response?.data?.message || 'Failed to upload achievement');
         } finally {
             setLoading(false);
         }
@@ -90,8 +90,8 @@ const UploadAchievementPage = () => {
         <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
             {/* Submission Suite Header */}
             <div className="page-header upload-header-suite" style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                <h2 className="heading-display">Institutional Credential Submission</h2>
-                <p className="page-subtitle upload-subtitle" style={{ maxWidth: '600px', margin: '0.5rem auto 0 auto' }}>Document official milestones, certifications, and academic excellence within the institutional registry.</p>
+                <h2 className="heading-display">Upload Achievement</h2>
+                <p className="page-subtitle upload-subtitle" style={{ maxWidth: '600px', margin: '0.5rem auto 0 auto' }}>Add your certifications, awards, and other achievements.</p>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -100,12 +100,12 @@ const UploadAchievementPage = () => {
                     <div className="documentation-section-res" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                         <div className="card upload-form-card" style={{ padding: '2.5rem' }}>
                             <div className="card-header" style={{ marginBottom: '2rem', padding: 0 }}>
-                                <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem' }}>Achievement Description</h4>
-                                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Specify the primary details of the institutional achievement.</p>
+                                <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem' }}>Achievement Details</h4>
+                                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Enter the basic information about your achievement.</p>
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800 }}>Formal Nomenclature <span style={{ color: 'var(--error-500)' }}>*</span></label>
+                                <label className="form-label" style={{ fontWeight: 800 }}>Achievement Title <span style={{ color: 'var(--error-500)' }}>*</span></label>
                                 <input
                                     className={`form-control ${errors.title ? 'error' : ''}`}
                                     placeholder="e.g. Winner of Smart India Hackathon 2024"
@@ -118,20 +118,20 @@ const UploadAchievementPage = () => {
 
                             <div className="form-fields-grid-res" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800 }}>Classification <span style={{ color: 'var(--error-500)' }}>*</span></label>
+                                    <label className="form-label" style={{ fontWeight: 800 }}>Category <span style={{ color: 'var(--error-500)' }}>*</span></label>
                                     <select
                                         className={`form-control ${errors.category ? 'error' : ''}`}
                                         value={form.category}
                                         style={{ height: '52px' }}
                                         onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
                                     >
-                                        <option value="">Select Domain</option>
+                                        <option value="">Select Category</option>
                                         {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800 }}>Impact Resolution <span style={{ color: 'var(--error-500)' }}>*</span></label>
+                                    <label className="form-label" style={{ fontWeight: 800 }}>Level <span style={{ color: 'var(--error-500)' }}>*</span></label>
                                     <select
                                         className={`form-control ${errors.level ? 'error' : ''}`}
                                         value={form.level}
@@ -148,7 +148,7 @@ const UploadAchievementPage = () => {
                                 <div className="form-fields-grid-res animate-slide-down" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
                                     {form.category === 'Other' && (
                                         <div className="form-group">
-                                            <label className="form-label" style={{ fontWeight: 800 }}>Specific Domain <span style={{ color: 'var(--error-500)' }}>*</span></label>
+                                            <label className="form-label" style={{ fontWeight: 800 }}>Specify Category <span style={{ color: 'var(--error-500)' }}>*</span></label>
                                             <input
                                                 className={`form-control ${errors.otherCategory ? 'error' : ''}`}
                                                 placeholder="e.g. Photography, Robotics"
@@ -161,7 +161,7 @@ const UploadAchievementPage = () => {
                                     )}
                                     {form.level === 'Other' && (
                                         <div className="form-group">
-                                            <label className="form-label" style={{ fontWeight: 800 }}>Specific Impact Level <span style={{ color: 'var(--error-500)' }}>*</span></label>
+                                            <label className="form-label" style={{ fontWeight: 800 }}>Specify Level <span style={{ color: 'var(--error-500)' }}>*</span></label>
                                             <input
                                                 className={`form-control ${errors.otherLevel ? 'error' : ''}`}
                                                 placeholder="e.g. Zonal, Intra-college"
@@ -177,7 +177,7 @@ const UploadAchievementPage = () => {
 
                             <div className="form-fields-grid-res" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800 }}>Registry Date <span style={{ color: 'var(--error-500)' }}>*</span></label>
+                                    <label className="form-label" style={{ fontWeight: 800 }}>Achievement Date <span style={{ color: 'var(--error-500)' }}>*</span></label>
                                     <input
                                         type="date"
                                         className={`form-control ${errors.date ? 'error' : ''}`}
@@ -189,7 +189,7 @@ const UploadAchievementPage = () => {
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800 }}>Organizing Body</label>
+                                    <label className="form-label" style={{ fontWeight: 800 }}>Organized By / Institution</label>
                                     <input
                                         className="form-control"
                                         style={{ height: '52px' }}
@@ -205,13 +205,13 @@ const UploadAchievementPage = () => {
                                 <textarea
                                     className={`form-control ${errors.description ? 'error' : ''}`}
                                     rows={6}
-                                    placeholder="Document your responsibilities, key milestones, and verified outcomes..."
+                                    placeholder="Describe your achievement, roles, and responsibilities..."
                                     value={form.description}
                                     onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
                                     style={{ resize: 'none' }}
                                 />
                                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>{form.description.length} / 2000 RESOLUTION</span>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>{form.description.length} / 2000 CHARACTERS</span>
                                 </div>
                             </div>
                         </div>
@@ -227,10 +227,10 @@ const UploadAchievementPage = () => {
                                         <Award size={24} />
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--brand-600)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Institutional Merit</div>
-                                        <div style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--text-primary)' }}>Point Allocation Pending</div>
+                                        <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--brand-600)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Point Allocation</div>
+                                        <div style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--text-primary)' }}>Points will be awarded soon</div>
                                         <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.4, fontWeight: 600 }}>
-                                            Faculty will award points based on established criteria for <strong>{form.level.split(' ')[0]}</strong> milestones upon verification.
+                                            Faculty will review and award points for your <strong>{form.level}</strong> achievement.
                                         </p>
                                     </div>
                                 </div>
@@ -239,8 +239,8 @@ const UploadAchievementPage = () => {
 
                         <div className="card" style={{ padding: '2rem' }}>
                             <div className="card-header" style={{ marginBottom: '1.5rem', padding: 0 }}>
-                                <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Verification Evidence</h4>
-                                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Sync official certificates and dossiers.</p>
+                                <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Upload Documents</h4>
+                                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Upload your certificates or proof of achievement.</p>
                             </div>
 
                             <div
@@ -256,7 +256,7 @@ const UploadAchievementPage = () => {
                                         <Upload size={20} color="var(--brand-600)" />
                                     </div>
                                     <div>
-                                        <p style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)', margin: 0 }}>Dossier Sync Engine</p>
+                                        <p style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)', margin: 0 }}>Click or drag to upload files</p>
                                         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', fontWeight: 600 }}>PDF, PNG, JPG (Max 100MB)</p>
                                     </div>
                                 </div>
@@ -272,7 +272,7 @@ const UploadAchievementPage = () => {
                                             </div>
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</div>
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>{(f.size / 1024).toFixed(1)} KB RESOLUTION</div>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>{(f.size / 1024).toFixed(1)} KB</div>
                                             </div>
                                             <button type="button" onClick={() => removeFile(i)} style={{ color: 'var(--error-500)', padding: '0.5rem', borderRadius: '50%', background: 'none', border: 'none', cursor: 'pointer' }}>
                                                 <X size={18} />
@@ -291,8 +291,8 @@ const UploadAchievementPage = () => {
                                         style={{ width: 20, height: 20, accentColor: 'var(--brand-600)' }}
                                     />
                                     <div>
-                                        <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>Publish to Global Portfolio</span>
-                                        <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>External visibility for recruiters and external bodies.</p>
+                                        <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>Show in Public Profile</span>
+                                        <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Make this achievement visible on your public portfolio.</p>
                                     </div>
                                 </label>
                             </div>
@@ -300,10 +300,10 @@ const UploadAchievementPage = () => {
 
                         {/* Submission Controls */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {loading && (
+                             {loading && (
                                 <div className="card" style={{ padding: '1.25rem' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.75rem' }}>
-                                        <span>SYNCHRONIZING RECORDS...</span>
+                                        <span>SUBMITTING...</span>
                                         <span>{progress}%</span>
                                     </div>
                                     <div style={{ height: 6, background: 'var(--slate-100)', borderRadius: '3px', overflow: 'hidden' }}>
@@ -312,10 +312,10 @@ const UploadAchievementPage = () => {
                                 </div>
                             )}
                             <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '56px', fontWeight: 900, fontSize: '1.1rem' }} disabled={loading}>
-                                {loading ? 'Processing Protocol...' : 'Submit Institutional Record'}
+                                {loading ? 'Submitting...' : 'Submit Achievement'}
                             </button>
                             <button type="button" className="btn btn-ghost" style={{ width: '100%', height: '48px', fontWeight: 800, border: '1px solid var(--border-primary)' }} onClick={() => navigate('/achievements')} disabled={loading}>
-                                Discard Submission
+                                Cancel
                             </button>
                         </div>
                     </div>

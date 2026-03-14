@@ -40,10 +40,10 @@ const MyInternshipsPage = () => {
         try {
             if (editingId) {
                 await internshipAPI.update(editingId, formData);
-                toast.success('Internship record updated');
+                toast.success('Internship updated');
             } else {
                 await internshipAPI.add(formData);
-                toast.success('Internship record added successfully');
+                toast.success('Internship added successfully');
             }
             setShowModal(false);
             resetForm();
@@ -100,12 +100,12 @@ const MyInternshipsPage = () => {
             <div className="animate-fade-in">
                 <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                     <div>
-                        <h2 className="heading-display">Internship Journey</h2>
-                        <p className="page-subtitle">Document your professional experiences and industry exposure.</p>
+                        <h2 className="heading-display">My Internships</h2>
+                        <p className="page-subtitle">Track and manage your internship experiences.</p>
                     </div>
                     <button className="btn btn-primary" onClick={() => { resetForm(); setShowModal(true); }} style={{ borderRadius: '12px', padding: '0.75rem 1.5rem', gap: '0.75rem' }}>
                         <Plus size={20} />
-                        <span>Add Experience</span>
+                        <span>Add Internship</span>
                     </button>
                 </div>
 
@@ -116,8 +116,8 @@ const MyInternshipsPage = () => {
                 ) : internships.length === 0 ? (
                     <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
                         <Briefcase size={64} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
-                        <h3 style={{ fontWeight: 800 }}>Start your professional registry</h3>
-                        <p style={{ color: 'var(--text-muted)' }}>You haven't added any internships yet. Share your experience to build your profile.</p>
+                        <h3 style={{ fontWeight: 800 }}>No internships added yet</h3>
+                        <p style={{ color: 'var(--text-muted)' }}>Share your experience to build your profile.</p>
                     </div>
                 ) : (
                     <div className="grid-res grid-res-2" style={{ gap: '1.5rem' }}>
@@ -191,7 +191,7 @@ const MyInternshipsPage = () => {
                                         }}
                                     >
                                         <ExternalLink size={18} />
-                                        VIEW COMPLETION CERTIFICATE
+                                        VIEW CERTIFICATE
                                     </a>
                                 )}
                             </div>
@@ -205,8 +205,8 @@ const MyInternshipsPage = () => {
                     <div className="modal animate-scale-in">
                         <div className="modal-header">
                             <div>
-                                <h3 style={{ margin: 0 }}>{editingId ? 'Update Experience' : 'New Internship'}</h3>
-                                <p style={{ margin: 0 }}>Fill in your professional experience details.</p>
+                                <h3 style={{ margin: 0 }}>{editingId ? 'Edit Internship' : 'Add Internship'}</h3>
+                                <p style={{ margin: 0 }}>Enter details about your internship.</p>
                             </div>
                             <button className="btn btn-ghost" onClick={() => setShowModal(false)} style={{ color: 'white', opacity: 0.8 }}>
                                 <X size={24} />
@@ -330,7 +330,7 @@ const MyInternshipsPage = () => {
 
                                 <div className="modal-actions-responsive">
                                     <button type="button" className="btn btn-secondary cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
-                                    <button type="submit" className="btn btn-primary submit-btn">{editingId ? 'Save Changes' : 'Record Experience'}</button>
+                                    <button type="submit" className="btn btn-primary submit-btn">{editingId ? 'Save Changes' : 'Add Internship'}</button>
                                 </div>
                             </form>
                         </div>

@@ -30,7 +30,7 @@ const MyCoursesPage = () => {
             setCourses(myRes.data.data);
             setAssignedCourses(assignedRes.data.data);
         } catch {
-            toast.error('Failed to load course registry');
+            toast.error('Failed to load courses');
         } finally {
             setLoading(false);
         }
@@ -52,7 +52,7 @@ const MyCoursesPage = () => {
             }
 
             await courseAPI.add({ ...rest, platform: finalPlatform });
-            toast.success('Course initialized in institutional registry');
+            toast.success('Course added successfully');
             setShowAddModal(false);
             setNewCourse({ 
                 courseName: '', 
@@ -72,13 +72,13 @@ const MyCoursesPage = () => {
 
     const handleSyncProgress = async (id, platform) => {
         setSyncingId(id);
-        const toastId = toast.loading(`Connecting to ${platform} institutional API...`);
+        const toastId = toast.loading(`Connecting to ${platform}...`);
         try {
             const res = await courseAPI.syncProgress(id, {}); // Empty creds for now, handled by backend simulation/keys
-            toast.success(`Progress synchronized: ${res.data.data.progress}%`, { id: toastId });
+            toast.success(`Progress synced: ${res.data.data.progress}%`, { id: toastId });
             loadData();
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Synchronization protocol failed', { id: toastId });
+            toast.error(err.response?.data?.message || 'Sync failed', { id: toastId });
         } finally {
             setSyncingId(null);
         }
@@ -88,7 +88,7 @@ const MyCoursesPage = () => {
         if (!window.confirm('Are you sure you want to delete this course record?')) return;
         try {
             await courseAPI.delete(id);
-            toast.success('Record deleted from registry');
+            toast.success('Course deleted');
             loadData();
         } catch {
             toast.error('Delete operation failed');
@@ -100,12 +100,12 @@ const MyCoursesPage = () => {
             <div className="animate-fade-in">
                 <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                        <h2 className="heading-display">My Learning Journey</h2>
-                        <p className="page-subtitle">Track your progress in assigned departmental courses and personal certifications.</p>
+                        <h2 className="heading-display">My Courses</h2>
+                        <p className="page-subtitle">Track your progress in assigned and personal courses.</p>
                     </div>
                     <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ borderRadius: '12px', padding: '0.75rem 1.5rem', gap: '0.75rem' }}>
                         <Plus size={20} />
-                        <span>Add New Course</span>
+                        <span>Add Course</span>
                     </button>
                 </div>
 
@@ -117,7 +117,7 @@ const MyCoursesPage = () => {
                         gap: '1.5rem' 
                     }}>
                         <GraduationCap size={24} style={{ color: 'var(--brand-600)' }} />
-                        <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Courses Assigned to You</h3>
+                        <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Assigned Courses</h3>
                         {assignedCourses.length > 0 && (
                             <span className="badge badge-brand" style={{ borderRadius: '6px' }}>{assignedCourses.length} Required</span>
                         )}
@@ -130,8 +130,8 @@ const MyCoursesPage = () => {
                     ) : assignedCourses.length === 0 ? (
                         <div className="card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
                             <GraduationCap size={40} style={{ opacity: 0.2, margin: '0 auto 1rem auto', color: 'var(--brand-600)' }} />
-                            <h4 style={{ fontWeight: 800, color: 'var(--brand-700)' }}>No mandatory courses assigned</h4>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>You're all caught up with your departmental requirements.</p>
+                            <h4 style={{ fontWeight: 800, color: 'var(--brand-700)' }}>No assigned courses</h4>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>You're all caught up with your requirements.</p>
                         </div>
                     ) : (
                         <div className="grid-res grid-res-2" style={{ gap: '1.5rem' }}>
@@ -170,7 +170,7 @@ const MyCoursesPage = () => {
                                                         }}
                                                     >
                                                         <ExternalLink size={16} />
-                                                        Access Learning Material
+                                                        Go to Course
                                                     </a>
                                                 )}
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
@@ -188,7 +188,7 @@ const MyCoursesPage = () => {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
                     <BookOpen size={24} style={{ color: 'var(--text-primary)' }} />
-                    <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>My Added Courses</h3>
+                    <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Personal Courses</h3>
                 </div>
 
                 {loading ? (
@@ -198,8 +198,8 @@ const MyCoursesPage = () => {
                 ) : courses.length === 0 ? (
                     <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
                         <BookOpen size={64} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
-                        <h3 style={{ fontWeight: 800 }}>Start your registry</h3>
-                        <p style={{ color: 'var(--text-muted)' }}>You haven't added any personal courses yet. Click "Add New Course" to begin.</p>
+                        <h3 style={{ fontWeight: 800 }}>No courses added yet</h3>
+                        <p style={{ color: 'var(--text-muted)' }}>Click "Add Course" to get started.</p>
                     </div>
                 ) : (
                     <div className="grid-res grid-res-3" style={{ gap: '1.5rem' }}>
@@ -351,10 +351,10 @@ const MyCoursesPage = () => {
                                         value={newCourse.category}
                                         onChange={e => setNewCourse({ ...newCourse, category: e.target.value })}
                                     >
-                                        <option value="Technical Core">Technical Core (Programming, Stack, etc.)</option>
+                                        <option value="Technical Core">Technical (Programming, CS, etc.)</option>
                                         <option value="Interdisciplinary">Interdisciplinary (Management, Soft Skills)</option>
-                                        <option value="Placement Prep">Placement Prep (Aptitude, OA Prep)</option>
-                                        <option value="Research/Internship">Research / Internship Based</option>
+                                        <option value="Placement Prep">Placement Prep</option>
+                                        <option value="Research/Internship">Research / Internship</option>
                                         <option value="Personal Interest">Personal Interest</option>
                                     </select>
                                 </div>
