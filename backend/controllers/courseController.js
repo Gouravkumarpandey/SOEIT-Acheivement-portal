@@ -1,4 +1,5 @@
 const Course = require('../models/Course');
+const CourseAssignment = require('../models/CourseAssignment');
 const User = require('../models/User');
 const { clearCache } = require('../utils/cache');
 
@@ -112,3 +113,66 @@ exports.getAllCourses = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Assign a course (Admin/Faculty)
+// @route   POST /api/courses/assignments
+exports.assignCourse = async (req, res, next) => {
+    try {
+        const { courseName, subject, description, department, semester } = req.body;
+        const assignedBy = req.user.id;
+
+        if (!courseName || !subject || !department || !semester) {
+            return res.status(400).json({ success: false, message: 'Required parameters missing' });
+        }
+
+        const assignment = await CourseAssignment.create({
+            courseName, subject, description, department, semester
+        }, assignedBy);
+
+        clearCache('/api/courses');
+        res.status(201).json({ success: true, message: 'Course assigned to cohort successfully', data: assignment });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get all assigned courses (Admin/Faculty)
+// @route   GET /api/courses/assignments
+exports.getAssignedCourses = async (req, res, next) => {
+    try {
+        const { department, semester } = req.query;
+        const assignments = await CourseAssignment.findAll({ department, semester });
+        res.status(200).json({ success: true, count: assignments.length, data: assignments });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get assignments for logged in student
+// @route   GET /api/courses/assignments/my
+exports.getMyAssignedCourses = async (req, res, next) => {
+    try {
+        const user = req.user;
+        if (user.role !== 'student') {
+            return res.status(403).json({ success: false, message: 'Forbidden' });
+        }
+
+        const assignments = await CourseAssignment.findByStudentTarget(user.department, user.semester);
+        res.status(200).json({ success: true, count: assignments.length, data: assignments });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Delete assignment (Admin/Faculty)
+// @route   DELETE /api/courses/assignments/:id
+exports.deleteAssignment = async (req, res, next) => {
+    try {
+        await CourseAssignment.delete(req.params.id);
+        clearCache('/api/courses');
+        res.status(200).json({ success: true, message: 'Assignment purged' });
+    } catch (error) {
+        next(error);
+    }
+};
+

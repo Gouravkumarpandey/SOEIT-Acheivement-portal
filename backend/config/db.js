@@ -191,6 +191,18 @@ const initSchema = async (client) => {
             created_at  TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (user_id) REFERENCES users(id)
         )`,
+    `CREATE TABLE IF NOT EXISTS course_assignments (
+            id              TEXT PRIMARY KEY,
+            course_name     TEXT NOT NULL,
+            subject         TEXT NOT NULL,
+            description     TEXT,
+            department      TEXT NOT NULL,
+            semester        INTEGER NOT NULL,
+            assigned_by     TEXT NOT NULL,
+            created_at      TEXT DEFAULT (datetime('now')),
+            updated_at      TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (assigned_by) REFERENCES users(id)
+        )`,
     // Indexing for high-speed performance (O(1) lookups)
     `CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)`,
     `CREATE INDEX IF NOT EXISTS idx_users_dept ON users(department)`,
@@ -205,6 +217,8 @@ const initSchema = async (client) => {
     `CREATE INDEX IF NOT EXISTS idx_internships_student ON internships(student_id)`,
     `CREATE INDEX IF NOT EXISTS idx_events_author ON events(created_by)`,
     `CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, is_read)`,
+    `CREATE INDEX IF NOT EXISTS idx_course_assignments_dept_sem ON course_assignments(department, semester)`,
+    `CREATE INDEX IF NOT EXISTS idx_course_assignments_faculty ON course_assignments(assigned_by)`,
     `CREATE INDEX IF NOT EXISTS idx_files_created ON files(created_at)`
   ], 'write');
 };

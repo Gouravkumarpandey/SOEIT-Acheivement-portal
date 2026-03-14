@@ -33,6 +33,7 @@ exports.protect = async (req, res, next) => {
             email: user.email,
             role: user.role,
             department: user.department,
+            batch: user.batch,
             isActive: user.isActive,
         };
 
@@ -63,6 +64,8 @@ exports.optionalProtect = async (req, res, next) => {
                 _id: user.id,
                 name: user.name,
                 role: user.role,
+                department: user.department,
+                batch: user.batch,
                 isActive: user.isActive,
             };
         }

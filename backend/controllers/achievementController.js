@@ -338,7 +338,7 @@ exports.getStudentStats = async (req, res, next) => {
                     -- Points for Year 3 & 4
                     SUM(CASE WHEN status='approved' AND (strftime('%Y', date) - SUBSTR(?, 1, 4)) >= 2 THEN points ELSE 0 END) as year3and4Points
                   FROM achievements WHERE student_id = ?`,
-                args: [req.user.batch, req.user.batch, studentId]
+                args: [req.user.batch || '2024-2028', req.user.batch || '2024-2028', studentId]
             }),
             User.findById(studentId),
             Achievement.aggregate([

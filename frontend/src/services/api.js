@@ -93,6 +93,11 @@ export const courseAPI = {
     updateProgress: (id, data) => API.put(`/courses/${id}/progress`, data),
     delete: (id) => API.delete(`/courses/${id}`),
     getAll: (params) => API.get('/courses', { params }),
+    // New Assignment APIs
+    assign: (data) => API.post('/courses/assignments', data),
+    getAssignments: (params) => API.get('/courses/assignments', { params }),
+    getMyAssignments: () => API.get('/courses/assignments/my'),
+    deleteAssignment: (id) => API.delete(`/courses/assignments/${id}`),
 };
 
 export const hackathonAPI = {

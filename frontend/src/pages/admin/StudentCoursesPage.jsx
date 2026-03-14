@@ -1,13 +1,23 @@
 import { useState, useEffect } from 'react';
 import { courseAPI } from '../../services/api';
-import { Search, Filter, BookOpen, GraduationCap, ChevronLeft, ChevronRight, Activity, Eye } from 'lucide-react';
+import { Search, Filter, BookOpen, GraduationCap, ChevronLeft, ChevronRight, Activity, Eye, Plus, Trash2, User, Book, Hash } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const StudentCoursesPage = () => {
     const [courses, setCourses] = useState([]);
+    const [assignments, setAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('progress'); // 'progress' or 'assignments'
     const [filters, setFilters] = useState({ department: '', status: '', search: '' });
+    const [showAssignModal, setShowAssignModal] = useState(false);
+    const [assignmentForm, setAssignmentForm] = useState({
+        courseName: '',
+        subject: '',
+        description: '',
+        department: '',
+        semester: ''
+    });
 
     const loadAllCourses = async () => {
         setLoading(true);
@@ -21,135 +31,325 @@ const StudentCoursesPage = () => {
         }
     };
 
+    const loadAssignments = async () => {
+        setLoading(true);
+        try {
+            const res = await courseAPI.getAssignments();
+            setAssignments(res.data.data);
+        } catch {
+            toast.error('Failed to fetch departmental allocations');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const handler = setTimeout(() => {
-            loadAllCourses();
-        }, 300); // 300ms debounce
-        return () => clearTimeout(handler);
-    }, [filters.department, filters.status, filters.search]);
+        if (activeTab === 'progress') {
+            const handler = setTimeout(() => {
+                loadAllCourses();
+            }, 300);
+            return () => clearTimeout(handler);
+        } else {
+            loadAssignments();
+        }
+    }, [filters.department, filters.status, filters.search, activeTab]);
+
+    const handleAssignCourse = async (e) => {
+        e.preventDefault();
+        try {
+            await courseAPI.assign(assignmentForm);
+            toast.success('Course assigned to cohort successfully');
+            setShowAssignModal(false);
+            setAssignmentForm({ courseName: '', subject: '', description: '', department: '', semester: '' });
+            loadAssignments();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Assignment failed');
+        }
+    };
+
+    const handleDeleteAssignment = async (id) => {
+        if (!window.confirm('Are you sure you want to purge this allocation?')) return;
+        try {
+            await courseAPI.deleteAssignment(id);
+            toast.success('Allocation purged from registry');
+            loadAssignments();
+        } catch {
+            toast.error('De-allocation failed');
+        }
+    };
 
     return (
         <div className="animate-fade-in">
-            <div className="page-header" style={{ marginBottom: '2.5rem' }}>
-                <h2 className="heading-display">Institutional Course Monitoring</h2>
-                <p className="page-subtitle">Real-time surveillance of student skill development and platform-based learning trajectories.</p>
+            <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h2 className="heading-display">Course Management</h2>
+                    <p className="page-subtitle">Track student progress and assign courses to different departments.</p>
+                </div>
+                {activeTab === 'assignments' && (
+                    <button className="btn btn-primary" onClick={() => setShowAssignModal(true)} style={{ borderRadius: '12px', padding: '0.75rem 1.5rem', gap: '0.75rem' }}>
+                        <Plus size={20} />
+                        Assign New Course
+                    </button>
+                )}
             </div>
 
-            <div className="card" style={{ marginBottom: '2.5rem', border: '1px solid var(--border-primary)' }}>
-                <div className="card-body" style={{ padding: '1.25rem' }}>
-                    <div className="grid-res grid-res-3" style={{ gap: '1rem', alignItems: 'center' }}>
-                        <div className="search-wrapper">
-                            <input
-                                className="form-control"
-                                placeholder="Search by Enrollment No, Scholar Name, or Course Protocol..."
-                                value={filters.search}
-                                onChange={e => setFilters({ ...filters, search: e.target.value })}
-                            />
-                            <Search size={18} className="search-icon" />
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-primary)', paddingBottom: '1px' }}>
+                <button 
+                    onClick={() => setActiveTab('progress')}
+                    style={{ 
+                        padding: '1rem 1.5rem', 
+                        fontWeight: 800, 
+                        fontSize: '0.9rem', 
+                        color: activeTab === 'progress' ? 'var(--brand-600)' : 'var(--text-muted)',
+                        borderBottom: activeTab === 'progress' ? '3px solid var(--brand-600)' : '3px solid transparent',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    Student Progress
+                </button>
+                <button 
+                    onClick={() => setActiveTab('assignments')}
+                    style={{ 
+                        padding: '1rem 1.5rem', 
+                        fontWeight: 800, 
+                        fontSize: '0.9rem', 
+                        color: activeTab === 'assignments' ? 'var(--brand-600)' : 'var(--text-muted)',
+                        borderBottom: activeTab === 'assignments' ? '3px solid var(--brand-600)' : '3px solid transparent',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    Assigned Courses
+                </button>
+            </div>
+
+            {activeTab === 'progress' ? (
+                <>
+                    <div className="card" style={{ marginBottom: '2.5rem', border: '1px solid var(--border-primary)' }}>
+                        <div className="card-body" style={{ padding: '1.25rem' }}>
+                            <div className="grid-res grid-res-3" style={{ gap: '1rem', alignItems: 'center' }}>
+                                <div className="search-wrapper">
+                                    <input
+                                        className="form-control"
+                                        placeholder="Search by Name, Roll No or Course..."
+                                        value={filters.search}
+                                        onChange={e => setFilters({ ...filters, search: e.target.value })}
+                                    />
+                                    <Search size={18} className="search-icon" />
+                                </div>
+                                <select
+                                    className="form-control"
+                                    style={{ fontWeight: 700 }}
+                                    value={filters.department}
+                                    onChange={e => setFilters({ ...filters, department: e.target.value })}
+                                >
+                                    <option value="">All Departments</option>
+                                    {[
+                                        { group: 'B.Tech', depts: ['CSE', 'AIDS (IBM)', 'AIML', 'ME', 'EEE'] },
+                                        { group: 'BCA', depts: ['BCA (Regular)', 'AIDL', 'Cybersecurity'] },
+                                        { group: 'Diploma', depts: ['DCSE', 'DME', 'DEEE'] },
+                                    ].map(({ group, depts }) => (
+                                        <optgroup key={group} label={group}>
+                                            {depts.map(d => <option key={d} value={d}>{d}</option>)}
+                                        </optgroup>
+                                    ))}
+                                </select>
+                                <select
+                                    className="form-control"
+                                    style={{ fontWeight: 700 }}
+                                    value={filters.status}
+                                    onChange={e => setFilters({ ...filters, status: e.target.value })}
+                                >
+                                    <option value="">Filter by Status</option>
+                                    <option value="Ongoing">Ongoing</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
                         </div>
-                        <select
-                            className="form-control"
-                            style={{ fontWeight: 700 }}
-                            value={filters.department}
-                            onChange={e => setFilters({ ...filters, department: e.target.value })}
-                        >
-                            <option value="">All Institutional Departments</option>
-                            {[
-                                { group: 'B.Tech', depts: ['CSE', 'AIDS (IBM)', 'AIML', 'ME', 'EEE'] },
-                                { group: 'BCA', depts: ['BCA (Regular)', 'AIDL', 'Cybersecurity'] },
-                                { group: 'Diploma', depts: ['DCSE', 'DME', 'DEEE'] },
-                            ].map(({ group, depts }) => (
-                                <optgroup key={group} label={group}>
-                                    {depts.map(d => <option key={d} value={d}>{d}</option>)}
-                                </optgroup>
-                            ))}
-                        </select>
-                        <select
-                            className="form-control"
-                            style={{ fontWeight: 700 }}
-                            value={filters.status}
-                            onChange={e => setFilters({ ...filters, status: e.target.value })}
-                        >
-                            <option value="">Status Resolution: All</option>
-                            <option value="Ongoing">Ongoing Certification</option>
-                            <option value="Completed">Verified Completion</option>
-                        </select>
+                    </div>
+
+                    <div className="card" style={{ border: '1px solid var(--border-primary)', overflow: 'hidden' }}>
+                        <div className="table-responsive">
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th style={{ paddingLeft: '2rem' }}>Student Name</th>
+                                        <th>Course</th>
+                                        <th>Platform</th>
+                                        <th style={{ textAlign: 'center' }}>Progress</th>
+                                        <th>Status</th>
+                                        <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loading ? (
+                                        [...Array(5)].map((_, i) => (
+                                            <tr key={i}><td colSpan="6" style={{ padding: '0.75rem 2rem' }}><div className="skeleton" style={{ height: 60, borderRadius: '12px' }} /></td></tr>
+                                        ))
+                                    ) : courses.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
+                                                <Activity size={48} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
+                                                <h4 style={{ fontWeight: 800 }}>No course records found</h4>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        courses.map(course => (
+                                            <tr key={course.id} className="hover-row">
+                                                <td style={{ paddingLeft: '2rem' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.5rem 0' }}>
+                                                        <div style={{ width: 44, height: 44, background: 'var(--primary-100)', color: 'var(--brand-700)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>
+                                                            {course.studentName.charAt(0)}
+                                                        </div>
+                                                        <div>
+                                                            <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{course.studentName}</div>
+                                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800 }}>{course.enrollmentNo}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{course.courseName}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800 }}>{course.department}</div>
+                                                </td>
+                                                <td><span style={{ fontSize: '0.85rem', fontWeight: 800 }}>{course.platform}</span></td>
+                                                <td style={{ textAlign: 'center' }}>
+                                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '1rem', width: '200px' }}>
+                                                        <div style={{ flex: 1, height: '6px', background: 'var(--slate-100)', borderRadius: '3px', overflow: 'hidden' }}>
+                                                            <div style={{ width: `${course.progress}%`, height: '100%', background: 'var(--brand-600)' }} />
+                                                        </div>
+                                                        <span style={{ fontSize: '0.8rem', fontWeight: 900 }}>{course.progress}%</span>
+                                                    </div>
+                                                </td>
+                                                <td style={{ textAlign: 'center' }}>
+                                                    <span className={`badge ${course.status === 'Completed' ? 'badge-success' : 'badge-warning'}`} style={{ fontWeight: 800 }}>{course.status}</span>
+                                                </td>
+                                                <td style={{ textAlign: 'right', paddingRight: '2rem' }}>
+                                                    <Link to={`/portfolio/${course.studentId}`} className="btn btn-ghost" style={{ color: 'var(--brand-600)' }}><Eye size={20} /></Link>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <div className="grid-res grid-res-2" style={{ gap: '1.5rem' }}>
+                    {loading ? (
+                        [...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: 200, borderRadius: '20px' }} />)
+                    ) : assignments.length === 0 ? (
+                        <div className="col-span-full" style={{ padding: '6rem 2rem', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: '20px' }}>
+                            <BookOpen size={48} style={{ opacity: 0.1, marginBottom: '1.5rem' }} />
+                            <h4 style={{ fontWeight: 800 }}>No courses assigned yet</h4>
+                            <p className="text-muted">Faculty can assign courses to specific departments and semesters.</p>
+                        </div>
+                    ) : (
+                        assignments.map(ass => (
+                            <div key={ass.id} className="card" style={{ borderRadius: '20px', border: '1px solid var(--border-primary)', position: 'relative' }}>
+                                <div className="card-body" style={{ padding: '2rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                        <div style={{ width: 48, height: 48, background: 'var(--brand-50)', color: 'var(--brand-600)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <Book size={24} />
+                                        </div>
+                                        <button onClick={() => handleDeleteAssignment(ass.id)} style={{ color: 'var(--error-500)', opacity: 0.5 }} className="btn btn-ghost"><Trash2 size={18} /></button>
+                                    </div>
+                                    <h3 style={{ fontWeight: 800, fontSize: '1.2rem', marginBottom: '0.5rem' }}>{ass.course_name}</h3>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                                        <span className="badge badge-brand" style={{ borderRadius: '6px' }}>{ass.department}</span>
+                                        <span className="badge badge-primary" style={{ borderRadius: '6px' }}>Semester {ass.semester}</span>
+                                        <span className="badge" style={{ borderRadius: '6px', background: 'var(--slate-100)', color: 'var(--slate-700)' }}>{ass.subject}</span>
+                                    </div>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: 1.6 }}>{ass.description}</p>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border-primary)' }}>
+                                        <div className="avatar avatar-sm">{ass.faculty_name.charAt(0)}</div>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>Assigned by: {ass.faculty_name}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
+
+            {showAssignModal && (
+                <div className="modal-overlay" style={{ zIndex: 1100 }}>
+                    <div className="modal" style={{ maxWidth: '550px', borderRadius: '30px', padding: '2.5rem' }}>
+                        <div style={{ marginBottom: '2rem' }}>
+                            <h2 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Assign New Course</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Select a department and semester to assign a course.</p>
+                        </div>
+                        <form onSubmit={handleAssignCourse}>
+                            <div className="form-group">
+                                <label className="form-label" style={{ fontWeight: 800 }}>Course Name</label>
+                                <input 
+                                    className="form-control" 
+                                    style={{ height: '50px', borderRadius: '12px' }}
+                                    placeholder="e.g., Full Stack Development"
+                                    required
+                                    value={assignmentForm.courseName}
+                                    onChange={e => setAssignmentForm({...assignmentForm, courseName: e.target.value})}
+                                />
+                            </div>
+                            <div className="grid-res grid-res-2" style={{ gap: '1rem' }}>
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800 }}>Subject</label>
+                                    <input 
+                                        className="form-control" 
+                                        style={{ height: '50px', borderRadius: '12px' }}
+                                        placeholder="e.g., Web Technologies"
+                                        required
+                                        value={assignmentForm.subject}
+                                        onChange={e => setAssignmentForm({...assignmentForm, subject: e.target.value})}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800 }}>Semester</label>
+                                    <select 
+                                        className="form-control"
+                                        style={{ height: '50px', borderRadius: '12px', fontWeight: 800 }}
+                                        required
+                                        value={assignmentForm.semester}
+                                        onChange={e => setAssignmentForm({...assignmentForm, semester: e.target.value})}
+                                    >
+                                        <option value="">Select Semester</option>
+                                        {[1,2,3,4,5,6,7,8].map(s => <option key={s} value={s}>Semester {s}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label" style={{ fontWeight: 800 }}>Department</label>
+                                <select 
+                                    className="form-control"
+                                    style={{ height: '50px', borderRadius: '12px', fontWeight: 800 }}
+                                    required
+                                    value={assignmentForm.department}
+                                    onChange={e => setAssignmentForm({...assignmentForm, department: e.target.value})}
+                                >
+                                    <option value="">Select Department</option>
+                                    {['CSE', 'AIDS (IBM)', 'AIML', 'ME', 'EEE', 'BCA (Regular)', 'AIDL', 'Cybersecurity', 'DCSE', 'DME', 'DEEE'].map(d => (
+                                        <option key={d} value={d}>{d}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label" style={{ fontWeight: 800 }}>Description</label>
+                                <textarea 
+                                    className="form-control" 
+                                    placeholder="Add any instructions or details about the course..."
+                                    style={{ borderRadius: '15px', padding: '1rem' }}
+                                    rows={3}
+                                    value={assignmentForm.description}
+                                    onChange={e => setAssignmentForm({...assignmentForm, description: e.target.value})}
+                                />
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
+                                <button type="button" className="btn btn-secondary" style={{ flex: 1, height: '54px', borderRadius: '15px' }} onClick={() => setShowAssignModal(false)}>Cancel</button>
+                                <button type="submit" className="btn btn-primary" style={{ flex: 2, height: '54px', borderRadius: '15px', fontWeight: 800 }}>Assign Course</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
-
-            <div className="card" style={{ border: '1px solid var(--border-primary)', overflow: 'hidden' }}>
-                <div className="table-responsive">
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th style={{ paddingLeft: '2rem' }}>Scholar Identity</th>
-                                <th>Course Resolution</th>
-                                <th>Platform Path</th>
-                                <th style={{ textAlign: 'center' }}>Progress Metrics</th>
-                                <th>Registry Status</th>
-                                <th style={{ textAlign: 'right', paddingRight: '2rem' }}>Audit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                [...Array(5)].map((_, i) => (
-                                    <tr key={i}><td colSpan="5" style={{ padding: '0.75rem 2rem' }}><div className="skeleton" style={{ height: 60, borderRadius: '12px' }} /></td></tr>
-                                ))
-                            ) : courses.length === 0 ? (
-                                <tr>
-                                    <td colSpan="5" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
-                                        <Activity size={48} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
-                                        <h4 style={{ fontWeight: 800 }}>No analytical records synchronized</h4>
-                                        <p style={{ color: 'var(--text-muted)' }}>The database yielded zero matches for the current institutional cohort.</p>
-                                    </td>
-                                </tr>
-                            ) : (
-                                courses.map(course => (
-                                    <tr key={course.id} className="hover-row">
-                                        <td style={{ paddingLeft: '2rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.5rem 0' }}>
-                                                <div style={{ width: 44, height: 44, background: 'var(--primary-100)', color: 'var(--brand-700)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>
-                                                    {course.studentName.charAt(0)}
-                                                </div>
-                                                <div>
-                                                    <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{course.studentName}</div>
-                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800 }}>{course.enrollmentNo || 'ID: ' + course.id.substring(0, 6)}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{course.courseName}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase' }}>DEPT: {course.department}</div>
-                                        </td>
-                                        <td>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-secondary)' }}>{course.platform}</span>
-                                        </td>
-                                        <td style={{ textAlign: 'center' }}>
-                                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '1rem', width: '200px' }}>
-                                                <div style={{ flex: 1, height: '6px', background: 'var(--slate-100)', borderRadius: '3px', overflow: 'hidden' }}>
-                                                    <div style={{ width: `${course.progress}%`, height: '100%', background: 'linear-gradient(90deg, var(--brand-500), var(--brand-700))' }} />
-                                                </div>
-                                                <span style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--brand-700)', minWidth: '40px' }}>{course.progress}%</span>
-                                            </div>
-                                        </td>
-                                        <td style={{ textAlign: 'center' }}>
-                                            <span className={`badge ${course.status === 'Completed' ? 'badge-success' : 'badge-warning'}`} style={{ fontWeight: 800, padding: '0.4rem 0.8rem', textTransform: 'uppercase' }}>
-                                                {course.status}
-                                            </span>
-                                        </td>
-                                        <td style={{ textAlign: 'right', paddingRight: '2rem' }}>
-                                            <Link to={`/portfolio/${course.student_id || course.studentId}`} className="btn btn-ghost" style={{ padding: '0.5rem', color: 'var(--brand-600)' }} title="Audit Scholar Portfolio">
-                                                <Eye size={20} strokeWidth={2.5} />
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            )}
         </div>
     );
 };

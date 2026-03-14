@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react';
 import { courseAPI } from '../../services/api';
-import { Plus, Trash2, BookOpen, ExternalLink, Clock, CheckCircle2, MoreVertical } from 'lucide-react';
+import { Plus, Trash2, BookOpen, Clock, CheckCircle2, Book, GraduationCap } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const MyCoursesPage = () => {
     const [courses, setCourses] = useState([]);
+    const [assignedCourses, setAssignedCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
     const [newCourse, setNewCourse] = useState({ courseName: '', platform: '', customPlatform: '', progress: 0 });
 
-    const loadCourses = async () => {
+    const loadData = async () => {
+        setLoading(true);
         try {
-            const res = await courseAPI.getMy();
-            setCourses(res.data.data);
+            const [myRes, assignedRes] = await Promise.all([
+                courseAPI.getMy(),
+                courseAPI.getMyAssignments()
+            ]);
+            setCourses(myRes.data.data);
+            setAssignedCourses(assignedRes.data.data);
         } catch {
             toast.error('Failed to load course registry');
         } finally {
@@ -21,7 +27,7 @@ const MyCoursesPage = () => {
     };
 
     useEffect(() => {
-        loadCourses();
+        loadData();
     }, []);
 
     const handleAddCourse = async (e) => {
@@ -39,7 +45,7 @@ const MyCoursesPage = () => {
             toast.success('Course initialized in institutional registry');
             setShowAddModal(false);
             setNewCourse({ courseName: '', platform: '', customPlatform: '', progress: 0 });
-            loadCourses();
+            loadData();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Initialization failed');
         }
@@ -51,7 +57,7 @@ const MyCoursesPage = () => {
         try {
             await courseAPI.updateProgress(id, { progress: nextProgress, status });
             toast.success(`Progress synchronized: ${nextProgress}%`);
-            loadCourses();
+            loadData();
         } catch {
             toast.error('Progress synchronization failed');
         }
@@ -62,7 +68,7 @@ const MyCoursesPage = () => {
         try {
             await courseAPI.delete(id);
             toast.success('Record purged from registry');
-            loadCourses();
+            loadData();
         } catch {
             toast.error('Purge operation failed');
         }
@@ -72,13 +78,58 @@ const MyCoursesPage = () => {
         <div className="animate-fade-in">
             <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h2 className="heading-display">Course Registry</h2>
-                    <p className="page-subtitle">Unified tracking for ongoing academic certifications and skill development.</p>
+                    <h2 className="heading-display">My Courses</h2>
+                    <p className="page-subtitle">Check assigned courses and track your added course progress.</p>
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+                <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ borderRadius: '12px', padding: '0.75rem 1.5rem' }}>
                     <Plus size={18} />
-                    <span>Initialize New Course</span>
+                    <span>Add New Course</span>
                 </button>
+            </div>
+
+            {/* Assigned by Faculty Section */}
+            {assignedCourses.length > 0 && (
+                <div style={{ marginBottom: '3rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                        <GraduationCap size={24} style={{ color: 'var(--brand-600)' }} />
+                        <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Courses Assigned to You</h3>
+                        <span className="badge badge-brand" style={{ borderRadius: '6px' }}>{assignedCourses.length} Assigned</span>
+                    </div>
+                    <div className="grid-res grid-res-2" style={{ gap: '1.5rem' }}>
+                        {assignedCourses.map(ass => (
+                            <div key={ass.id} className="card" style={{ borderRadius: '24px', border: '2px solid var(--brand-100)', background: 'linear-gradient(to bottom right, #ffffff, var(--brand-50))' }}>
+                                <div className="card-body" style={{ padding: '2rem' }}>
+                                    <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
+                                        <div style={{ width: 56, height: 56, background: 'var(--brand-600)', color: 'white', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            <Book size={28} />
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                <div>
+                                                    <h4 style={{ fontWeight: 900, fontSize: '1.2rem', color: 'var(--brand-700)', marginBottom: '0.25rem' }}>{ass.course_name}</h4>
+                                                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{ass.subject}</div>
+                                                </div>
+                                                <span className="badge badge-success" style={{ borderRadius: '6px', fontSize: '0.7rem' }}>REQUIRED</span>
+                                            </div>
+                                            <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{ass.description || 'No additional details provided.'}</p>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                                                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--brand-200)', color: 'var(--brand-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem' }}>
+                                                    {ass.faculty_name.charAt(0)}
+                                                </div>
+                                                <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>Assigned by: <span style={{ color: 'var(--brand-600)' }}>{ass.faculty_name}</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                <BookOpen size={24} style={{ color: 'var(--text-primary)' }} />
+                <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>My Added Courses</h3>
             </div>
 
             {loading ? (
@@ -88,8 +139,8 @@ const MyCoursesPage = () => {
             ) : courses.length === 0 ? (
                 <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
                     <BookOpen size={64} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
-                    <h3 style={{ fontWeight: 800 }}>No active courses found</h3>
-                    <p style={{ color: 'var(--text-muted)' }}>Start cataloging your learning journey today.</p>
+                    <h3 style={{ fontWeight: 800 }}>No courses added yet</h3>
+                    <p style={{ color: 'var(--text-muted)' }}>Start adding your learning journey here.</p>
                 </div>
             ) : (
                 <div className="grid-res grid-res-3" style={{ gap: '1.5rem' }}>
@@ -109,7 +160,7 @@ const MyCoursesPage = () => {
 
                             <div style={{ marginBottom: '1.5rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>SYNCHRONIZATION PROGRESS</span>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>PROGRESS</span>
                                     <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--brand-700)' }}>{course.progress}%</span>
                                 </div>
                                 <div style={{ height: '8px', background: 'var(--slate-100)', borderRadius: '4px', overflow: 'hidden' }}>
@@ -142,20 +193,20 @@ const MyCoursesPage = () => {
             {showAddModal && (
                 <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
                     <div className="card animate-scale-in" style={{ width: '100%', maxWidth: '450px', padding: '2rem' }}>
-                        <h3 style={{ margin: '0 0 1.5rem 0', fontWeight: 900 }}>Register New Course</h3>
+                        <h3 style={{ margin: '0 0 1.5rem 0', fontWeight: 900 }}>Add New Course</h3>
                         <form onSubmit={handleAddCourse} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>COURSE NOMENCLATURE</label>
+                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>COURSE NAME</label>
                                 <input
                                     className="form-control"
-                                    placeholder="Enter Course "
+                                    placeholder="Enter Course name"
                                     required
                                     value={newCourse.courseName}
                                     onChange={e => setNewCourse({ ...newCourse, courseName: e.target.value })}
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>PLATFORM RESOLUTION</label>
+                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>PLATFORM</label>
                                 <select
                                     className="form-control"
                                     required
@@ -186,7 +237,7 @@ const MyCoursesPage = () => {
                             )}
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                 <button type="button" className="btn btn-ghost w-full" onClick={() => setShowAddModal(false)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary w-full">Initialize</button>
+                                <button type="submit" className="btn btn-primary w-full">Add Course</button>
                             </div>
                         </form>
                     </div>
