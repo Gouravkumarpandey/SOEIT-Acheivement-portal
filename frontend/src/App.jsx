@@ -8,14 +8,7 @@ import ScrollToTop from './components/common/ScrollToTop';
 import ScrollToTopButton from './components/common/ScrollToTopButton';
 
 // Loading Component
-const PageLoader = () => (
-  <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}>
-    <div className="flex flex-col items-center gap-4">
-      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      <p style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>Loading fast...</p>
-    </div>
-  </div>
-);
+const PageLoader = () => null;
 
 // Public Pages
 const LandingPage = lazy(() => import('./pages/public/LandingPage'));
