@@ -8,7 +8,7 @@ const MyCoursesPage = () => {
     const [assignedCourses, setAssignedCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [newCourse, setNewCourse] = useState({ courseName: '', platform: '', customPlatform: '', progress: 0 });
+    const [newCourse, setNewCourse] = useState({ courseName: '', platform: '', customPlatform: '', courseLink: '', progress: 0 });
 
     const loadData = async () => {
         setLoading(true);
@@ -44,7 +44,7 @@ const MyCoursesPage = () => {
             await courseAPI.add({ ...rest, platform: finalPlatform });
             toast.success('Course initialized in institutional registry');
             setShowAddModal(false);
-            setNewCourse({ courseName: '', platform: '', customPlatform: '', progress: 0 });
+            setNewCourse({ courseName: '', platform: '', customPlatform: '', courseLink: '', progress: 0 });
             loadData();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Initialization failed');
@@ -211,10 +211,22 @@ const MyCoursesPage = () => {
                                     <Clock size={16} />
                                     <span>Update Progress</span>
                                 </button>
+                                {course.course_link && (
+                                    <a 
+                                        href={course.course_link} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="btn btn-ghost" 
+                                        style={{ padding: '0.75rem', borderRadius: '10px', background: 'var(--slate-50)', color: 'var(--brand-700)' }}
+                                        title="View Material"
+                                    >
+                                        <ExternalLink size={18} />
+                                    </a>
+                                )}
                                 {course.progress === 100 && (
-                                    <div style={{ padding: '0.75rem', background: 'var(--success-50)', color: 'var(--success-700)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center' }}>
-                                        <CheckCircle2 size={16} />
-                                        <span style={{ fontSize: '0.8rem', fontWeight: 800 }}>COMPLETED</span>
+                                    <div style={{ position: 'absolute', top: '1.25rem', right: '4rem', background: 'var(--success-50)', color: 'var(--success-700)', padding: '0.2rem 0.6rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                        <CheckCircle2 size={12} />
+                                        <span style={{ fontSize: '0.65rem', fontWeight: 900 }}>COMPLETED</span>
                                     </div>
                                 )}
                             </div>
@@ -281,6 +293,17 @@ const MyCoursesPage = () => {
                                         />
                                     </div>
                                 )}
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.85rem' }}>Course Link (Optional)</label>
+                                    <input
+                                        type="url"
+                                        className="form-control"
+                                        style={{ height: '54px', borderRadius: '14px', fontSize: '1rem' }}
+                                        placeholder="https://..."
+                                        value={newCourse.courseLink}
+                                        onChange={e => setNewCourse({ ...newCourse, courseLink: e.target.value })}
+                                    />
+                                </div>
 
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
                                     <button type="button" className="btn btn-secondary" style={{ flex: 1, height: '54px', borderRadius: '14px', fontWeight: 800 }} onClick={() => setShowAddModal(false)}>Cancel</button>
