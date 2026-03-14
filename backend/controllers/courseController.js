@@ -118,7 +118,7 @@ exports.getAllCourses = async (req, res, next) => {
 // @route   POST /api/courses/assignments
 exports.assignCourse = async (req, res, next) => {
     try {
-        const { courseName, subject, description, department, semester } = req.body;
+        const { courseName, subject, description, courseLink, department, semester } = req.body;
         const assignedBy = req.user.id;
 
         if (!courseName || !subject || !department || !semester) {
@@ -126,7 +126,7 @@ exports.assignCourse = async (req, res, next) => {
         }
 
         const assignment = await CourseAssignment.create({
-            courseName, subject, description, department, semester
+            courseName, subject, description, courseLink, department, semester
         }, assignedBy);
 
         clearCache('/api/courses');

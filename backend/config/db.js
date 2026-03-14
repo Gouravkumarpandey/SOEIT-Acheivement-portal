@@ -196,6 +196,7 @@ const initSchema = async (client) => {
             course_name     TEXT NOT NULL,
             subject         TEXT NOT NULL,
             description     TEXT,
+            course_link     TEXT DEFAULT '',
             department      TEXT NOT NULL,
             semester        INTEGER NOT NULL,
             assigned_by     TEXT NOT NULL,

@@ -16,7 +16,8 @@ const StudentCoursesPage = () => {
         subject: '',
         description: '',
         department: '',
-        semester: ''
+        semester: '',
+        courseLink: ''
     });
 
     const loadAllCourses = async () => {
@@ -60,7 +61,7 @@ const StudentCoursesPage = () => {
             await courseAPI.assign(assignmentForm);
             toast.success('Course assigned to cohort successfully');
             setShowAssignModal(false);
-            setAssignmentForm({ courseName: '', subject: '', description: '', department: '', semester: '' });
+            setAssignmentForm({ courseName: '', subject: '', description: '', department: '', semester: '', courseLink: '' });
             loadAssignments();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Assignment failed');
@@ -340,6 +341,16 @@ const StudentCoursesPage = () => {
                                     rows={3}
                                     value={assignmentForm.description}
                                     onChange={e => setAssignmentForm({...assignmentForm, description: e.target.value})}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label" style={{ fontWeight: 800 }}>Course Link (Optional)</label>
+                                <input 
+                                    className="form-control" 
+                                    style={{ height: '50px', borderRadius: '12px' }}
+                                    placeholder="https://example.com/course"
+                                    value={assignmentForm.courseLink}
+                                    onChange={e => setAssignmentForm({...assignmentForm, courseLink: e.target.value})}
                                 />
                             </div>
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>

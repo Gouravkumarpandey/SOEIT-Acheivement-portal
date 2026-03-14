@@ -12,11 +12,11 @@ const CourseAssignment = {
 
         await db.execute({
             sql: `INSERT INTO course_assignments 
-                (id, course_name, subject, description, department, semester, assigned_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                (id, course_name, subject, description, course_link, department, semester, assigned_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             args: [
                 id, data.courseName, data.subject, data.description || '', 
-                data.department, data.semester, assignedBy
+                data.courseLink || '', data.department, data.semester, assignedBy
             ],
         });
 

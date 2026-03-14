@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { courseAPI } from '../../services/api';
-import { Plus, Trash2, BookOpen, Clock, CheckCircle2, Book, GraduationCap } from 'lucide-react';
+import { Plus, Trash2, BookOpen, Clock, CheckCircle2, Book, GraduationCap, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const MyCoursesPage = () => {
@@ -112,6 +112,29 @@ const MyCoursesPage = () => {
                                                 <span className="badge badge-success" style={{ borderRadius: '6px', fontSize: '0.7rem' }}>REQUIRED</span>
                                             </div>
                                             <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{ass.description || 'No additional details provided.'}</p>
+                                            
+                                            {ass.course_link && (
+                                                <a 
+                                                    href={ass.course_link} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="btn btn-ghost"
+                                                    style={{ 
+                                                        marginTop: '1rem', 
+                                                        width: '100%', 
+                                                        justifyContent: 'center', 
+                                                        gap: '0.5rem',
+                                                        background: 'var(--brand-100)',
+                                                        color: 'var(--brand-700)',
+                                                        fontSize: '0.85rem',
+                                                        fontWeight: 800,
+                                                        borderRadius: '12px'
+                                                    }}
+                                                >
+                                                    <ExternalLink size={16} />
+                                                    Go to Course
+                                                </a>
+                                            )}
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
                                                 <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--brand-200)', color: 'var(--brand-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem' }}>
                                                     {ass.faculty_name.charAt(0)}
