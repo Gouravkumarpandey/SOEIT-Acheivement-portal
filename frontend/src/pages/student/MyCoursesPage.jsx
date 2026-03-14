@@ -64,13 +64,13 @@ const MyCoursesPage = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to purge this course record?')) return;
+        if (!window.confirm('Are you sure you want to delete this course record?')) return;
         try {
             await courseAPI.delete(id);
-            toast.success('Record purged from registry');
+            toast.success('Record deleted from registry');
             loadData();
         } catch {
-            toast.error('Purge operation failed');
+            toast.error('Delete operation failed');
         }
     };
 

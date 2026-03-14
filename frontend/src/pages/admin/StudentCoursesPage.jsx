@@ -69,10 +69,10 @@ const StudentCoursesPage = () => {
     };
 
     const handleDeleteAssignment = async (id) => {
-        if (!window.confirm('Are you sure you want to purge this allocation?')) return;
+        if (!window.confirm('Are you sure you want to delete this allocation?')) return;
         try {
             await courseAPI.deleteAssignment(id);
-            toast.success('Allocation purged from registry');
+            toast.success('Allocation deleted from registry');
             loadAssignments();
         } catch {
             toast.error('De-allocation failed');

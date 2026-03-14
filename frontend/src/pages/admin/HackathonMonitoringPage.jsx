@@ -111,10 +111,10 @@ const HackathonMonitoringPage = () => {
         if (!window.confirm('SECURITY ALERT: Delete this scholarship application log?')) return;
         try {
             await hackathonAPI.deleteActivity(id);
-            toast.success('Activity log purged');
+            toast.success('Activity log deleted');
             fetchActivities();
         } catch (error) {
-            toast.error('Purge protocol failed');
+            toast.error('Deletion protocol failed');
         }
     };
 
