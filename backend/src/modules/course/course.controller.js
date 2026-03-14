@@ -1,6 +1,6 @@
-const Course = require('../course/course.model');
-const CourseAssignment = require('../course/course-assignment.model');
-const User = require('../user/user.model');
+const Course = require('../../modules/course/course.model');
+const CourseAssignment = require('../../modules/course/course-assignment.model');
+const User = require('../../modules/user/user.model');
 const { clearCache } = require('../../utils/cache');
 const syncEngine = require('../../utils/syncEngine');
 

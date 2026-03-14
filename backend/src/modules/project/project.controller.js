@@ -1,4 +1,4 @@
-const Project = require('../project/project.model');
+const Project = require('../../modules/project/project.model');
 
 // @desc    Add new project
 // @route   POST /api/projects

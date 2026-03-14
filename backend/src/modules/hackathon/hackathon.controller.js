@@ -1,5 +1,5 @@
-const Hackathon = require('../hackathon/hackathon.model');
-const HackathonActivity = require('../hackathon/hackathon-activity.model');
+const Hackathon = require('../../modules/hackathon/hackathon.model');
+const HackathonActivity = require('../../modules/hackathon/hackathon-activity.model');
 
 // @desc    Get all hackathons
 // @route   GET /api/hackathons

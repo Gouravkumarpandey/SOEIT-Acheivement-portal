@@ -1,7 +1,7 @@
-const User = require('../user/user.model');
+const User = require('../../modules/user/user.model');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const FileModel = require('../file/file.model');
+const FileModel = require('../../modules/file/file.model');
 const { clearCache } = require('../../utils/cache');
 
 const generateToken = (id) => {

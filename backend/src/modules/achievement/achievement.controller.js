@@ -1,9 +1,9 @@
-const Achievement = require('../achievement/achievement.model');
-const Verification = require('../achievement/verification.model');
-const User = require('../user/user.model');
-const Course = require('../course/course.model');
-const HackathonActivity = require('../hackathon/hackathon-activity.model');
-const FileModel = require('../file/file.model');
+const Achievement = require('../../modules/achievement/achievement.model');
+const Verification = require('../../modules/achievement/verification.model');
+const User = require('../../modules/user/user.model');
+const Course = require('../../modules/course/course.model');
+const HackathonActivity = require('../../modules/hackathon/hackathon-activity.model');
+const FileModel = require('../../modules/file/file.model');
 const { cache, clearCache } = require('../../utils/cache');
 
 // @desc    Create achievement

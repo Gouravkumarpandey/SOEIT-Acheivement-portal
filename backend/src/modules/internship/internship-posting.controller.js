@@ -1,4 +1,4 @@
-const InternshipPosting = require('../internship/internship-posting.model');
+const InternshipPosting = require('../../modules/internship/internship-posting.model');
 
 // @desc    Post a new internship opportunity (Faculty/Admin)
 // @route   POST /api/internship-postings

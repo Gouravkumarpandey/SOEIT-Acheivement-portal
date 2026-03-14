@@ -1,6 +1,6 @@
-const Event = require('../event/event.model');
-const User = require('../user/user.model');
-const Notification = require('../notification/notification.model');
+const Event = require('../../modules/event/event.model');
+const User = require('../../modules/user/user.model');
+const Notification = require('../../modules/notification/notification.model');
 const sendEmail = require('../../utils/sendEmail');
 const getEmailTemplate = require('../../utils/emailTemplates');
 const { clearCache } = require('../../utils/cache');

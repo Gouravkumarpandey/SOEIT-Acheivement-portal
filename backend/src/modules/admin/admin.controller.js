@@ -1,6 +1,6 @@
-const Achievement = require('../achievement/achievement.model');
-const User = require('../user/user.model');
-const Verification = require('../achievement/verification.model');
+const Achievement = require('../../modules/achievement/achievement.model');
+const User = require('../../modules/user/user.model');
+const Verification = require('../../modules/achievement/verification.model');
 const { getDb } = require('../../config/db');
 const sendEmail = require('../../utils/sendEmail');
 const getEmailTemplate = require('../../utils/emailTemplates');
@@ -152,7 +152,7 @@ exports.verifyAchievement = async (req, res, next) => {
 
         // Create in-app notification for the student
         if (updated && updated.studentId) {
-            const Notification = require('../notification/notification.model');
+            const Notification = require('../../modules/notification/notification.model');
             await Notification.create({
                 user: updated.studentId,
                 type: 'achievement',
