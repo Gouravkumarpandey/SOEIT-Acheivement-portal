@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { courseAPI } from '../../services/api';
-import { Plus, Trash2, BookOpen, Clock, CheckCircle2, Book, GraduationCap, ExternalLink } from 'lucide-react';
+import { Plus, Trash2, BookOpen, Clock, CheckCircle2, Book, GraduationCap, ExternalLink, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const MyCoursesPage = () => {
@@ -78,29 +78,42 @@ const MyCoursesPage = () => {
         <div className="animate-fade-in">
             <div className="page-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h2 className="heading-display">My Courses</h2>
-                    <p className="page-subtitle">Check assigned courses and track your added course progress.</p>
+                    <h2 className="heading-display">My Learning Journey</h2>
+                    <p className="page-subtitle">Track your progress in assigned departmental courses and personal certifications.</p>
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ borderRadius: '12px', padding: '0.75rem 1.5rem' }}>
-                    <Plus size={18} />
+                <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ borderRadius: '12px', padding: '0.75rem 1.5rem', gap: '0.75rem' }}>
+                    <Plus size={20} />
                     <span>Add New Course</span>
                 </button>
             </div>
 
             {/* Assigned by Faculty Section */}
-            {assignedCourses.length > 0 && (
-                <div style={{ marginBottom: '3rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                        <GraduationCap size={24} style={{ color: 'var(--brand-600)' }} />
-                        <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Courses Assigned to You</h3>
-                        <span className="badge badge-brand" style={{ borderRadius: '6px' }}>{assignedCourses.length} Assigned</span>
+            <div style={{ marginBottom: '3.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                    <GraduationCap size={24} style={{ color: 'var(--brand-600)' }} />
+                    <h3 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Courses Assigned to You</h3>
+                    {assignedCourses.length > 0 && (
+                        <span className="badge badge-brand" style={{ borderRadius: '6px' }}>{assignedCourses.length} Required</span>
+                    )}
+                </div>
+
+                {loading ? (
+                    <div className="grid-res grid-res-2" style={{ gap: '1.5rem' }}>
+                        {[...Array(2)].map((_, i) => <div key={i} className="skeleton" style={{ height: 180, borderRadius: 'var(--radius-lg)' }} />)}
                     </div>
+                ) : assignedCourses.length === 0 ? (
+                    <div className="card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+                        <GraduationCap size={40} style={{ opacity: 0.2, margin: '0 auto 1rem auto', color: 'var(--brand-600)' }} />
+                        <h4 style={{ fontWeight: 800, color: 'var(--brand-700)' }}>No mandatory courses assigned</h4>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>You're all caught up with your departmental requirements.</p>
+                    </div>
+                ) : (
                     <div className="grid-res grid-res-2" style={{ gap: '1.5rem' }}>
                         {assignedCourses.map(ass => (
-                            <div key={ass.id} className="card" style={{ borderRadius: '24px', border: '2px solid var(--brand-100)', background: 'linear-gradient(to bottom right, #ffffff, var(--brand-50))' }}>
+                            <div key={ass.id} className="card" style={{ position: 'relative', overflow: 'hidden' }}>
                                 <div className="card-body" style={{ padding: '2rem' }}>
                                     <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
-                                        <div style={{ width: 56, height: 56, background: 'var(--brand-600)', color: 'white', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        <div style={{ width: 56, height: 56, background: 'var(--brand-600)', color: 'white', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                             <Book size={28} />
                                         </div>
                                         <div style={{ flex: 1 }}>
@@ -118,27 +131,24 @@ const MyCoursesPage = () => {
                                                     href={ass.course_link} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer"
-                                                    className="btn btn-ghost"
+                                                    className="btn btn-primary"
                                                     style={{ 
-                                                        marginTop: '1rem', 
+                                                        marginTop: '1.25rem', 
                                                         width: '100%', 
                                                         justifyContent: 'center', 
                                                         gap: '0.5rem',
-                                                        background: 'var(--brand-100)',
-                                                        color: 'var(--brand-700)',
                                                         fontSize: '0.85rem',
                                                         fontWeight: 800,
-                                                        borderRadius: '12px'
+                                                        borderRadius: '12px',
+                                                        padding: '0.75rem'
                                                     }}
                                                 >
                                                     <ExternalLink size={16} />
-                                                    Go to Course
+                                                    Access Learning Material
                                                 </a>
                                             )}
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                                                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--brand-200)', color: 'var(--brand-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem' }}>
-                                                    {ass.faculty_name.charAt(0)}
-                                                </div>
+                                                <div className="avatar avatar-sm" style={{ width: 32, height: 32 }}>{ass.faculty_name.charAt(0)}</div>
                                                 <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>Assigned by: <span style={{ color: 'var(--brand-600)' }}>{ass.faculty_name}</span></div>
                                             </div>
                                         </div>
@@ -147,8 +157,8 @@ const MyCoursesPage = () => {
                             </div>
                         ))}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
                 <BookOpen size={24} style={{ color: 'var(--text-primary)' }} />
@@ -156,19 +166,19 @@ const MyCoursesPage = () => {
             </div>
 
             {loading ? (
-                <div className="grid-res grid-res-3">
-                    {[...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: 200, borderRadius: '20px' }} />)}
+                <div className="grid-res grid-res-3" style={{ gap: '1.5rem' }}>
+                    {[...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: 220, borderRadius: 'var(--radius-lg)' }} />)}
                 </div>
             ) : courses.length === 0 ? (
                 <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
                     <BookOpen size={64} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
-                    <h3 style={{ fontWeight: 800 }}>No courses added yet</h3>
-                    <p style={{ color: 'var(--text-muted)' }}>Start adding your learning journey here.</p>
+                    <h3 style={{ fontWeight: 800 }}>Start your registry</h3>
+                    <p style={{ color: 'var(--text-muted)' }}>You haven't added any personal courses yet. Click "Add New Course" to begin.</p>
                 </div>
             ) : (
                 <div className="grid-res grid-res-3" style={{ gap: '1.5rem' }}>
                     {courses.map(course => (
-                        <div key={course.id} className="card course-card animate-scale-in" style={{ padding: '1.5rem', border: '1px solid var(--border-primary)', position: 'relative', overflow: 'hidden' }}>
+                        <div key={course.id} className="card course-card animate-scale-in" style={{ padding: '1.75rem', border: '1px solid var(--border-primary)', position: 'relative', overflow: 'hidden' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
                                 <div style={{ width: 44, height: 44, background: 'var(--primary-50)', color: 'var(--brand-700)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <BookOpen size={22} />
@@ -178,7 +188,7 @@ const MyCoursesPage = () => {
                                 </button>
                             </div>
 
-                            <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>{course.course_name}</h4>
+                            <h4 style={{ fontSize: '1.1rem', fontWeight: 850, margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>{course.course_name}</h4>
                             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 700, marginBottom: '1.5rem' }}>{course.platform}</p>
 
                             <div style={{ marginBottom: '1.5rem' }}>
@@ -193,13 +203,13 @@ const MyCoursesPage = () => {
 
                             <div style={{ display: 'flex', gap: '0.75rem' }}>
                                 <button
-                                    className="btn btn-ghost w-full"
-                                    style={{ fontSize: '0.8rem', fontWeight: 800, padding: '0.75rem', background: 'var(--slate-50)' }}
+                                    className="btn btn-secondary w-full"
+                                    style={{ fontSize: '0.8rem', fontWeight: 800, padding: '0.75rem', borderRadius: '10px' }}
                                     onClick={() => handleUpdateProgress(course.id, course.progress)}
                                     disabled={course.progress >= 100}
                                 >
                                     <Clock size={16} />
-                                    <span>Inc. Progress</span>
+                                    <span>Update Progress</span>
                                 </button>
                                 {course.progress === 100 && (
                                     <div style={{ padding: '0.75rem', background: 'var(--success-50)', color: 'var(--success-700)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center' }}>
@@ -214,55 +224,70 @@ const MyCoursesPage = () => {
             )}
 
             {showAddModal && (
-                <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-                    <div className="card animate-scale-in" style={{ width: '100%', maxWidth: '450px', padding: '2rem' }}>
-                        <h3 style={{ margin: '0 0 1.5rem 0', fontWeight: 900 }}>Add New Course</h3>
-                        <form onSubmit={handleAddCourse} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                            <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>COURSE NAME</label>
-                                <input
-                                    className="form-control"
-                                    placeholder="Enter Course name"
-                                    required
-                                    value={newCourse.courseName}
-                                    onChange={e => setNewCourse({ ...newCourse, courseName: e.target.value })}
-                                />
+                <div className="modal-overlay animate-fade-in">
+                    <div className="modal animate-scale-in">
+                        <div className="modal-header">
+                            <div>
+                                <h3 style={{ margin: 0 }}>Add New Course</h3>
+                                <p style={{ margin: 0 }}>Initialize a new course in your learning registry.</p>
                             </div>
-                            <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>PLATFORM</label>
-                                <select
-                                    className="form-control"
-                                    required
-                                    value={newCourse.platform}
-                                    onChange={e => setNewCourse({ ...newCourse, platform: e.target.value })}
-                                >
-                                    <option value="">Select Platform</option>
-                                    <option value="Coursera">Coursera</option>
-                                    <option value="NPTEL">NPTEL</option>
-                                    <option value="Udemy">Udemy</option>
-                                    <option value="LinkedIn Learning">LinkedIn Learning</option>
-                                    <option value="Internshala">Internshala</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-
-                            {newCourse.platform === 'Other' && (
-                                <div className="form-group animate-fade-in">
-                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>SPECIFY PLATFORM</label>
+                            <button className="btn btn-ghost" onClick={() => setShowAddModal(false)} style={{ color: 'white', padding: '0.25rem' }}>
+                                <XCircle size={22} />
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={handleAddCourse} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.85rem' }}>Course Name</label>
                                     <input
                                         className="form-control"
-                                        placeholder="e.g. edX, Pluralsight, etc."
+                                        style={{ height: '54px', borderRadius: '14px', fontSize: '1rem' }}
+                                        placeholder="e.g. Modern React Architecture"
                                         required
-                                        value={newCourse.customPlatform}
-                                        onChange={e => setNewCourse({ ...newCourse, customPlatform: e.target.value })}
+                                        value={newCourse.courseName}
+                                        onChange={e => setNewCourse({ ...newCourse, courseName: e.target.value })}
                                     />
                                 </div>
-                            )}
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                <button type="button" className="btn btn-ghost w-full" onClick={() => setShowAddModal(false)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary w-full">Add Course</button>
-                            </div>
-                        </form>
+                                
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.85rem' }}>Learning Platform</label>
+                                    <select
+                                        className="form-control"
+                                        style={{ height: '54px', borderRadius: '14px', fontSize: '1rem', fontWeight: 700 }}
+                                        required
+                                        value={newCourse.platform}
+                                        onChange={e => setNewCourse({ ...newCourse, platform: e.target.value })}
+                                    >
+                                        <option value="">Select Platform</option>
+                                        <option value="Coursera">Coursera</option>
+                                        <option value="NPTEL">NPTEL</option>
+                                        <option value="Udemy">Udemy</option>
+                                        <option value="LinkedIn Learning">LinkedIn Learning</option>
+                                        <option value="Internshala">Internshala</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                {newCourse.platform === 'Other' && (
+                                    <div className="form-group animate-fade-in">
+                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.85rem' }}>Specify Platform</label>
+                                        <input
+                                            className="form-control"
+                                            style={{ height: '54px', borderRadius: '14px' }}
+                                            placeholder="e.g. edX, Pluralsight, etc."
+                                            required
+                                            value={newCourse.customPlatform}
+                                            onChange={e => setNewCourse({ ...newCourse, customPlatform: e.target.value })}
+                                        />
+                                    </div>
+                                )}
+
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                                    <button type="button" className="btn btn-secondary" style={{ flex: 1, height: '54px', borderRadius: '14px', fontWeight: 800 }} onClick={() => setShowAddModal(false)}>Cancel</button>
+                                    <button type="submit" className="btn btn-primary" style={{ flex: 2, height: '54px', borderRadius: '14px', fontWeight: 800, fontSize: '1rem' }}>Add Course</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}

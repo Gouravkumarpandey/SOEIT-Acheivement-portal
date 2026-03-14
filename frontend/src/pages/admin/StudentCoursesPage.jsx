@@ -273,13 +273,19 @@ const StudentCoursesPage = () => {
             )}
 
             {showAssignModal && (
-                <div className="modal-overlay" style={{ zIndex: 1100 }}>
-                    <div className="modal" style={{ maxWidth: '550px', borderRadius: '30px', padding: '2.5rem' }}>
-                        <div style={{ marginBottom: '2rem' }}>
-                            <h2 style={{ fontWeight: 900, letterSpacing: '-0.02em' }}>Assign New Course</h2>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Select a department and semester to assign a course.</p>
+                <div className="modal-overlay animate-fade-in">
+                    <div className="modal animate-scale-in">
+                        <div className="modal-header">
+                            <div>
+                                <h2 style={{ fontWeight: 900, letterSpacing: '-0.02em', margin: 0 }}>Assign New Course</h2>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '0.25rem 0 0 0' }}>Select a department and semester to assign a course.</p>
+                            </div>
+                            <button className="btn btn-ghost" onClick={() => setShowAssignModal(false)} style={{ borderRadius: '50%', width: 44, height: 44, padding: 0 }}>
+                                <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
+                            </button>
                         </div>
-                        <form onSubmit={handleAssignCourse}>
+                        <div className="modal-body">
+                            <form onSubmit={handleAssignCourse}>
                             <div className="form-group">
                                 <label className="form-label" style={{ fontWeight: 800 }}>Course Name</label>
                                 <input 
@@ -360,9 +366,10 @@ const StudentCoursesPage = () => {
                         </form>
                     </div>
                 </div>
-            )}
-        </div>
-    );
+            </div>
+        )}
+    </div>
+);
 };
 
 export default StudentCoursesPage;

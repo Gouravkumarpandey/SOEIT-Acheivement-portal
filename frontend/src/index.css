@@ -210,10 +210,7 @@ h6 {
 .heading-display {
   font-weight: 800;
   letter-spacing: -0.04em;
-  background: linear-gradient(to bottom right, var(--primary-900), var(--primary-700));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--primary-900);
 }
 
 
@@ -855,12 +852,11 @@ textarea.form-control {
 .loading-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(248, 250, 252, 0.75);
+  background: rgba(248, 250, 252, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  backdrop-filter: blur(4px);
 }
 
 /* ===================== TOPBAR ===================== */
@@ -871,7 +867,6 @@ textarea.form-control {
   justify-content: space-between;
   padding: 0 2rem;
   background: #fff;
-  backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-primary);
   box-shadow: var(--shadow-sm);
   position: sticky;
@@ -1448,39 +1443,81 @@ textarea.form-control {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.35);
-  backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.35); /* Institutional Navy Overlay */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 500;
-  padding: 1rem;
-  animation: fadeIn 0.2s ease;
+  z-index: 2000;
+  padding: 1.5rem;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease;
 }
 
 .modal {
   background: #fff;
   border: 1px solid var(--border-primary);
-  border-radius: var(--radius-xl);
+  border-radius: 20px;
   width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow-xl);
+  max-width: 650px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.35);
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  max-height: calc(100vh - 4rem);
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+
+  .modal {
+    max-height: calc(100vh - 2rem);
+    border-radius: 20px;
+  }
+
+  .modal-header {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
 }
 
 .modal-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-primary);
+  padding: 1.25rem 1.75rem;
+  background: var(--brand-700);
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  flex-shrink: 0;
+}
+
+.modal-header h3 {
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.modal-header p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 2.5rem;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .modal-footer {

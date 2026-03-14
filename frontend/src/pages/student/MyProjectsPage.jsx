@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { projectAPI } from '../../services/api';
-import { Plus, Trash2, Github, ExternalLink, Code2, Layers } from 'lucide-react';
+import { Plus, Trash2, Github, ExternalLink, Code2, Layers, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const MyProjectsPage = () => {
@@ -149,83 +149,93 @@ const MyProjectsPage = () => {
             )}
 
             {showModal && (
-                <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-                    <div className="card animate-scale-in" style={{ width: '100%', maxWidth: '600px', padding: '2rem', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <h3 style={{ margin: '0 0 1.5rem 0', fontWeight: 900 }}>Add New Project</h3>
-                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                            <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>PROJECT TITLE</label>
-                                <input
-                                    className="form-control"
-                                    placeholder="e.g. Portfolio Website, E-commerce App"
-                                    required
-                                    value={formData.title}
-                                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                />
+                <div className="modal-overlay animate-fade-in">
+                    <div className="modal animate-scale-in" style={{ maxWidth: '600px' }}>
+                        <div className="modal-header">
+                            <div>
+                                <h3 style={{ margin: 0 }}>Add New Project</h3>
+                                <p style={{ margin: 0 }}>Showcase your technical work and achievements.</p>
                             </div>
-
-                            <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>DESCRIPTION</label>
-                                <textarea
-                                    className="form-control"
-                                    placeholder="Describe your project, features, and your role..."
-                                    rows={4}
-                                    required
-                                    value={formData.description}
-                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>TECH STACK (COMMA SEPARATED)</label>
-                                <input
-                                    className="form-control"
-                                    placeholder="e.g. React, Node.js, MongoDB"
-                                    value={formData.techStack}
-                                    onChange={e => setFormData({ ...formData, techStack: e.target.value })}
-                                />
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                            <button className="btn btn-ghost" onClick={() => setShowModal(false)} style={{ color: 'white', padding: '0.25rem' }}>
+                                <XCircle size={22} />
+                            </button>
+                        </div>
+                        <div className="modal-body" style={{ padding: '2rem' }}>
+                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>GITHUB LINK</label>
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>PROJECT TITLE</label>
                                     <input
-                                        type="url"
                                         className="form-control"
-                                        placeholder="https://github.com/..."
-                                        value={formData.githubLink}
-                                        onChange={e => setFormData({ ...formData, githubLink: e.target.value })}
+                                        placeholder="e.g. Portfolio Website, E-commerce App"
+                                        required
+                                        value={formData.title}
+                                        onChange={e => setFormData({ ...formData, title: e.target.value })}
                                     />
                                 </div>
+
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>LIVE DEMO LINK</label>
-                                    <input
-                                        type="url"
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>DESCRIPTION</label>
+                                    <textarea
                                         className="form-control"
-                                        placeholder="https://..."
-                                        value={formData.liveLink}
-                                        onChange={e => setFormData({ ...formData, liveLink: e.target.value })}
+                                        placeholder="Describe your project, features, and your role..."
+                                        rows={4}
+                                        required
+                                        value={formData.description}
+                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
                                     />
                                 </div>
-                            </div>
 
-                            <div className="form-group">
-                                <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>STATUS</label>
-                                <select
-                                    className="form-control"
-                                    value={formData.status}
-                                    onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                >
-                                    <option value="Completed">Completed</option>
-                                    <option value="Ongoing">Ongoing</option>
-                                </select>
-                            </div>
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>TECH STACK (COMMA SEPARATED)</label>
+                                    <input
+                                        className="form-control"
+                                        placeholder="e.g. React, Node.js, MongoDB"
+                                        value={formData.techStack}
+                                        onChange={e => setFormData({ ...formData, techStack: e.target.value })}
+                                    />
+                                </div>
 
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                <button type="button" className="btn btn-ghost w-full" onClick={() => setShowModal(false)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary w-full">Add Project</button>
-                            </div>
-                        </form>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                                    <div className="form-group">
+                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>GITHUB LINK</label>
+                                        <input
+                                            type="url"
+                                            className="form-control"
+                                            placeholder="https://github.com/..."
+                                            value={formData.githubLink}
+                                            onChange={e => setFormData({ ...formData, githubLink: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>LIVE DEMO LINK</label>
+                                        <input
+                                            type="url"
+                                            className="form-control"
+                                            placeholder="https://..."
+                                            value={formData.liveLink}
+                                            onChange={e => setFormData({ ...formData, liveLink: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label" style={{ fontWeight: 800, fontSize: '0.75rem' }}>STATUS</label>
+                                    <select
+                                        className="form-control"
+                                        value={formData.status}
+                                        onChange={e => setFormData({ ...formData, status: e.target.value })}
+                                    >
+                                        <option value="Completed">Completed</option>
+                                        <option value="Ongoing">Ongoing</option>
+                                    </select>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                    <button type="button" className="btn btn-ghost w-full" onClick={() => setShowModal(false)}>Cancel</button>
+                                    <button type="submit" className="btn btn-primary w-full">Add Project</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
