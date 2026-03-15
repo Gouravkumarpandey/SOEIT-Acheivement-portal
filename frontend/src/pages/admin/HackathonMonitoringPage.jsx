@@ -13,7 +13,7 @@ const HackathonMonitoringPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddModal, setShowAddModal] = useState(false);
     const [newHack, setNewHack] = useState({
-        title: '', type: 'Web Development', link: '', prize: '',
+        title: '', type: '', link: '', prize: '',
         deadline_date: '', badge: '', students_count: '0'
     });
 
@@ -60,7 +60,7 @@ const HackathonMonitoringPage = () => {
             if (res.data.success) {
                 toast.success('Hackathon published to live registry');
                 setShowAddModal(false);
-                setNewHack({ title: '', type: 'Web Development', link: '', prize: '', deadline_date: '', badge: '', students_count: '0' });
+                setNewHack({ title: '', type: '', link: '', prize: '', deadline_date: '', badge: '', students_count: '0' });
                 fetchLiveChallenges();
             }
         } catch (error) {
@@ -282,9 +282,11 @@ const HackathonMonitoringPage = () => {
                                     <label className="form-label">Category</label>
                                     <select
                                         className="form-input"
+                                        required
                                         value={newHack.type}
                                         onChange={e => setNewHack({ ...newHack, type: e.target.value })}
                                     >
+                                        <option value="">Select Category</option>
                                         <option>Web Development</option>
                                         <option>AI / ML</option>
                                         <option>Cybersecurity</option>
