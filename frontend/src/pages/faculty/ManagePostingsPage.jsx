@@ -259,7 +259,7 @@ const ManagePostingsPage = () => {
                                     <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 900, color: 'white' }}>{editingId ? 'Edit Internship' : 'Add Internship'}</h3>
                                     <p style={{ margin: '0.5rem 0 0 0', opacity: 0.9, fontWeight: 600, fontSize: '0.85rem' }}>Enter the internship details for the students.</p>
                                 </div>
-                                <button onClick={() => setShowModal(false)} className="btn btn-ghost" style={{ color: 'white' }}><X size={24} /></button>
+                                <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost" style={{ color: '#ef4444', background: 'rgba(255,255,255,0.1)', padding: '0.5rem', borderRadius: '12px' }}><X size={24} /></button>
                             </div>
                         </div>
 

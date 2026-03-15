@@ -284,7 +284,7 @@ const MyCoursesPage = () => {
                                 <h3 style={{ margin: 0 }}>Add New Course</h3>
                                 <p style={{ margin: 0 }}>Initialize a new course in your learning registry.</p>
                             </div>
-                            <button className="btn btn-ghost btn-close-red" onClick={() => setShowAddModal(false)}>
+                            <button className="btn btn-ghost" onClick={() => setShowAddModal(false)} style={{ color: '#ef4444' }}>
                                 <X size={24} />
                             </button>
                         </div>
