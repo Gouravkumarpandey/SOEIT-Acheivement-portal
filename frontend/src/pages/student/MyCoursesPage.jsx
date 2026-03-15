@@ -15,7 +15,7 @@ const MyCoursesPage = () => {
         customPlatform: '', 
         courseLink: '', 
         progress: 0,
-        category: 'Technical Core',
+        category: '',
         expectedCompletionDate: '',
         skillsToBeLearnt: ''
     });
@@ -60,7 +60,7 @@ const MyCoursesPage = () => {
                 customPlatform: '', 
                 courseLink: '', 
                 progress: 0,
-                category: 'Technical Core',
+                category: '',
                 expectedCompletionDate: '',
                 skillsToBeLearnt: ''
             });
@@ -351,6 +351,7 @@ const MyCoursesPage = () => {
                                         value={newCourse.category}
                                         onChange={e => setNewCourse({ ...newCourse, category: e.target.value })}
                                     >
+                                        <option value="">Select Category</option>
                                         <option value="Technical Core">Technical (Programming, CS, etc.)</option>
                                         <option value="Interdisciplinary">Interdisciplinary (Management, Soft Skills)</option>
                                         <option value="Placement Prep">Placement Prep</option>
