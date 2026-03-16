@@ -7,50 +7,105 @@ import {
 } from 'lucide-react';
 
 const studentLinks = [
-    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/events', icon: Calendar, label: 'Campus Events' },
-    { to: '/achievements', icon: Trophy, label: 'My Achievements' },
-    { to: '/achievements/upload', icon: Upload, label: 'Upload Achievement' },
-    { to: '/courses', icon: BookOpen, label: 'Course Registry' },
-    { to: '/internships', icon: Briefcase, label: 'My Internships' },
-    { to: '/internship-opportunities', icon: Star, label: 'Internship Opportunities' },
-    { to: '/hackathons', icon: Terminal, label: 'Live Hackathons' },
-    { to: '/projects', icon: Layers, label: 'My Projects' },
-    { to: '/profile', icon: User, label: 'My Profile' },
+    {
+        title: 'Main Menu',
+        links: [
+            { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+            { to: '/events', icon: Calendar, label: 'Campus Events' },
+        ]
+    },
+    {
+        title: 'Achievements',
+        links: [
+            { to: '/achievements', icon: Trophy, label: 'My Achievements' },
+            { to: '/achievements/upload', icon: Upload, label: 'Upload Achievement' },
+        ]
+    },
+    {
+        title: 'Academic',
+        links: [
+            { to: '/courses', icon: BookOpen, label: 'Course Registry' },
+            { to: '/projects', icon: Layers, label: 'My Projects' },
+        ]
+    },
+    {
+        title: 'Career & Talent',
+        links: [
+            { to: '/internships', icon: Briefcase, label: 'My Internships' },
+            { to: '/internship-opportunities', icon: Star, label: 'Internship Opportunities' },
+            { to: '/hackathons', icon: Terminal, label: 'Live Hackathons' },
+        ]
+    },
+    {
+        title: 'Account',
+        links: [
+            { to: '/profile', icon: User, label: 'My Profile' },
+        ]
+    }
 ];
 
 const adminLinks = [
-    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/events', icon: Calendar, label: 'Campus Events' },
-    { to: '/admin/verify', icon: CheckCircle, label: 'Verify Achievements' },
-    { to: '/admin/achievements', icon: Trophy, label: 'All Achievements' },
-    { to: '/admin/students', icon: Users, label: 'Students' },
-    { to: '/admin/faculty', icon: Shield, label: 'Faculty' },
-    { to: '/admin/reports', icon: BarChart3, label: 'Reports & Analytics' },
-    { to: '/admin/courses', icon: BookOpen, label: 'Course Monitoring' },
-    { to: '/admin/internships', icon: Briefcase, label: 'Internship Monitoring' },
-    { to: '/admin/projects', icon: Layers, label: 'Project Monitoring' },
-    { to: '/admin/manage-internships', icon: Upload, label: 'Internship Postings' },
-    { to: '/admin/hackathons', icon: Activity, label: 'Hackathon Control' },
-    { to: '/profile', icon: User, label: 'My Profile' },
+    {
+        title: 'Main Menu',
+        links: [
+            { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+            { to: '/events', icon: Calendar, label: 'Campus Events' },
+        ]
+    },
+    {
+        title: 'Achievements',
+        links: [
+            { to: '/admin/verify', icon: CheckCircle, label: 'Verify Achievements' },
+            { to: '/admin/achievements', icon: Trophy, label: 'All Achievements' },
+        ]
+    },
+    {
+        title: 'Academic Monitoring',
+        links: [
+            { to: '/admin/students', icon: Users, label: 'Students' },
+            { to: '/admin/faculty', icon: Shield, label: 'Faculty' },
+            { to: '/admin/courses', icon: BookOpen, label: 'Course Monitoring' },
+            { to: '/admin/projects', icon: Layers, label: 'Project Monitoring' },
+        ]
+    },
+    {
+        title: 'Resource Management',
+        links: [
+            { to: '/admin/manage-internships', icon: Upload, label: 'Internship Postings' },
+            { to: '/admin/internships', icon: Briefcase, label: 'Internship Monitoring' },
+            { to: '/admin/hackathons', icon: Activity, label: 'Hackathon Control' },
+        ]
+    },
+    {
+        title: 'Analytics & Settings',
+        links: [
+            { to: '/admin/reports', icon: BarChart3, label: 'Reports & Analytics' },
+            { to: '/profile', icon: User, label: 'My Profile' },
+        ]
+    }
 ];
+
 
 const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
     const { user, logout, isStudent } = useAuth();
     const navigate = useNavigate();
-    const links = isStudent ? studentLinks : adminLinks;
+    const categories = isStudent ? studentLinks : adminLinks;
 
-    const filteredLinks = links
-        .filter(link => {
-            if (user?.role === 'faculty' && link.to === '/admin/faculty') return false;
-            return true;
-        })
-        .map(link => {
-            if (user?.role === 'faculty' && link.to === '/admin/dashboard') return { ...link, to: '/faculty/dashboard' };
-            if (user?.role === 'faculty' && link.to === '/admin/manage-internships') return { ...link, to: '/faculty/manage-internships' };
-            if (user?.role === 'faculty' && link.to === '/admin/projects') return { ...link, to: '/faculty/projects' };
-            return link;
-        });
+    const filteredCategories = categories.map(category => ({
+        ...category,
+        links: category.links
+            .filter(link => {
+                if (user?.role === 'faculty' && link.to === '/admin/faculty') return false;
+                return true;
+            })
+            .map(link => {
+                if (user?.role === 'faculty' && link.to === '/admin/dashboard') return { ...link, to: '/faculty/dashboard' };
+                if (user?.role === 'faculty' && link.to === '/admin/manage-internships') return { ...link, to: '/faculty/manage-internships' };
+                if (user?.role === 'faculty' && link.to === '/admin/projects') return { ...link, to: '/faculty/projects' };
+                return link;
+            })
+    })).filter(category => category.links.length > 0);
+
 
     const handleLogout = async () => {
         await logout();
@@ -148,33 +203,49 @@ const Sidebar = ({ mobileOpen, onClose, collapsed, onToggleCollapse }) => {
                     </div>
                 </div>
 
-                <nav className="sidebar-nav" style={{ flex: 1, padding: '1.5rem 0.75rem', overflowY: 'auto' }}>
-                    <div className="sidebar-text-expand" style={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--text-muted)', padding: '0 1rem 1rem', opacity: 0.6 }}>Menu</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                        {filteredLinks.map(({ to, icon: Icon, label }) => (
-                            <NavLink key={to} to={to} onClick={mobileOpen ? onClose : undefined} end
-                                className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-                                style={({ isActive }) => ({
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.875rem',
-                                    padding: '0.875rem 1rem',
-                                    borderRadius: '12px',
-                                    fontWeight: isActive ? 800 : 600,
-                                    fontSize: '0.9rem',
-                                    color: isActive ? 'var(--brand-700)' : 'var(--text-secondary)',
-                                    background: isActive ? 'var(--primary-50)' : 'transparent',
-                                    transition: 'all 0.2s ease',
-                                    textDecoration: 'none',
-                                    border: isActive ? '1px solid var(--primary-100)' : '1px solid transparent'
-                                })}>
-                                {({ isActive }) => (
-                                    <>
-                                        <Icon size={20} strokeWidth={isActive ? 2.5 : 2} style={{ flexShrink: 0 }} />
-                                        <span className="sidebar-text-expand" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
-                                    </>
-                                )}
-                            </NavLink>
+                <nav className="sidebar-nav" style={{ flex: 1, padding: '1rem 0.75rem', overflowY: 'auto' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        {filteredCategories.map((category, idx) => (
+                            <div key={idx}>
+                                <div className="sidebar-text-expand" style={{
+                                    fontSize: '0.65rem',
+                                    fontWeight: 900,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.12em',
+                                    color: 'var(--text-muted)',
+                                    padding: '0 1rem 0.6rem',
+                                    opacity: 0.5
+                                }}>
+                                    {category.title}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                    {category.links.map(({ to, icon: Icon, label }) => (
+                                        <NavLink key={to} to={to} onClick={mobileOpen ? onClose : undefined} end
+                                            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                                            style={({ isActive }) => ({
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.875rem',
+                                                padding: '0.8rem 1rem',
+                                                borderRadius: '12px',
+                                                fontWeight: isActive ? 800 : 600,
+                                                fontSize: '0.875rem',
+                                                color: isActive ? 'var(--brand-700)' : 'var(--text-secondary)',
+                                                background: isActive ? 'var(--primary-50)' : 'transparent',
+                                                transition: 'all 0.2s ease',
+                                                textDecoration: 'none',
+                                                border: isActive ? '1px solid var(--primary-100)' : '1px solid transparent'
+                                            })}>
+                                            {({ isActive }) => (
+                                                <>
+                                                    <Icon size={18} strokeWidth={isActive ? 2.5 : 2} style={{ flexShrink: 0 }} />
+                                                    <span className="sidebar-text-expand" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+                                                </>
+                                            )}
+                                        </NavLink>
+                                    ))}
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </nav>
