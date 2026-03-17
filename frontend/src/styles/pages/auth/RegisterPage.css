@@ -157,6 +157,42 @@
     text-decoration: underline;
 }
 
+/* ===== SIGN UP BUTTON — matches Login page exactly ===== */
+.btn-arka-jain {
+    background: #303657 !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 1.125rem !important;
+    border-radius: 14px !important;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 16px rgba(48, 54, 87, 0.2) !important;
+    cursor: pointer;
+}
+
+.btn-arka-jain:hover:not(:disabled) {
+    background: #1e2444 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(48, 54, 87, 0.3) !important;
+}
+
+.btn-arka-jain:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(48, 54, 87, 0.2) !important;
+}
+
+.btn-arka-jain:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.w-full {
+    width: 100%;
+    display: block;
+}
+
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;

@@ -230,18 +230,24 @@ const initSchema = async (client) => {
   ], 'write');
 
   // migration for existing systems
-  try {
-    await client.execute(`ALTER TABLE course_assignments ADD COLUMN course_link TEXT DEFAULT ''`);
-    await client.execute(`ALTER TABLE courses ADD COLUMN course_link TEXT DEFAULT ''`);
-    await client.execute(`ALTER TABLE courses ADD COLUMN last_synced_at TEXT`);
-    await client.execute(`ALTER TABLE courses ADD COLUMN sync_credentials TEXT DEFAULT '{}'`);
-    await client.execute(`ALTER TABLE courses ADD COLUMN category TEXT`);
-    await client.execute(`ALTER TABLE courses ADD COLUMN expected_completion_date TEXT`);
-    await client.execute(`ALTER TABLE courses ADD COLUMN skills_to_be_learnt TEXT`);
-    console.log('✅ Migration: added course tracking columns');
-  } catch (err) {
-    // columns likely exist
+  const migrations = [
+    `ALTER TABLE course_assignments ADD COLUMN course_link TEXT DEFAULT ''`,
+    `ALTER TABLE courses ADD COLUMN course_link TEXT DEFAULT ''`,
+    `ALTER TABLE courses ADD COLUMN last_synced_at TEXT`,
+    `ALTER TABLE courses ADD COLUMN sync_credentials TEXT DEFAULT '{}'`,
+    `ALTER TABLE courses ADD COLUMN category TEXT`,
+    `ALTER TABLE courses ADD COLUMN expected_completion_date TEXT`,
+    `ALTER TABLE courses ADD COLUMN skills_to_be_learnt TEXT`
+  ];
+
+  for (const query of migrations) {
+    try {
+      await client.execute(query);
+    } catch (err) {
+      // column likely exists, ignore the error
+    }
   }
+  console.log('✅ Migration checks completed for course tracking columns');
 };
 
 const seedDemoUsers = async (client) => {
