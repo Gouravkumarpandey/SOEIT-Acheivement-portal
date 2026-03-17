@@ -149,7 +149,8 @@ const NavDropdown = ({ category }) => {
                     {category.links.map(link => (
                         <NavLink 
                             key={link.to} 
-                            to={link.to} 
+                            to={link.to}
+                            end
                             onClick={() => setIsOpen(false)}
                             className={({ isActive }) => `dropdown-item ${isActive ? 'active' : ''}`}
                             style={({ isActive }) => ({
