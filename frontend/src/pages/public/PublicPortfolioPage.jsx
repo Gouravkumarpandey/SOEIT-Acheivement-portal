@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { achievementAPI, STATIC_BASE_URL } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal, Download, Shield } from 'lucide-react';
+import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal, Download, Shield, FileText, File as FileIcon, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { generateResumeDocx } from '../../utils/generateResumeDocx';
 
 const LEVEL_COLORS = { International: '#f59e0b', National: '#3b82f6', State: '#8b5cf6', University: '#10b981', College: '#06b6d4', Department: '#6b7280' };
 const CATEGORY_ICONS = { Academic: '🎓', Sports: '🏆', Cultural: '🎭', Technical: '💻', Research: '🔬', Internship: '💼', Certification: '📜', Competition: '🥇', 'Community Service': '🤝', Other: '⭐' };
@@ -107,6 +108,7 @@ const PublicPortfolioPage = () => {
                     const finalName = `${baseName}_${index}.${extension}`;
                     zip.file(finalName, blob);
                 } catch (err) {
+                    console.error('Download failed for file:', file?.name, err);
                     missingFiles++;
                 }
             });
@@ -134,6 +136,7 @@ const PublicPortfolioPage = () => {
                 toast.success('All certificates downloaded successfully!', { id: toastId });
             }
         } catch (error) {
+            console.error('ZIP creation failed:', error);
             toast.error('Failed to create ZIP file.', { id: toastId });
         } finally {
             setDownloading(false);
@@ -207,17 +210,26 @@ const PublicPortfolioPage = () => {
                                 {student.github && <a href={student.github.startsWith('http') ? student.github : `https://${student.github}`} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm"><Github size={14} /> GitHub</a>}
                                 {student.portfolio && <a href={student.portfolio.startsWith('http') ? student.portfolio : `https://${student.portfolio}`} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm"><Globe size={14} /> Portfolio</a>}
 
-                                <div style={{ width: '1px', height: '20px', background: 'var(--border-primary)', margin: '0 0.25rem' }} />
-
                                 {(user?.role === 'admin' || user?.role === 'faculty' || user?.id === userId || user?._id === userId) && (
-                                    <button
-                                        className="btn btn-primary btn-sm"
-                                        onClick={handleDownloadAll}
-                                        disabled={downloading}
-                                        style={{ background: 'var(--brand-700)', border: 'none', boxShadow: '0 4px 12px rgba(0,33,71,0.2)' }}
-                                    >
-                                        {downloading ? <div className="spinner-sm" /> : <><Download size={14} /> Download Evidence Ledger</>}
-                                    </button>
+                                    <>
+                                        <button
+                                            className="btn btn-secondary btn-sm"
+                                            onClick={() => generateResumeDocx(data)}
+                                            style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                                            title="Resume"
+                                        >
+                                            <FileText size={14} color="#3b82f6" /> Resume
+                                        </button>
+
+                                        <button
+                                            className="btn btn-primary btn-sm"
+                                            onClick={handleDownloadAll}
+                                            disabled={downloading}
+                                            style={{ background: 'var(--brand-700)', border: 'none', boxShadow: '0 4px 12px rgba(0,33,71,0.2)' }}
+                                        >
+                                            {downloading ? <div className="spinner-sm" /> : <><Download size={14} /> Evidence Ledger</>}
+                                        </button>
+                                    </>
                                 )}
                             </div>
                         </div>
@@ -235,10 +247,11 @@ const PublicPortfolioPage = () => {
                             { label: 'Hackathons Explored', value: stats.hackathonsExplored || 0, icon: Terminal, color: '#8b5cf6' },
                             { label: 'Courses Enrolled', value: stats.courses || 0, icon: Award, color: '#06b6d4' },
                             { label: 'Completed', value: stats.completedCourses || 0, icon: CheckCircle, color: '#10b981' },
-                        ].map(({ label, value, icon: Icon, color }) => (
+                            // eslint-disable-next-line no-unused-vars
+                        ].map(({ label, value, icon: IconComponent, color }) => (
                             <div key={label}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
-                                    <Icon size={16} style={{ color }} />
+                                    <IconComponent size={16} style={{ color }} />
                                     <span style={{ fontSize: '1.5rem', fontWeight: 800, fontFamily: 'Space Grotesk', color: 'var(--text-primary)' }}>{value}</span>
                                 </div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{label}</div>
