@@ -1,4 +1,4 @@
-import '../../styles/HowItWorksPage.css';
+import '../../styles/pages/public/HowItWorksPage.css';
 import { UserPlus, Upload, Clock, CheckCircle, Share2, TrendingUp, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

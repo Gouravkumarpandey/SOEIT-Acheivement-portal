@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import { Users, Clock, Search, Filter } from 'lucide-react';
 import { hackathonAPI } from '../../services/api';
-import '../../styles/HackathonsPage.css';
+import '../../styles/pages/student/HackathonsPage.css';
 import ScrollToTopButton from '../../components/common/ScrollToTopButton';
 
 // Stable, always-available Unsplash images (by topic/keyword - reliable CDN)

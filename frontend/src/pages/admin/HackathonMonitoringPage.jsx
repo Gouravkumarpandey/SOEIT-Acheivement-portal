@@ -3,7 +3,7 @@ import { hackathonAPI } from '../../services/api';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import { Search, Loader2, Activity, CheckCircle, Download, RefreshCw, Trash2, Plus, Trophy } from 'lucide-react';
-import '../../styles/HackathonMonitoringPage.css';
+import '../../styles/pages/admin/HackathonMonitoringPage.css';
 
 const HackathonMonitoringPage = () => {
     const [activeTab, setActiveTab] = useState('logs');

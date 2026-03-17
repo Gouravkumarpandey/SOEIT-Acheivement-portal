@@ -1,4 +1,4 @@
-import '../../styles/EventsPage.css';
+import '../../styles/pages/shared/EventsPage.css';
 import { useState, useEffect } from 'react';
 import { eventAPI } from '../../services/api';
 import { Calendar, MapPin, Link as LinkIcon, Plus, Trash2, User, Filter, Search, Edit, XCircle } from 'lucide-react';

@@ -1,4 +1,4 @@
-import '../../styles/StudentManagementPage.css';
+import '../../styles/pages/admin/StudentManagementPage.css';
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import { Users, Search, Trophy, Star, Eye, ChevronLeft, ChevronRight, Download, XCircle } from 'lucide-react';

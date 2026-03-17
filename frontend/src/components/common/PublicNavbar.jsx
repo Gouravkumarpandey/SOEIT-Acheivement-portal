@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GraduationCap, Menu, X, ArrowRight } from 'lucide-react';
-import '../../styles/PublicNavbar.css';
+import '../../styles/layout/PublicNavbar.css';
 
 const PublicNavbar = () => {
     const [scrolled, setScrolled] = useState(false);

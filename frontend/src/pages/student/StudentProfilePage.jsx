@@ -1,4 +1,4 @@
-import '../../styles/StudentProfilePage.css';
+import '../../styles/pages/student/StudentProfilePage.css';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { authAPI } from '../../services/api';

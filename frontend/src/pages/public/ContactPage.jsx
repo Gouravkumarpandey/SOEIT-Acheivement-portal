@@ -1,4 +1,4 @@
-import '../../styles/ContactPage.css';
+import '../../styles/pages/public/ContactPage.css';
 import { useState } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';

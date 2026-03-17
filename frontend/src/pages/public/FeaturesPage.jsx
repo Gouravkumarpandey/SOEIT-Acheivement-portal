@@ -1,4 +1,4 @@
-import '../../styles/FeaturesPage.css';
+import '../../styles/pages/public/FeaturesPage.css';
 import { Upload, Shield, BarChart3, Globe, Award, TrendingUp, CheckCircle, Search, Star, Zap, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

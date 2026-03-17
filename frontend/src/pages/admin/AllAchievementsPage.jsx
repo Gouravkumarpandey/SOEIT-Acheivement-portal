@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import '../../styles/pages/admin/AllAchievementsPage.css';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import { Search, Filter, Trophy, ChevronLeft, ChevronRight, Clock, CheckCircle, XCircle, Download } from 'lucide-react';

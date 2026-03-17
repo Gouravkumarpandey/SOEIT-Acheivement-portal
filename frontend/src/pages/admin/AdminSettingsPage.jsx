@@ -1,4 +1,4 @@
-import '../../styles/AdminSettingsPage.css';
+import '../../styles/pages/admin/AdminSettingsPage.css';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { authAPI } from '../../services/api';

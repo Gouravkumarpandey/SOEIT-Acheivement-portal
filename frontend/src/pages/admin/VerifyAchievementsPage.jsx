@@ -1,4 +1,4 @@
-import '../../styles/VerifyAchievementsPage.css';
+import '../../styles/pages/admin/VerifyAchievementsPage.css';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { adminAPI, STATIC_BASE_URL } from '../../services/api';

@@ -1,4 +1,4 @@
-import '../../styles/MyAchievementsPage.css';
+import '../../styles/pages/student/MyAchievementsPage.css';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { achievementAPI } from '../../services/api';

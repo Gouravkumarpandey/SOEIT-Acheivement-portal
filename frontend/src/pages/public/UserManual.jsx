@@ -7,7 +7,7 @@ import {
     FileDown, Layout, MessageSquare, Trophy, UserCheck, FileSearch, History,
     ClipboardList, BarChart3, Zap
 } from 'lucide-react';
-import '../../styles/UserManual.css';
+import '../../styles/pages/public/UserManual.css';
 
 const UserManual = () => {
     const [studentFlipped, setStudentFlipped] = useState(new Array(6).fill(false));

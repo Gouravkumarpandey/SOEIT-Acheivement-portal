@@ -1,4 +1,4 @@
-import '../../styles/RegisterPage.css';
+import '../../styles/pages/auth/RegisterPage.css';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';

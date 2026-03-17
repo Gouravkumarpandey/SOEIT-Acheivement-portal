@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import '../../styles/LandingPage.css';
+import '../../styles/pages/public/LandingPage.css';
 import { Link } from 'react-router-dom';
 import PublicNavbar from '../../components/common/PublicNavbar';
 import Footer from '../../components/common/Footer';

@@ -4,7 +4,7 @@ import { achievementAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Trophy, Star, Search, Users, BookOpen, ChevronRight, Award, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
-import '../../styles/PublicPortfoliosPage.css';
+import '../../styles/pages/public/PublicPortfoliosPage.css';
 
 const DEPT_PILLS = ['All', 'CSE', 'AIDS (IBM)', 'AIML', 'ME', 'EEE', 'BCA (Regular)', 'AIDL', 'Cybersecurity', 'DCSE', 'DME', 'DEEE'];
 const DEPT_GROUPS = [

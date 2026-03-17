@@ -1,4 +1,4 @@
-import '../../styles/ReportsPage.css';
+import '../../styles/pages/admin/ReportsPage.css';
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, AreaChart, Area } from 'recharts';

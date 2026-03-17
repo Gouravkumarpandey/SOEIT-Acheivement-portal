@@ -1,4 +1,4 @@
-import '../../styles/LoginPage.css';
+import '../../styles/pages/auth/LoginPage.css';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';

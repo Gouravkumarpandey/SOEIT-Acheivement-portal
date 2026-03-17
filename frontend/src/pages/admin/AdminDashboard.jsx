@@ -1,4 +1,4 @@
-import '../../styles/AdminDashboard.css';
+import '../../styles/pages/admin/AdminDashboard.css';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminAPI } from '../../services/api';

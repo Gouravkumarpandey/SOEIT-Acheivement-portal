@@ -1,4 +1,4 @@
-import '../../styles/UploadAchievementPage.css';
+import '../../styles/pages/student/UploadAchievementPage.css';
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { achievementAPI } from '../../services/api';

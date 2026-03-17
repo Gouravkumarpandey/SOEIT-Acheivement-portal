@@ -1,4 +1,4 @@
-import '../../styles/PublicPortfolioPage.css';
+import '../../styles/pages/public/PublicPortfolioPage.css';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { achievementAPI, STATIC_BASE_URL } from '../../services/api';

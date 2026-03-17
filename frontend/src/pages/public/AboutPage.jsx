@@ -1,4 +1,4 @@
-import '../../styles/AboutPage.css';
+import '../../styles/pages/public/AboutPage.css';
 import { GraduationCap, Target, Eye, Heart, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

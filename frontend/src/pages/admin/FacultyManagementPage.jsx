@@ -1,4 +1,4 @@
-import '../../styles/FacultyManagementPage.css';
+import '../../styles/pages/admin/FacultyManagementPage.css';
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import { Users, Search, Mail, Shield, UserCheck, UserX, Download } from 'lucide-react';
