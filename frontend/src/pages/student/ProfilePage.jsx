@@ -170,7 +170,7 @@ const ProfilePage = () => {
                                     <>
                                         <div className="form-group">
                                             <label className="form-label field-label-res">Batch *</label>
-                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 2022-26" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
+                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 2022-26 or 2022-2026" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
                                         </div>
                                         <div className="form-group">
                                             <label className="form-label field-label-res">Semester</label>

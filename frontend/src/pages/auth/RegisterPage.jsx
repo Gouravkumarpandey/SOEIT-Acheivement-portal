@@ -87,7 +87,7 @@ const RegisterPage = () => {
 
         if (form.role === 'student') {
             if (!form.batch) e.batch = 'Batch is required';
-            else if (!/^\d{4}-\d{2}$/.test(form.batch)) e.batch = 'Invalid format (e.g. 2022-26)';
+            else if (!/^\d{4}-(\d{2}|\d{4})$/.test(form.batch)) e.batch = 'Invalid format (e.g. 2022-26 or 2022-2026)';
         }
 
         if (!form.enrollmentNo) {
@@ -187,7 +187,7 @@ const RegisterPage = () => {
                                     <Field
                                         name="batch"
                                         label="Batch Year"
-                                        placeholder="e.g. 2022-26"
+                                        placeholder="e.g. 2022-26 or 2022-2026"
                                         required
                                         form={form}
                                         setForm={setForm}
