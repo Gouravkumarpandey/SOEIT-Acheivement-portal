@@ -102,7 +102,7 @@ exports.updateProfile = async (req, res, next) => {
             'linkedIn', 'github', 'portfolio', 
             'edu10thSchool', 'edu10thYear', 'edu10thPercent', 
             'edu12thSchool', 'edu12thYear', 'edu12thPercent', 
-            'universityName', 'universityCgpa'
+            'universityName', 'universityCgpa', 'skills'
         ];
         const updates = {};
         allowedFields.forEach((field) => { if (req.body[field] !== undefined) updates[field] = req.body[field]; });

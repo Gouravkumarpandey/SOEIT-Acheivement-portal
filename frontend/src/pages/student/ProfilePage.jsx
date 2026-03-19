@@ -19,7 +19,8 @@ const ProfilePage = () => {
         linkedIn: '', github: '', portfolio: '',
         edu10thSchool: '', edu10thYear: '', edu10thPercent: '',
         edu12thSchool: '', edu12thYear: '', edu12thPercent: '',
-        universityName: 'Arka Jain University, Jamshedpur', universityCgpa: ''
+        universityName: 'Arka Jain University, Jamshedpur', universityCgpa: '',
+        skills: ''
     });
     const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
     const [showPw, setShowPw] = useState({ current: false, new: false, confirm: false });
@@ -37,6 +38,7 @@ const ProfilePage = () => {
                 edu10thSchool: user.edu10thSchool || '', edu10thYear: user.edu10thYear || '', edu10thPercent: user.edu10thPercent || '',
                 edu12thSchool: user.edu12thSchool || '', edu12thYear: user.edu12thYear || '', edu12thPercent: user.edu12thPercent || '',
                 universityName: user.universityName || 'Arka Jain University, Jamshedpur', universityCgpa: user.universityCgpa || '',
+                skills: user.skills || '',
             });
             setImagePreview(user.profileImage ? `${import.meta.env.VITE_UPLOADS_URL || ''}${user.profileImage}` : '');
         }
@@ -256,6 +258,12 @@ const ProfilePage = () => {
                                     <label className="form-label field-label-res">Percentage / CGPA</label>
                                     <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 90% or 9.5 CGPA" value={form.edu10thPercent} onChange={e => setForm(p => ({ ...p, edu10thPercent: e.target.value }))} />
                                 </div>
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: '2rem' }}>
+                                <label className="form-label field-label-res">Technical Skills</label>
+                                <textarea className="form-control" style={{ borderRadius: '14px', padding: '1.25rem', fontWeight: 600, lineHeight: 1.6, resize: 'none' }} rows={4} placeholder="e.g. Programming Languages: C++, Python&#10;Libraries: NumPy, Pandas&#10;Frameworks: React.js, Node.js" value={form.skills} onChange={e => setForm(p => ({ ...p, skills: e.target.value }))} />
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem', fontWeight: 600 }}>Tip: Group your skills by categories (e.g. Languages: Java, Python) for a better resume look.</div>
                             </div>
 
                             <div className="form-group">

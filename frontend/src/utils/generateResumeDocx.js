@@ -1,9 +1,9 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, TabStopType, TabStopPosition } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, TabStopType, TabStopPosition, UnderlineType } from 'docx';
 import { saveAs } from 'file-saver';
 import { format } from 'date-fns';
 
 export const generateResumeDocx = async (data) => {
-    const { student, achievements, courses } = data;
+    const { student, achievements, courses, internships, projects } = data;
 
     const createContactInfo = () => {
         const contactInfo = [];
@@ -18,12 +18,12 @@ export const generateResumeDocx = async (data) => {
             children: [
                 new TextRun({
                     text: contactInfo.join('  |  '),
-                    size: 21,
-                    font: "Times New Roman",
+                    size: 20,
+                    font: "Calibri",
                     color: "000000"
                 })
             ],
-            spacing: { after: 200 },
+            spacing: { after: 150 },
         });
     };
 
@@ -36,20 +36,36 @@ export const generateResumeDocx = async (data) => {
             children: [
                 new TextRun({
                     text: student.name,
-                    size: 56, // 28pt
+                    size: 48, // 24pt
                     bold: true,
-                    font: "Times New Roman"
+                    font: "Calibri"
                 })
             ],
-            spacing: { after: 100 },
+            spacing: { after: 50 },
         }),
         createContactInfo()
     );
 
     const createSectionHeader = (title) => {
         return new Paragraph({
-            text: title,
             heading: HeadingLevel.HEADING_1,
+            children: [
+                new TextRun({
+                    text: title,
+                    size: 24,
+                    bold: true,
+                    font: "Calibri",
+                })
+            ],
+            border: {
+                bottom: {
+                    color: "000000",
+                    space: 1,
+                    value: BorderStyle.SINGLE,
+                    size: 4,
+                },
+            },
+            spacing: { before: 180, after: 120 }
         });
     };
 
@@ -58,14 +74,28 @@ export const generateResumeDocx = async (data) => {
             tabStops: [
                 {
                     type: TabStopType.RIGHT,
-                    position: 10000, 
+                    position: 9500, 
                 },
             ],
             children: [
-                new TextRun({ text: leftText, bold: boldLeft, italics: italicLeft, size: 22, font: "Times New Roman" }),
-                new TextRun({ text: `\t${rightText}`, bold: boldRight, italics: italicRight, size: 22, font: "Times New Roman" })
+                new TextRun({ text: leftText, bold: boldLeft, italics: italicLeft, size: 21, font: "Calibri" }),
+                new TextRun({ text: `\t${rightText}`, bold: boldRight, italics: italicRight, size: 21, font: "Calibri" })
             ],
-            spacing: { before: 50, after: 50 }
+            spacing: { before: 40, after: 40 }
+        });
+    };
+
+    const createBulletPoint = (text, isSubBullet = false) => {
+        return new Paragraph({
+            children: [
+                new TextRun({ 
+                    text: isSubBullet ? `◦  ${text}` : `–  ${text}`, 
+                    size: 20, 
+                    font: "Calibri" 
+                })
+            ],
+            indent: { left: isSubBullet ? 720 : 360 },
+            spacing: { before: 30, after: 30 }
         });
     };
 
@@ -77,12 +107,12 @@ export const generateResumeDocx = async (data) => {
                 children: [
                     new TextRun({
                         text: student.bio,
-                        size: 22,
-                        font: "Times New Roman"
+                        size: 20,
+                        font: "Calibri"
                     })
                 ],
                 alignment: AlignmentType.JUSTIFIED,
-                spacing: { before: 100, after: 150 }
+                spacing: { after: 100 }
             })
         );
     }
@@ -90,19 +120,20 @@ export const generateResumeDocx = async (data) => {
     // Education Section
     sections.push(createSectionHeader("Education"));
     
+    // University
+    const batchRange = student.batch ? (student.batch.includes('-') ? student.batch : `${student.batch}-${parseInt(student.batch)+4}`) : '2022-26';
     sections.push(createRow(
         student.universityName || 'Arka Jain University, Jamshedpur', 
-        student.universityCgpa ? `Current CGPA: ${student.universityCgpa}` : (student.department ? `Department of ${student.department}` : ''),
+        student.universityCgpa ? `CGPA: ${student.universityCgpa}` : 'Arka Jain University',
         true, false, false, false
     ));
-    
     sections.push(createRow(
-        'Bachelor of Technology (or Equivalent)', 
-        `Sem ${student.semester || 'N/A'} | Batch ${student.batch || '2022-26'}`,
-        false, true, false, true
+        `Bachelor of Technology in ${student.department || 'Computer Science & Engineering'}`, 
+        `Aug. 2022 – May 2026`, // Placeholder for date range from batch
+        false, true, false, false
     ));
     
-    // 12th Education
+    // 12th
     if (student.edu12thSchool) {
         sections.push(createRow(
             student.edu12thSchool,
@@ -112,11 +143,11 @@ export const generateResumeDocx = async (data) => {
         sections.push(createRow(
             'Senior Secondary (PCM/PCB)',
             student.edu12thYear || '',
-            false, true, false, true
+            false, true, false, false
         ));
     }
 
-    // 10th Education
+    // 10th
     if (student.edu10thSchool) {
         sections.push(createRow(
             student.edu10thSchool,
@@ -126,66 +157,112 @@ export const generateResumeDocx = async (data) => {
         sections.push(createRow(
             'Secondary Education',
             student.edu10thYear || '',
-            false, true, false, true
+            false, true, false, false
         ));
     }
-    
-    sections.push(new Paragraph({ spacing: { after: 150 } }));
 
-    // Experience / Achievements Section
-    if (achievements && achievements.length > 0) {
-        sections.push(createSectionHeader("Experience & Achievements"));
-
-        const categories = [...new Set(achievements.map(a => a.category))];
-        
-        categories.forEach(category => {
-            const catAchievements = achievements.filter(a => a.category === category);
-            
-            catAchievements.forEach(ach => {
-                const dateStr = ach.date ? format(new Date(ach.date), 'MMM yyyy') : '';
-                
-                sections.push(createRow(
-                    ach.title, 
-                    dateStr,
-                    true, false, false, false
-                ));
-                
-                sections.push(createRow(
-                    ach.institution || category, 
-                    `Level: ${ach.level}`,
-                    false, true, false, true
-                ));
-
-                if (ach.description) {
-                    const descLines = ach.description.split('\n').filter(d => d.trim().length > 0);
-                    if (descLines.length === 0) descLines.push('Verified Accomplishment.');
-
-                    descLines.forEach(line => {
-                        sections.push(new Paragraph({
-                            children: [
-                                new TextRun({ text: `–  ${line.trim()}`, size: 22, font: "Times New Roman" })
-                            ],
-                            indent: { left: 360 }, // approx 0.25 inch
-                            spacing: { before: 40, after: 40 }
-                        }));
-                    });
-                }
-                
-                sections.push(new Paragraph({ spacing: { after: 150 } }));
-            });
+    // Technical Skills
+    if (student.skills) {
+        sections.push(createSectionHeader("Technical Skills"));
+        const skillLines = student.skills.split('\n').filter(s => s.trim());
+        skillLines.forEach(line => {
+            const parts = line.split(':');
+            if (parts.length > 1) {
+                sections.push(new Paragraph({
+                    children: [
+                        new TextRun({ text: `${parts[0].trim()}: `, bold: true, size: 21, font: "Calibri" }),
+                        new TextRun({ text: parts.slice(1).join(':').trim(), size: 21, font: "Calibri" })
+                    ],
+                    spacing: { before: 40, after: 40 }
+                }));
+            } else {
+                sections.push(new Paragraph({
+                    children: [
+                        new TextRun({ text: line.trim(), size: 21, font: "Calibri" })
+                    ],
+                    spacing: { before: 40, after: 40 }
+                }));
+            }
         });
     }
 
-    // Courses / Certifications
-    if (courses && courses.length > 0) {
-        sections.push(createSectionHeader("Projects & Certifications"));
-
-        courses.forEach(course => {
+    // Experience Section (Internships)
+    if (internships && internships.length > 0) {
+        sections.push(createSectionHeader("Experience"));
+        internships.forEach(exp => {
+            const startStr = exp.start_date ? format(new Date(exp.start_date), 'MMM yyyy') : '';
+            const endStr = exp.status === 'Ongoing' ? 'Present' : (exp.end_date ? format(new Date(exp.end_date), 'MMM yyyy') : '');
+            
             sections.push(createRow(
-                `${course.course_name} | ${course.platform}`, 
-                `Status: ${course.status}`,
+                exp.company_name, 
+                `${startStr} – ${endStr}`,
                 true, false, false, false
             ));
+            
+            sections.push(createRow(
+                exp.role, 
+                exp.location || '',
+                false, true, false, true
+            ));
+
+            if (exp.description) {
+                exp.description.split('\n').filter(d => d.trim()).forEach(line => {
+                    sections.push(createBulletPoint(line.trim()));
+                });
+            }
+        });
+    }
+
+    // Projects Section
+    if (projects && projects.length > 0) {
+        sections.push(createSectionHeader("Projects"));
+        projects.forEach(proj => {
+            const leftText = `${proj.title} | ${proj.techStack || ''}`;
+            let rightText = '';
+            if (proj.githubLink) rightText = 'GitHub Link';
+            
+            sections.push(createRow(
+                leftText, 
+                rightText,
+                true, false, false, false
+            ));
+
+            if (proj.description) {
+                proj.description.split('\n').filter(d => d.trim()).forEach(line => {
+                    sections.push(createBulletPoint(line.trim()));
+                });
+            }
+        });
+    }
+
+    // Achievements Section (Bulleted like Ritesh image)
+    const legitAchievements = achievements?.filter(a => a.category !== 'Internship' && a.category !== 'Project');
+    if (legitAchievements && legitAchievements.length > 0) {
+        sections.push(createSectionHeader("Achievements"));
+        legitAchievements.forEach(ach => {
+            const dateStr = ach.date ? ` (${format(new Date(ach.date), 'yyyy')})` : '';
+            sections.push(new Paragraph({
+                children: [
+                    new TextRun({ text: `${ach.title}`, bold: true, size: 20, font: "Calibri" }),
+                    new TextRun({ text: ` — ${ach.description || 'Verified Accomplishment'}${dateStr}.`, size: 20, font: "Calibri" })
+                ],
+                indent: { left: 180 },
+                spacing: { before: 40, after: 40 }
+            }));
+        });
+    }
+
+    // Skills / Courses combined
+    if (courses && courses.length > 0) {
+        sections.push(createSectionHeader("Relevant Courses & Certifications"));
+        courses.forEach(course => {
+            sections.push(new Paragraph({
+                children: [
+                    new TextRun({ text: `• ${course.course_name}`, bold: true, size: 20, font: "Calibri" }),
+                    new TextRun({ text: ` — ${course.platform} (${course.status})`, size: 20, font: "Calibri" })
+                ],
+                spacing: { before: 20, after: 20 }
+            }));
         });
     }
 
@@ -198,29 +275,21 @@ export const generateResumeDocx = async (data) => {
                     basedOn: "Normal",
                     next: "Normal",
                     run: {
-                        size: 26,
+                        size: 24,
                         bold: true,
-                        font: "Times New Roman",
+                        font: "Calibri",
                         color: "000000",
                     },
                     paragraph: {
-                        spacing: { before: 200, after: 100 },
-                        border: {
-                            bottom: {
-                                color: "000000",
-                                space: 1,
-                                value: "single",
-                                size: 6,
-                            },
-                        },
+                        spacing: { before: 180, after: 120 },
                     },
                 },
                 {
                     id: "Normal",
                     name: "Normal",
                     run: {
-                        font: "Times New Roman",
-                        size: 22,
+                        font: "Calibri",
+                        size: 20,
                         color: "000000"
                     }
                 }
@@ -231,10 +300,10 @@ export const generateResumeDocx = async (data) => {
                 properties: {
                     page: {
                         margin: {
-                            top: 576,    // 0.4 inch
-                            right: 576,
-                            bottom: 576,
-                            left: 576,
+                            top: 720,    // 0.5 inch
+                            right: 720,
+                            bottom: 720,
+                            left: 720,
                         },
                     },
                 },

@@ -41,6 +41,7 @@ const initSchema = async (client) => {
             edu_12th_percent TEXT,
             university_name TEXT DEFAULT 'Arka Jain University, Jamshedpur',
             university_cgpa TEXT,
+            skills          TEXT,
             created_at      TEXT DEFAULT (datetime('now')),
             updated_at      TEXT DEFAULT (datetime('now'))
         )`,
@@ -253,7 +254,8 @@ const initSchema = async (client) => {
     `ALTER TABLE users ADD COLUMN edu_12th_year TEXT`,
     `ALTER TABLE users ADD COLUMN edu_12th_percent TEXT`,
     `ALTER TABLE users ADD COLUMN university_name TEXT DEFAULT 'Arka Jain University, Jamshedpur'`,
-    `ALTER TABLE users ADD COLUMN university_cgpa TEXT`
+    `ALTER TABLE users ADD COLUMN university_cgpa TEXT`,
+    `ALTER TABLE users ADD COLUMN skills TEXT`
   ];
 
   for (const query of migrations) {

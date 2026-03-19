@@ -2,6 +2,8 @@ const Achievement = require('../../modules/achievement/achievement.model');
 const Verification = require('../../modules/achievement/verification.model');
 const User = require('../../modules/user/user.model');
 const Course = require('../../modules/course/course.model');
+const Internship = require('../../modules/internship/internship.model');
+const Project = require('../../modules/project/project.model');
 const HackathonActivity = require('../../modules/hackathon/hackathon-activity.model');
 const FileModel = require('../../modules/file/file.model');
 const { cache, clearCache } = require('../../utils/cache');
@@ -225,8 +227,10 @@ exports.getPublicPortfolio = async (req, res, next) => {
 
         if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
 
-        const [coursesRows, hackathonsExplored] = await Promise.all([
+        const [coursesRows, internships, projects, hackathonsExplored] = await Promise.all([
             Course.findByStudentId(req.params.userId),
+            Internship.findByStudentId(req.params.userId),
+            Project.findAll({ studentId: req.params.userId }),
             HackathonActivity.countByStudent(req.params.userId)
         ]);
 
@@ -250,7 +254,7 @@ exports.getPublicPortfolio = async (req, res, next) => {
         delete studentData.resetPasswordToken;
         delete studentData.resetPasswordExpire;
 
-        res.status(200).json({ success: true, student: studentData, achievements, courses: coursesRows, stats });
+        res.status(200).json({ success: true, student: studentData, achievements, courses: coursesRows, internships, projects, stats });
     } catch (error) {
         next(error);
     }

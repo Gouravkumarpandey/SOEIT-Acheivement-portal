@@ -2,33 +2,34 @@ import html2pdf from 'html2pdf.js';
 import { format } from 'date-fns';
 
 export const generateResumePdf = (data) => {
-    const { student, achievements, courses } = data;
+    const { student, achievements, courses, internships, projects } = data;
 
     // Create a temporary container
     const container = document.createElement('div');
-    container.style.width = '740px';
+    container.style.width = '780px';
     container.style.boxSizing = 'border-box';
-    container.style.padding = '10px';
+    container.style.padding = '0px';
     
-    // Times New Roman, matching standard professional latex style
-    container.style.fontFamily = '"Times New Roman", Times, serif';
+    // Calibri/Arial feel for modern resume
+    container.style.fontFamily = '"Calibri", Arial, sans-serif';
     container.style.color = '#000';
-    container.style.lineHeight = '1.3';
+    container.style.lineHeight = '1.25';
     container.style.backgroundColor = '#fff';
 
     const header = document.createElement('div');
     header.style.textAlign = 'center';
-    header.style.marginBottom = '12px';
+    header.style.marginBottom = '10px';
 
     const name = document.createElement('h1');
     name.textContent = student.name;
-    name.style.fontSize = '36px';
+    name.style.fontSize = '32px';
     name.style.fontWeight = 'bold';
-    name.style.margin = '0 0 4px 0';
+    name.style.margin = '0 0 2px 0';
+    name.style.letterSpacing = '-0.02em';
     header.appendChild(name);
 
     const contact = document.createElement('div');
-    contact.style.fontSize = '12.5px';
+    contact.style.fontSize = '12px';
     
     const contactInfoHtml = [];
     if (student.phone) contactInfoHtml.push(`+91-${student.phone.replace('+91-', '')}`);
@@ -44,11 +45,12 @@ export const generateResumePdf = (data) => {
     const createSectionHeader = (title) => {
         const h2 = document.createElement('h2');
         h2.textContent = title;
-        h2.style.fontSize = '17px';
+        h2.style.fontSize = '16px';
         h2.style.fontWeight = 'bold';
-        h2.style.margin = '10px 0 4px 0';
-        h2.style.paddingBottom = '3px';
-        h2.style.borderBottom = '1px solid #000';
+        h2.style.margin = '14px 0 6px 0';
+        h2.style.paddingBottom = '2px';
+        h2.style.borderBottom = '1.5px solid #000';
+        h2.style.textTransform = 'none';
         return h2;
     };
 
@@ -56,7 +58,7 @@ export const generateResumePdf = (data) => {
         const row = document.createElement('div');
         row.style.display = 'flex';
         row.style.justifyContent = 'space-between';
-        row.style.fontSize = '14.5px';
+        row.style.fontSize = '13.5px';
         row.style.marginBottom = '1px';
 
         const left = document.createElement('div');
@@ -69,122 +71,147 @@ export const generateResumePdf = (data) => {
         return row;
     };
 
+    const createBullets = (lines) => {
+        const ul = document.createElement('ul');
+        ul.style.margin = '2px 0 4px 0';
+        ul.style.paddingLeft = '18px';
+        ul.style.listStyleType = 'none';
+
+        lines.forEach(line => {
+            if (!line.trim()) return;
+            const li = document.createElement('li');
+            li.style.fontSize = '13px';
+            li.style.marginBottom = '1px';
+            li.innerHTML = `&ndash; &nbsp;${line.trim()}`;
+            ul.appendChild(li);
+        });
+        return ul;
+    };
+
     // Career Objective Section
     if (student.bio) {
         container.appendChild(createSectionHeader('Career Objective'));
-        
         const bioP = document.createElement('div');
         bioP.textContent = student.bio;
-        bioP.style.fontSize = '14px';
-        bioP.style.margin = '2px 0 6px 0';
+        bioP.style.fontSize = '13px';
         bioP.style.textAlign = 'justify';
         container.appendChild(bioP);
     }
 
     // Education Section
     container.appendChild(createSectionHeader('Education'));
-
-    // Example mapping to the format in the picture
-    // University Education (from DB)
-    const uniRow = createRow(
+    
+    // University
+    container.appendChild(createRow(
         `<strong>${student.universityName || 'Arka Jain University, Jamshedpur'}</strong>`, 
-        student.universityCgpa ? `Current CGPA: ${student.universityCgpa}` : (student.department ? `Department of ${student.department}` : '')
-    );
-    container.appendChild(uniRow);
+        student.universityCgpa ? `CGPA: ${student.universityCgpa}` : ''
+    ));
+    container.appendChild(createRow(
+        `<em>Bachelor of Technology in ${student.department || 'Computer Science & Engineering'}</em>`, 
+        `<em>Aug 2022 - May 2026</em>`
+    ));
 
-    const degRow = createRow(
-        `<em>Bachelor of Technology (or Equivalent)</em>`, 
-        `<em>Sem ${student.semester || 'N/A'} | Batch ${student.batch || '2022-26'}</em>`
-    );
-    degRow.style.marginBottom = '2px';
-    container.appendChild(degRow);
-
-    // 12th Education
+    // 12th
     if (student.edu12thSchool) {
-        const edu12Row = createRow(
+        container.appendChild(createRow(
             `<strong>${student.edu12thSchool}</strong>`,
             student.edu12thPercent ? `Percentage: ${student.edu12thPercent}` : ''
-        );
-        container.appendChild(edu12Row);
-        
-        const edu12SubRow = createRow(
+        ));
+        container.appendChild(createRow(
             `<em>Senior Secondary (PCM/PCB)</em>`,
-            student.edu12thYear ? `<em>${student.edu12thYear}</em>` : ''
-        );
-        edu12SubRow.style.marginBottom = '2px';
-        container.appendChild(edu12SubRow);
+            `<em>${student.edu12thYear || ''}</em>`
+        ));
     }
 
-    // 10th Education
+    // 10th
     if (student.edu10thSchool) {
-        const edu10Row = createRow(
+        container.appendChild(createRow(
             `<strong>${student.edu10thSchool}</strong>`,
             student.edu10thPercent ? `Percentage: ${student.edu10thPercent}` : ''
-        );
-        container.appendChild(edu10Row);
-        
-        const edu10SubRow = createRow(
+        ));
+        container.appendChild(createRow(
             `<em>Secondary Education</em>`,
-            student.edu10thYear ? `<em>${student.edu10thYear}</em>` : ''
-        );
-        edu10SubRow.style.marginBottom = '8px';
-        container.appendChild(edu10SubRow);
+            `<em>${student.edu10thYear || ''}</em>`
+        ));
     }
 
-    // Experience / Achievements Section
-    if (achievements && achievements.length > 0) {
-        container.appendChild(createSectionHeader('Experience & Achievements'));
-
-        const categories = [...new Set(achievements.map(a => a.category))];
-        categories.forEach(category => {
-            const catAchievements = achievements.filter(a => a.category === category);
-            catAchievements.forEach(ach => {
-                const item = document.createElement('div');
-                item.style.marginBottom = '6px';
-
-                const r1 = createRow(`<strong>${ach.title}</strong>`, ach.date ? format(new Date(ach.date), 'MMM yyyy') : '');
-                item.appendChild(r1);
-
-                const r2 = createRow(`<em>${ach.institution || category}</em>`, `<em>Level: ${ach.level}</em>`);
-                item.appendChild(r2);
-
-                if (ach.description) {
-                    const ul = document.createElement('ul');
-                    ul.style.margin = '2px 0 0 0';
-                    ul.style.paddingLeft = '18px';
-                    ul.style.listStyleType = 'none';
-
-                    // Use splitting to make bullet points natively
-                    const descLines = ach.description.split('\n').filter(d => d.trim().length > 0);
-                    if (descLines.length === 0) descLines.push('Verified Accomplishment.');
-
-                    descLines.forEach(line => {
-                        const li = document.createElement('li');
-                        li.style.fontSize = '14px';
-                        li.style.position = 'relative';
-                        // Add an em dash instead of standard bullet for the LaTeX experience block feel
-                        li.innerHTML = `&ndash; &nbsp;${line.trim()}`;
-                        ul.appendChild(li);
-                    });
-                    item.appendChild(ul);
-                }
-
-                container.appendChild(item);
-            });
+    // Technical Skills
+    if (student.skills) {
+        container.appendChild(createSectionHeader('Technical Skills'));
+        const skillLines = student.skills.split('\n').filter(s => s.trim());
+        skillLines.forEach(line => {
+            const div = document.createElement('div');
+            div.style.fontSize = '13.5px';
+            div.style.marginBottom = '2px';
+            const parts = line.split(':');
+            if (parts.length > 1) {
+                div.innerHTML = `<strong>${parts[0].trim()}:</strong> ${parts.slice(1).join(':').trim()}`;
+            } else {
+                div.textContent = line.trim();
+            }
+            container.appendChild(div);
         });
     }
 
-    // Courses / Certifications Section
+    // Experience Section
+    if (internships && internships.length > 0) {
+        container.appendChild(createSectionHeader('Experience'));
+        internships.forEach(exp => {
+            const startStr = exp.start_date ? format(new Date(exp.start_date), 'MMM yyyy') : '';
+            const endStr = exp.status === 'Ongoing' ? 'Present' : (exp.end_date ? format(new Date(exp.end_date), 'MMM yyyy') : '');
+            
+            container.appendChild(createRow(
+                `<strong>${exp.company_name}</strong>`,
+                `${startStr} - ${endStr}`
+            ));
+            container.appendChild(createRow(
+                `<em>${exp.role}</em>`,
+                `<em>${exp.location || ''}</em>`
+            ));
+
+            if (exp.description) {
+                container.appendChild(createBullets(exp.description.split('\n')));
+            }
+        });
+    }
+
+    // Projects Section
+    if (projects && projects.length > 0) {
+        container.appendChild(createSectionHeader('Projects'));
+        projects.forEach(proj => {
+            container.appendChild(createRow(
+                `<strong>${proj.title} | ${proj.techStack || ''}</strong>`,
+                proj.githubLink ? `<span style="text-decoration: underline;">GitHub Link</span>` : ''
+            ));
+            if (proj.description) {
+                container.appendChild(createBullets(proj.description.split('\n')));
+            }
+        });
+    }
+
+    // Achievements Section
+    const legitAchievements = achievements?.filter(a => a.category !== 'Internship' && a.category !== 'Project');
+    if (legitAchievements && legitAchievements.length > 0) {
+        container.appendChild(createSectionHeader('Achievements'));
+        legitAchievements.forEach(ach => {
+            const dateStr = ach.date ? ` (${format(new Date(ach.date), 'yyyy')})` : '';
+            const div = document.createElement('div');
+            div.style.fontSize = '13px';
+            div.style.marginBottom = '3px';
+            div.innerHTML = `<strong>${ach.title}</strong> — ${ach.description || 'Verified Accomplishment'}${dateStr}.`;
+            container.appendChild(div);
+        });
+    }
+
+    // Courses
     if (courses && courses.length > 0) {
-        container.appendChild(createSectionHeader('Projects & Certifications'));
-
+        container.appendChild(createSectionHeader('Relevant Courses & Certifications'));
         courses.forEach(course => {
-            const item = document.createElement('div');
-            item.style.marginBottom = '6px';
-
-            const r1 = createRow(`<strong>${course.course_name}</strong> &nbsp;|&nbsp; <strong>${course.platform}</strong>`, `Status: ${course.status}`);
-            item.appendChild(r1);
-            container.appendChild(item);
+            const div = document.createElement('div');
+            div.style.fontSize = '13px';
+            div.style.marginBottom = '2px';
+            div.innerHTML = `&bull; <strong>${course.course_name}</strong> — ${course.platform} (${course.status})`;
+            container.appendChild(div);
         });
     }
 
