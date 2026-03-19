@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { generateResumeDocx } from '../../utils/generateResumeDocx';
+import { generateResumePdf } from '../../utils/generateResumePdf';
 
 const LEVEL_COLORS = { International: '#f59e0b', National: '#3b82f6', State: '#8b5cf6', University: '#10b981', College: '#06b6d4', Department: '#6b7280' };
 const CATEGORY_ICONS = { Academic: '🎓', Sports: '🏆', Cultural: '🎭', Technical: '💻', Research: '🔬', Internship: '💼', Certification: '📜', Competition: '🥇', 'Community Service': '🤝', Other: '⭐' };
@@ -21,6 +22,7 @@ const PublicPortfolioPage = () => {
     const [downloading, setDownloading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedCat, setSelectedCat] = useState('');
+    const [resumeMenuOpen, setResumeMenuOpen] = useState(false);
 
     useEffect(() => {
         setLoading(true);
@@ -239,14 +241,34 @@ const PublicPortfolioPage = () => {
 
                                 {(user?.role === 'admin' || user?.role === 'faculty' || user?.id === userId || user?._id === userId) && (
                                     <>
-                                        <button
-                                            className="btn btn-secondary btn-sm"
-                                            onClick={() => generateResumeDocx(data)}
-                                            style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
-                                            title="Resume"
-                                        >
-                                            <FileText size={14} color="#3b82f6" /> Resume
-                                        </button>
+                                        <div style={{ position: 'relative' }}>
+                                            <button
+                                                className="btn btn-secondary btn-sm"
+                                                onClick={() => setResumeMenuOpen(!resumeMenuOpen)}
+                                                style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '0.4rem', border: resumeMenuOpen ? '1px solid var(--brand-500)' : '1px solid var(--border-primary)' }}
+                                            >
+                                                <FileText size={14} color="#3b82f6" /> Resume <ChevronDown size={14} style={{ transform: resumeMenuOpen ? 'rotate(180deg)' : 'none', transition: '0.2s' }} />
+                                            </button>
+                                            
+                                            {resumeMenuOpen && (
+                                                <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: '#fff', border: '1px solid var(--border-primary)', borderRadius: '10px', boxShadow: 'var(--shadow-lg)', padding: '0.35rem', zIndex: 1000, minWidth: '100px' }}>
+                                                    <button 
+                                                        className="btn btn-ghost btn-sm" 
+                                                        style={{ width: '100%', justifyContent: 'flex-start', padding: '0.4rem 0.75rem', fontSize: '0.78rem', borderRadius: '6px', gap: '0.5rem' }}
+                                                        onClick={() => { generateResumePdf(data); setResumeMenuOpen(false); }}
+                                                    >
+                                                        <FileIcon size={12} color="#ef4444" /> PDF
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-ghost btn-sm" 
+                                                        style={{ width: '100%', justifyContent: 'flex-start', padding: '0.4rem 0.75rem', fontSize: '0.78rem', borderRadius: '6px', marginTop: '2px', gap: '0.5rem' }}
+                                                        onClick={() => { generateResumeDocx(data); setResumeMenuOpen(false); }}
+                                                    >
+                                                        <FileText size={12} color="#3b82f6" /> Word
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
 
                                         <button
                                             className="btn btn-primary btn-sm"
