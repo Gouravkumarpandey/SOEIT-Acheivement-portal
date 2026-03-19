@@ -15,10 +15,11 @@ const ProfilePage = () => {
     const { user, updateUser } = useAuth();
     const [tab, setTab] = useState('profile');
     const [form, setForm] = useState({ 
-        name: '', phone: '', bio: '', batch: '', semester: '', section: '', 
+        name: '', email: '', phone: '', enrollmentNo: '', bio: '', batch: '', semester: '', section: '', 
         linkedIn: '', github: '', portfolio: '',
         edu10thSchool: '', edu10thYear: '', edu10thPercent: '',
-        edu12thSchool: '', edu12thYear: '', edu12thPercent: ''
+        edu12thSchool: '', edu12thYear: '', edu12thPercent: '',
+        universityName: 'Arka Jain University, Jamshedpur', universityCgpa: ''
     });
     const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
     const [showPw, setShowPw] = useState({ current: false, new: false, confirm: false });
@@ -30,11 +31,12 @@ const ProfilePage = () => {
     useEffect(() => {
         if (user) {
             setForm({
-                name: user.name || '', phone: user.phone || '', bio: user.bio || '',
+                name: user.name || '', email: user.email || '', phone: user.phone || '', enrollmentNo: user.enrollmentNo || '', bio: user.bio || '',
                 batch: user.batch || '', semester: user.semester || '', section: user.section || '',
                 linkedIn: user.linkedIn || '', github: user.github || '', portfolio: user.portfolio || '',
                 edu10thSchool: user.edu10thSchool || '', edu10thYear: user.edu10thYear || '', edu10thPercent: user.edu10thPercent || '',
                 edu12thSchool: user.edu12thSchool || '', edu12thYear: user.edu12thYear || '', edu12thPercent: user.edu12thPercent || '',
+                universityName: user.universityName || 'Arka Jain University, Jamshedpur', universityCgpa: user.universityCgpa || '',
             });
             setImagePreview(user.profileImage ? `${import.meta.env.VITE_UPLOADS_URL || ''}${user.profileImage}` : '');
         }
@@ -169,15 +171,37 @@ const ProfilePage = () => {
                                     <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
                                 </div>
                                 <div className="form-group">
+                                    <label className="form-label field-label-res">Email Id</label>
+                                    <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} />
+                                </div>
+                                <div className="form-group">
                                     <label className="form-label field-label-res">Phone Number</label>
                                     <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="+91 00000 00000" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
                                 </div>
+                                <div className="form-group">
+                                    <label className="form-label field-label-res">Enrollment No (Student ID)</label>
+                                    <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. AJU/251522" value={form.enrollmentNo} onChange={e => setForm(p => ({ ...p, enrollmentNo: e.target.value }))} />
+                                </div>
+                            </div>
 
-                                {user?.role === 'student' && (
-                                    <>
+                            {user?.role === 'student' && (
+                                <>
+                                    <div style={{ marginBottom: '2.5rem', marginTop: '3rem' }}>
+                                        <h4 style={{ margin: 0, fontWeight: 950, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>University Details</h4>
+                                        <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Your current higher education details.</p>
+                                    </div>
+                                    <div className="form-fields-grid" style={{ gap: '1.75rem', marginBottom: '2rem' }}>
+                                        <div className="form-group span-full-res">
+                                            <label className="form-label field-label-res">University Name</label>
+                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} value={form.universityName || 'Arka Jain University, Jamshedpur'} readOnly />
+                                        </div>
                                         <div className="form-group">
                                             <label className="form-label field-label-res">Batch *</label>
-                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 2022-26 or 2022-2026" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
+                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 2022-26" value={form.batch} onChange={e => setForm(p => ({ ...p, batch: e.target.value }))} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label field-label-res">Current CGPA</label>
+                                            <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 8.5" value={form.universityCgpa} onChange={e => setForm(p => ({ ...p, universityCgpa: e.target.value }))} />
                                         </div>
                                         <div className="form-group">
                                             <label className="form-label field-label-res">Semester</label>
@@ -190,9 +214,9 @@ const ProfilePage = () => {
                                             <label className="form-label field-label-res">Section</label>
                                             <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. A" value={form.section} onChange={e => setForm(p => ({ ...p, section: e.target.value }))} />
                                         </div>
-                                    </>
-                                )}
-                            </div>
+                                    </div>
+                                </>
+                            )}
 
                             <div style={{ marginBottom: '2.5rem' }}>
                                 <h4 style={{ margin: 0, fontWeight: 950, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>12th / Senior Secondary Details</h4>

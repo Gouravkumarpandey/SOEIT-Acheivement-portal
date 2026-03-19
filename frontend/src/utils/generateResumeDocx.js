@@ -91,14 +91,14 @@ export const generateResumeDocx = async (data) => {
     sections.push(createSectionHeader("Education"));
     
     sections.push(createRow(
-        student.institution || 'University Name', 
-        student.department ? `Department of ${student.department}` : '',
+        student.universityName || 'Arka Jain University, Jamshedpur', 
+        student.universityCgpa ? `Current CGPA: ${student.universityCgpa}` : (student.department ? `Department of ${student.department}` : ''),
         true, false, false, false
     ));
     
     sections.push(createRow(
         'Bachelor of Technology (or Equivalent)', 
-        `${student.semester ? `Semester ${student.semester}` : ''} ${student.batch ? `| Batch ${student.batch}` : ''}`,
+        `Sem ${student.semester || 'N/A'} | Batch ${student.batch || '2022-26'}`,
         false, true, false, true
     ));
     

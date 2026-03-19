@@ -29,12 +29,19 @@ const StudentDashboard = () => {
     const { user } = useAuth();
     const [stats, setStats] = useState({ stats: { all: 0, approved: 0, pending: 0, totalPoints: 0, byCategory: [], byLevel: [] }, recentActivity: [] });
     const [loading, setLoading] = useState(true);
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
     useEffect(() => {
         const load = async () => {
             try {
                 const { data } = await achievementAPI.getStats();
                 if (data) setStats(data);
+                
+                // Check if profile is incomplete (missing 10th or 12th school info)
+                const isComplete = user?.edu10thSchool && user?.edu12thSchool && user?.universityCgpa;
+                if (!isComplete) {
+                    setShowProfileModal(true);
+                }
             } catch {
                 toast.error('Could not load dashboard data. Please check your connection.');
             } finally {
@@ -42,7 +49,7 @@ const StudentDashboard = () => {
             }
         };
         load();
-    }, []);
+    }, [user]);
 
     const statCards = [
         { label: 'Total Achievements', value: stats?.stats?.all ?? 0, icon: Trophy, color: 'var(--brand-600)', bg: 'var(--primary-50)', delta: 'Total Records' },
@@ -70,6 +77,41 @@ const StudentDashboard = () => {
 
     return (
         <div className="animate-fade-in">
+            {/* Profile Completion Alert Banner */}
+            {showProfileModal && (
+                <div className="card animate-slide-up" style={{ 
+                    marginBottom: '2rem', 
+                    padding: '1rem 1.5rem', 
+                    background: 'var(--primary-50)', 
+                    border: '1px solid var(--brand-200)', 
+                    borderRadius: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1.5rem',
+                    flexWrap: 'wrap',
+                    boxShadow: '0 4px 12px rgba(0, 33, 71, 0.05)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ width: '40px', height: '40px', background: 'white', color: 'var(--brand-600)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>
+                            <GraduationCap size={20} />
+                        </div>
+                        <div>
+                            <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: 'var(--brand-700)' }}>Academic Profile Incomplete</h4>
+                            <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Please update your 10th, 12th, and CGPA details for accurate resume generation.</p>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                        <Link to="/profile" className="btn btn-primary btn-sm" style={{ padding: '0.5rem 1.25rem', borderRadius: '10px', fontWeight: 800 }}>
+                            Complete Now
+                        </Link>
+                        <button onClick={() => setShowProfileModal(false)} title="Close" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                            <XCircle size={18} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Scholar Identity Header */}
             <div className="page-header dashboard-header-suite" style={{ marginBottom: '2.5rem' }}>
                 <div className="dashboard-header-content">

@@ -85,15 +85,16 @@ export const generateResumePdf = (data) => {
     container.appendChild(createSectionHeader('Education'));
 
     // Example mapping to the format in the picture
+    // University Education (from DB)
     const uniRow = createRow(
-        `<strong>${student.institution || 'University Name'}</strong>`, 
-        student.department ? `Department of ${student.department}` : ''
+        `<strong>${student.universityName || 'Arka Jain University, Jamshedpur'}</strong>`, 
+        student.universityCgpa ? `Current CGPA: ${student.universityCgpa}` : (student.department ? `Department of ${student.department}` : '')
     );
     container.appendChild(uniRow);
 
     const degRow = createRow(
         `<em>Bachelor of Technology (or Equivalent)</em>`, 
-        `<em>${student.semester ? `Semester ${student.semester}` : ''} ${student.batch ? `| Batch ${student.batch}` : ''}</em>`
+        `<em>Sem ${student.semester || 'N/A'} | Batch ${student.batch || '2022-26'}</em>`
     );
     degRow.style.marginBottom = '2px';
     container.appendChild(degRow);
