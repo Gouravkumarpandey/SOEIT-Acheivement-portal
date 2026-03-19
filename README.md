@@ -43,6 +43,7 @@ The portal is built on the **REVN** stack (React, Express, Vite, Node) with **Li
 ### 🎓 For Students
 - **Milestone Registry** — Submit achievements (Certificate, Title, Level, Category).
 - **Persistent Storage** — All certificates are stored as BLOBs in the database (No 404s on server restart).
+- **Professional Resume Engine** — One-click generation of high-density DOCX/PDF resumes pulling data from profile, projects, and internships.
 - **Public Portfolio** — A professional shareable link showcasing stats, verified achievements, and projects.
 - **Course & Internship Tracker** — Log ongoing learning activities and internship details.
 - **Hackathon Hub** — Live listing of 90+ real upcoming hackathons with integrated activity logging.
@@ -60,13 +61,14 @@ The portal is built on the **REVN** stack (React, Express, Vite, Node) with **Li
 
 ---
 
-## 🆕 Recent Updates (March 16, 2026)
+## 🆕 Recent Updates (March 19, 2026)
 
 | Update | Description |
 | :--- | :--- |
-| 🛡️ **Robust User Deletion** | Fixed critical 500 errors by implementing exhaustive batch deletion for all related user data (FK constraints). |
-| 🔄 **Unified Registration** | Implemented a single registration portal with a role-switcher for **Student** and **Faculty**. |
-| 🏷️ **Strict Prefix Validation** | Enforced enrollment number formats: `AJU/` for students and `ARKA/AJU/` for faculty. |
+| 📄 **Professional Resume Engine** | Launched high-density automated resume generator matching top-tier technical industry standards. |
+| 🆔 **Comprehensive Profiles** | Expanded user profiles to include 10th/12th academic markers, Enrollment IDs, and University CGPA. |
+| 🛡️ **Session-Based Auth** | Enhanced security by migrating to `sessionStorage`, ensuring automatic logout when the browser tab is closed. |
+| 🚀 **Direct Verification** | Updated email verification flow to land users directly on the dashboard for a smoother onboarding experience. |
 | 🏥 **DB Reliability** | Optimized Turso schema with indexes for high-speed lookups across all management modules. |
 
 ---
