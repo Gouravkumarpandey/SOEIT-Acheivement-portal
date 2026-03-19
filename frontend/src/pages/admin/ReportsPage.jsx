@@ -1,12 +1,38 @@
 import '../../styles/pages/admin/ReportsPage.css';
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, AreaChart, Area } from 'recharts';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip as ChartTooltip,
+    Legend as ChartLegend,
+    Filler
+} from 'chart.js';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import { Trophy, Star, TrendingUp, Award, Download, BarChart3 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    ChartTooltip,
+    ChartLegend,
+    Filler
+);
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
 
@@ -32,10 +58,82 @@ const ReportsPage = () => {
         </div>
     );
 
-    const monthlyData = (data?.monthlyTrend || []).map(d => ({
-        name: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d._id.month - 1],
-        submitted: d.submitted, approved: d.approved,
-    }));
+    const monthlyLabels = (data?.monthlyTrend || []).map(d => 
+        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d._id.month - 1]
+    );
+
+    const trendChartData = {
+        labels: monthlyLabels,
+        datasets: [
+            {
+                label: 'Total Submissions',
+                data: (data?.monthlyTrend || []).map(d => d.submitted),
+                backgroundColor: 'rgba(59, 130, 246, 0.2)', // Light blue
+                borderColor: '#3b82f6',
+                borderWidth: 2,
+                borderRadius: 8,
+                barThickness: 25,
+            },
+            {
+                label: 'Approved Achievements',
+                data: (data?.monthlyTrend || []).map(d => d.approved),
+                backgroundColor: '#10b981', // Solid green
+                borderColor: '#10b981',
+                borderWidth: 1,
+                borderRadius: 8,
+                barThickness: 25,
+            }
+        ]
+    };
+
+    const pieChartData = {
+        labels: (data?.categoryStats || []).map(d => d._id),
+        datasets: [{
+            data: (data?.categoryStats || []).map(d => d.count),
+            backgroundColor: COLORS,
+            borderWidth: 0,
+            hoverOffset: 15
+        }]
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { 
+                display: true, 
+                position: 'top',
+                align: 'end',
+                labels: { usePointStyle: true, font: { weight: '800', size: 11 } }
+            },
+            tooltip: {
+                backgroundColor: '#fff',
+                titleColor: '#0f172a',
+                bodyColor: '#64748b',
+                padding: 12,
+                borderRadius: 12,
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                bodyFont: { weight: '800' },
+                usePointStyle: true
+            }
+        },
+        scales: {
+            x: { 
+                grid: { display: false }, 
+                ticks: { color: '#64748b', font: { weight: '800', size: 11 } } 
+            },
+            y: { 
+                beginAtZero: true,
+                grid: { borderDash: [5, 5], color: '#e2e8f0' }, 
+                ticks: { 
+                    stepSize: 1,
+                    color: '#64748b', 
+                    font: { weight: '800', size: 11 } 
+                } 
+            }
+        }
+    };
 
     const exportReportsPDF = () => {
         try {
@@ -56,6 +154,12 @@ const ReportsPage = () => {
             doc.setFontSize(16);
             doc.text('I. ACHIEVEMENT TRENDS', 14, y);
             y += 10;
+            
+            const monthlyData = (data?.monthlyTrend || []).map(d => ({
+                name: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d._id.month - 1],
+                submitted: d.submitted, approved: d.approved,
+            }));
+
             autoTable(doc, {
                 startY: y,
                 head: [['Month', 'Total Submissions', 'Approved Achievements']],
@@ -101,6 +205,11 @@ const ReportsPage = () => {
     const exportReportsExcel = () => {
         try {
             const wb = XLSX.utils.book_new();
+
+            const monthlyData = (data?.monthlyTrend || []).map(d => ({
+                name: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d._id.month - 1],
+                submitted: d.submitted, approved: d.approved,
+            }));
 
             // 1. Monthly Trends
             const wsMonthly = XLSX.utils.json_to_sheet(monthlyData.map(d => ({
@@ -184,20 +293,8 @@ const ReportsPage = () => {
                     <div className="card-header" style={{ borderBottom: '1px solid var(--border-primary)', padding: '1.5rem' }}>
                         <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Monthly Trends</h4>
                     </div>
-                    <div className="card-body chart-body-res" style={{ padding: '2rem 1rem 1rem 1rem' }}>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <AreaChart data={monthlyData}>
-                                <defs>
-                                    <linearGradient id="gradSub" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--brand-600)" stopOpacity={0.12} /><stop offset="100%" stopColor="var(--brand-600)" stopOpacity={0} /></linearGradient>
-                                    <linearGradient id="gradApp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--success-500)" stopOpacity={0.12} /><stop offset="100%" stopColor="var(--success-500)" stopOpacity={0} /></linearGradient>
-                                </defs>
-                                <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12, fontWeight: 700 }} tickLine={false} axisLine={false} dy={10} />
-                                <YAxis tick={{ fill: '#64748b', fontSize: 12, fontWeight: 700 }} tickLine={false} axisLine={false} />
-                                <Tooltip contentStyle={{ background: '#fff', border: 'none', borderRadius: 12, boxShadow: 'var(--shadow-xl)' }} />
-                                <Area type="monotone" dataKey="submitted" stroke="var(--brand-700)" strokeWidth={3} fill="url(#gradSub)" name="Submissions" dot={{ r: 4, fill: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                                <Area type="monotone" dataKey="approved" stroke="var(--success-600)" strokeWidth={3} fill="url(#gradApp)" name="Approved" dot={{ r: 4, fill: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                    <div className="card-body chart-body-res" style={{ padding: '2rem 1rem 1rem 1rem', minHeight: '300px' }}>
+                        <Bar data={trendChartData} options={chartOptions} />
                     </div>
                 </div>
 
@@ -205,25 +302,19 @@ const ReportsPage = () => {
                     <div className="card-header" style={{ borderBottom: '1px solid var(--border-primary)', padding: '1.5rem' }}>
                         <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Achievements by Category</h4>
                     </div>
-                    <div className="card-body chart-body-res" style={{ padding: '1.5rem' }}>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie
-                                    data={data?.categoryStats || []}
-                                    dataKey="count"
-                                    nameKey="_id"
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={75}
-                                    outerRadius={105}
-                                    paddingAngle={6}
-                                    stroke="none"
-                                >
-                                    {(data?.categoryStats || []).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                                </Pie>
-                                <Tooltip contentStyle={{ background: '#fff', border: 'none', borderRadius: 12, boxShadow: 'var(--shadow-xl)' }} />
-                            </PieChart>
-                        </ResponsiveContainer>
+                    <div className="card-body chart-body-res" style={{ padding: '1.5rem', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: '100%', height: '280px' }}>
+                            <Pie 
+                                data={pieChartData} 
+                                options={{ 
+                                    ...chartOptions, 
+                                    plugins: { 
+                                        ...chartOptions.plugins, 
+                                        legend: { display: true, position: 'bottom', labels: { usePointStyle: true, font: { weight: '800', size: 10 } } } 
+                                    } 
+                                }} 
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

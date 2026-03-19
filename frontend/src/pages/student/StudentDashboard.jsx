@@ -4,11 +4,31 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { achievementAPI } from '../../services/api';
 import { Trophy, CheckCircle, Clock, XCircle, Star, Upload, TrendingUp, Award, GraduationCap, ArrowUpRight, Globe } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    ArcElement,
+    Tooltip as ChartTooltip,
+    Legend as ChartLegend,
+    Filler
+} from 'chart.js';
+import { Bar, Pie } from 'react-chartjs-2';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
-const COLORS = ['var(--brand-600)', 'var(--accent-500)', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    ArcElement,
+    ChartTooltip,
+    ChartLegend,
+    Filler
+);
+
+const COLORS = ['rgba(0, 33, 71, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(139, 92, 246, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(236, 72, 153, 0.8)', 'rgba(132, 204, 22, 0.8)'];
 
 const StatusBadge = ({ status }) => {
     const map = {
@@ -58,8 +78,49 @@ const StudentDashboard = () => {
         { label: 'Total Points', value: stats?.stats?.totalPoints ?? 0, icon: Award, color: '#8b5cf6', bg: '#f5f3ff', delta: 'Accumulated Score' },
     ];
 
-    const categoryData = stats?.stats?.byCategory?.map(d => ({ name: d._id, count: d.count })) || [];
-    const levelData = stats?.stats?.byLevel?.map(d => ({ name: d._id, value: d.count })) || [];
+    const categoryChartData = {
+        labels: (stats?.stats?.byCategory || []).map(d => d._id),
+        datasets: [{
+            label: 'Achievements',
+            data: (stats?.stats?.byCategory || []).map(d => d.count),
+            backgroundColor: 'rgba(0, 33, 71, 0.8)',
+            borderRadius: 8,
+            barThickness: 30
+        }]
+    };
+
+    const levelChartData = {
+        labels: (stats?.stats?.byLevel || []).map(d => d._id),
+        datasets: [{
+            data: (stats?.stats?.byLevel || []).map(d => d.count),
+            backgroundColor: COLORS,
+            borderWidth: 0,
+            hoverOffset: 12
+        }]
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#fff',
+                titleColor: '#0f172a',
+                bodyColor: '#64748b',
+                padding: 12,
+                borderRadius: 12,
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                bodyFont: { weight: '800' },
+                usePointStyle: true
+            }
+        },
+        scales: {
+            x: { grid: { display: false }, ticks: { color: '#64748b', font: { weight: '800', size: 10 } } },
+            y: { grid: { borderDash: [5, 5], color: '#e2e8f0' }, ticks: { color: '#64748b', font: { weight: '800', size: 10 } } }
+        }
+    };
 
     if (loading) {
         return (
@@ -182,19 +243,9 @@ const StudentDashboard = () => {
                         <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Achievement Distribution</h4>
                         <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Overview of achievements by category.</p>
                     </div>
-                    <div className="analytical-chart-wrap">
-                        {categoryData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height={300}>
-                                <BarChart data={categoryData}>
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'var(--text-muted)', fontWeight: 700 }} dy={10} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'var(--text-muted)', fontWeight: 700 }} />
-                                    <Tooltip
-                                        cursor={{ fill: 'var(--primary-50)' }}
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-xl)', fontWeight: 800 }}
-                                    />
-                                    <Bar dataKey="count" fill="var(--brand-600)" radius={[6, 6, 0, 0]} barSize={36} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                    <div className="analytical-chart-wrap" style={{ minHeight: '300px' }}>
+                        {(stats?.stats?.byCategory || []).length > 0 ? (
+                            <Bar data={categoryChartData} options={chartOptions} />
                         ) : (
                             <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                                 <Trophy size={48} style={{ color: 'var(--slate-200)', marginBottom: '1rem' }} />
@@ -209,19 +260,20 @@ const StudentDashboard = () => {
                         <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem' }}>Recognition Level</h4>
                         <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Distribution of achievements by level.</p>
                     </div>
-                    <div className="analytical-chart-wrap">
-                        {levelData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height={300}>
-                                <PieChart>
-                                    <Pie data={levelData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={8} stroke="none">
-                                        {levelData.map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-xl)', fontWeight: 800 }} />
-                                    <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ paddingTop: '20px' }} formatter={v => <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)' }}>{v}</span>} />
-                                </PieChart>
-                            </ResponsiveContainer>
+                    <div className="analytical-chart-wrap" style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {(stats?.stats?.byLevel || []).length > 0 ? (
+                            <div style={{ width: '100%', height: '280px' }}>
+                                <Pie 
+                                    data={levelChartData} 
+                                    options={{ 
+                                        ...chartOptions, 
+                                        plugins: { 
+                                            ...chartOptions.plugins, 
+                                            legend: { display: true, position: 'bottom', labels: { usePointStyle: true, font: { weight: '800', size: 10 } } } 
+                                        } 
+                                    }} 
+                                />
+                            </div>
                         ) : (
                             <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
                                 <Award size={48} style={{ color: 'var(--slate-200)', marginBottom: '1rem' }} />

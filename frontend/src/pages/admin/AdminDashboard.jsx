@@ -3,9 +3,35 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import { Users, Trophy, Clock, CheckCircle, XCircle, TrendingUp, BarChart3, Award, Shield } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend } from 'recharts';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip as ChartTooltip,
+    Legend as ChartLegend,
+    Filler
+} from 'chart.js';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    ChartTooltip,
+    ChartLegend,
+    Filler
+);
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'];
 
@@ -34,10 +60,90 @@ const AdminDashboard = () => {
         { label: 'Pending Review', value: data?.stats?.pendingCount ?? 0, icon: Clock, color: 'var(--warning-500)', bg: 'var(--warning-50)', delta: 'Waiting for approval', iconColor: 'var(--warning-700)' },
     ];
 
-    const trendData = (data?.monthlyTrend || []).map(d => ({
-        name: `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d._id.month - 1]}`,
-        count: d.count,
-    }));
+    const trendLabels = (data?.monthlyTrend || []).map(d => 
+        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d._id.month - 1]
+    );
+    const trendValues = (data?.monthlyTrend || []).map(d => d.count);
+
+    const trendChart = {
+        labels: trendLabels,
+        datasets: [{
+            label: 'Submissions',
+            data: trendValues,
+            fill: true,
+            borderColor: '#002147',
+            backgroundColor: 'rgba(0, 33, 71, 0.1)',
+            tension: 0.4,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#002147',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+        }]
+    };
+
+    const pieChart = {
+        labels: (data?.byCategory || []).map(d => d._id),
+        datasets: [{
+            data: (data?.byCategory || []).map(d => d.count),
+            backgroundColor: COLORS,
+            borderWidth: 0,
+            hoverOffset: 15
+        }]
+    };
+
+    const barLabels = (data?.byDepartment || []).map(d => d._id);
+    const barChart = {
+        labels: barLabels,
+        datasets: [
+            {
+                label: 'Total Submissions',
+                data: (data?.byDepartment || []).map(d => d.count),
+                backgroundColor: 'rgba(100, 116, 139, 0.2)',
+                borderRadius: 8,
+                barThickness: 25
+            },
+            {
+                label: 'Approved Submissions',
+                data: (data?.byDepartment || []).map(d => d.approved),
+                backgroundColor: '#002147',
+                borderRadius: 8,
+                barThickness: 25
+            }
+        ]
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: '#fff',
+                titleColor: '#0f172a',
+                bodyColor: '#64748b',
+                padding: 12,
+                borderRadius: 12,
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                displayColors: true,
+                usePointStyle: true,
+                bodyFont: { weight: '800' }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { color: '#64748b', font: { weight: '800', size: 11 } }
+            },
+            y: {
+                grid: { borderDash: [5, 5], color: '#e2e8f0' },
+                ticks: { color: '#64748b', font: { weight: '800', size: 11 } }
+            }
+        }
+    };
 
     if (loading) {
         return (
@@ -99,21 +205,8 @@ const AdminDashboard = () => {
                             <BarChart3 size={16} /> Last 12 Months
                         </div>
                     </div>
-                    <div className="card-body admin-chart-body">
-                        <ResponsiveContainer width="100%" height={320}>
-                            <AreaChart data={trendData}>
-                                <defs>
-                                    <linearGradient id="adminTrend" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="var(--brand-600)" stopOpacity={0.15} />
-                                        <stop offset="100%" stopColor="var(--brand-600)" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 800 }} tickLine={false} axisLine={false} dy={15} />
-                                <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 800 }} tickLine={false} axisLine={false} dx={-10} />
-                                <Tooltip cursor={{ stroke: 'var(--brand-200)', strokeWidth: 2 }} contentStyle={{ background: '#fff', border: '1px solid var(--border-primary)', borderRadius: 14, boxShadow: 'var(--shadow-xl)', padding: '12px' }} />
-                                <Area type="monotone" dataKey="count" stroke="var(--brand-600)" strokeWidth={4} fill="url(#adminTrend)" dot={{ r: 6, fill: '#fff', stroke: 'var(--brand-600)', strokeWidth: 3 }} activeDot={{ r: 8, strokeWidth: 0, fill: 'var(--brand-700)' }} />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                    <div className="card-body admin-chart-body" style={{ minHeight: '320px' }}>
+                        <Line data={trendChart} options={chartOptions} />
                     </div>
                 </div>
 
@@ -122,26 +215,10 @@ const AdminDashboard = () => {
                     <div className="card-header admin-chart-header">
                         <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Category Breakdown</h4>
                     </div>
-                    <div className="card-body admin-domain-body">
-                        <ResponsiveContainer width="100%" height={320}>
-                            <PieChart>
-                                <Pie
-                                    data={data?.byCategory || []}
-                                    dataKey="count"
-                                    nameKey="_id"
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={75}
-                                    outerRadius={105}
-                                    paddingAngle={8}
-                                    stroke="none"
-                                >
-                                    {(data?.byCategory || []).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.05))' }} />)}
-                                </Pie>
-                                <Tooltip contentStyle={{ background: '#fff', border: '1px solid var(--border-primary)', borderRadius: 14, boxShadow: 'var(--shadow-xl)' }} />
-                                <Legend verticalAlign="bottom" align="center" iconType="circle" iconSize={10} wrapperStyle={{ paddingTop: '30px' }} formatter={v => <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{v}</span>} />
-                            </PieChart>
-                        </ResponsiveContainer>
+                    <div className="card-body admin-domain-body" style={{ minHeight: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: '100%', height: '280px' }}>
+                            <Pie data={pieChart} options={{ ...chartOptions, plugins: { ...chartOptions.plugins, legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { weight: '800', size: 10 } } } } }} />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -152,17 +229,14 @@ const AdminDashboard = () => {
                     <div className="card-header admin-chart-header">
                         <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.15rem', color: 'var(--text-primary)' }}>Department Progress</h4>
                     </div>
-                    <div className="card-body admin-chart-body">
-                        <ResponsiveContainer width="100%" height={320}>
-                            <BarChart data={data?.byDepartment || []} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                                <XAxis dataKey="_id" tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 900 }} tickLine={false} axisLine={false} dy={15} />
-                                <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 900 }} tickLine={false} axisLine={false} />
-                                <Tooltip cursor={{ fill: 'var(--slate-50)', radius: 8 }} contentStyle={{ background: '#fff', border: '1px solid var(--border-primary)', borderRadius: 14, boxShadow: 'var(--shadow-xl)' }} />
-                                <Bar dataKey="count" name="Total Submissions" fill="var(--slate-200)" radius={[6, 6, 0, 0]} barSize={28} />
-                                <Bar dataKey="approved" name="Approved Submissions" fill="var(--brand-600)" radius={[6, 6, 0, 0]} barSize={28} />
-                                <Legend align="right" verticalAlign="top" wrapperStyle={{ top: -25, paddingBottom: '20px' }} iconSize={12} formatter={v => <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{v}</span>} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <div className="card-body admin-chart-body" style={{ minHeight: '320px' }}>
+                        <Bar 
+                            data={barChart} 
+                            options={{
+                                ...chartOptions, 
+                                plugins: { ...chartOptions.plugins, legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, font: { weight: '800', size: 11 } } } } 
+                            }} 
+                        />
                     </div>
                 </div>
 
