@@ -14,7 +14,12 @@ const DEPARTMENTS = {
 const ProfilePage = () => {
     const { user, updateUser } = useAuth();
     const [tab, setTab] = useState('profile');
-    const [form, setForm] = useState({ name: '', phone: '', bio: '', batch: '', semester: '', section: '', linkedIn: '', github: '', portfolio: '' });
+    const [form, setForm] = useState({ 
+        name: '', phone: '', bio: '', batch: '', semester: '', section: '', 
+        linkedIn: '', github: '', portfolio: '',
+        edu10thSchool: '', edu10thYear: '', edu10thPercent: '',
+        edu12thSchool: '', edu12thYear: '', edu12thPercent: ''
+    });
     const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
     const [showPw, setShowPw] = useState({ current: false, new: false, confirm: false });
     const [profileImage, setProfileImage] = useState(null);
@@ -28,6 +33,8 @@ const ProfilePage = () => {
                 name: user.name || '', phone: user.phone || '', bio: user.bio || '',
                 batch: user.batch || '', semester: user.semester || '', section: user.section || '',
                 linkedIn: user.linkedIn || '', github: user.github || '', portfolio: user.portfolio || '',
+                edu10thSchool: user.edu10thSchool || '', edu10thYear: user.edu10thYear || '', edu10thPercent: user.edu10thPercent || '',
+                edu12thSchool: user.edu12thSchool || '', edu12thYear: user.edu12thYear || '', edu12thPercent: user.edu12thPercent || '',
             });
             setImagePreview(user.profileImage ? `${import.meta.env.VITE_UPLOADS_URL || ''}${user.profileImage}` : '');
         }
@@ -156,7 +163,7 @@ const ProfilePage = () => {
                                 <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: 'var(--text-muted)', fontWeight: 600 }}>Update your public and institutional profile information.</p>
                             </div>
 
-                            <div className="form-fields-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.75rem', marginBottom: '2rem' }}>
+                            <div className="form-fields-grid" style={{ gap: '1.75rem', marginBottom: '2rem' }}>
                                 <div className="form-group">
                                     <label className="form-label field-label-res">Full Name</label>
                                     <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
@@ -179,12 +186,50 @@ const ProfilePage = () => {
                                                 {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester {s}</option>)}
                                             </select>
                                         </div>
-                                        <div className="form-group span-full-res" style={{ gridColumn: 'span 2' }}>
+                                        <div className="form-group span-full-res">
                                             <label className="form-label field-label-res">Section</label>
                                             <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. A" value={form.section} onChange={e => setForm(p => ({ ...p, section: e.target.value }))} />
                                         </div>
                                     </>
                                 )}
+                            </div>
+
+                            <div style={{ marginBottom: '2.5rem' }}>
+                                <h4 style={{ margin: 0, fontWeight: 950, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>12th / Senior Secondary Details</h4>
+                                <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Information about your intermediate education.</p>
+                            </div>
+                            <div className="form-fields-grid" style={{ marginBottom: '2rem' }}>
+    <div className="form-group span-full-res">
+                                    <label className="form-label field-label-res">School Name</label>
+                                    <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. KV School, Delhi" value={form.edu12thSchool} onChange={e => setForm(p => ({ ...p, edu12thSchool: e.target.value }))} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label field-label-res">Passing Year</label>
+                                    <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 2020" value={form.edu12thYear} onChange={e => setForm(p => ({ ...p, edu12thYear: e.target.value }))} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label field-label-res">Percentage / CGPA</label>
+                                    <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 85% or 9.0 CGPA" value={form.edu12thPercent} onChange={e => setForm(p => ({ ...p, edu12thPercent: e.target.value }))} />
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: '2.5rem' }}>
+                                <h4 style={{ margin: 0, fontWeight: 950, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>10th / Secondary Details</h4>
+                                <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Information about your high school education.</p>
+                            </div>
+                            <div className="form-fields-grid" style={{ marginBottom: '2rem' }}>
+    <div className="form-group span-full-res">
+                                    <label className="form-label field-label-res">School Name</label>
+                                    <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. KV School, Delhi" value={form.edu10thSchool} onChange={e => setForm(p => ({ ...p, edu10thSchool: e.target.value }))} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label field-label-res">Passing Year</label>
+                                    <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 2018" value={form.edu10thYear} onChange={e => setForm(p => ({ ...p, edu10thYear: e.target.value }))} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label field-label-res">Percentage / CGPA</label>
+                                    <input className="form-control" style={{ height: '52px', borderRadius: '12px', fontWeight: 700 }} placeholder="e.g. 90% or 9.5 CGPA" value={form.edu10thPercent} onChange={e => setForm(p => ({ ...p, edu10thPercent: e.target.value }))} />
+                                </div>
                             </div>
 
                             <div className="form-group">

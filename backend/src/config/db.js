@@ -33,6 +33,12 @@ const initSchema = async (client) => {
             reset_password_token    TEXT,
             reset_password_expire   TEXT,
             last_login      TEXT,
+            edu_10th_school TEXT,
+            edu_10th_year   TEXT,
+            edu_10th_percent TEXT,
+            edu_12th_school TEXT,
+            edu_12th_year   TEXT,
+            edu_12th_percent TEXT,
             created_at      TEXT DEFAULT (datetime('now')),
             updated_at      TEXT DEFAULT (datetime('now'))
         )`,
@@ -237,7 +243,13 @@ const initSchema = async (client) => {
     `ALTER TABLE courses ADD COLUMN sync_credentials TEXT DEFAULT '{}'`,
     `ALTER TABLE courses ADD COLUMN category TEXT`,
     `ALTER TABLE courses ADD COLUMN expected_completion_date TEXT`,
-    `ALTER TABLE courses ADD COLUMN skills_to_be_learnt TEXT`
+    `ALTER TABLE courses ADD COLUMN skills_to_be_learnt TEXT`,
+    `ALTER TABLE users ADD COLUMN edu_10th_school TEXT`,
+    `ALTER TABLE users ADD COLUMN edu_10th_year TEXT`,
+    `ALTER TABLE users ADD COLUMN edu_10th_percent TEXT`,
+    `ALTER TABLE users ADD COLUMN edu_12th_school TEXT`,
+    `ALTER TABLE users ADD COLUMN edu_12th_year TEXT`,
+    `ALTER TABLE users ADD COLUMN edu_12th_percent TEXT`
   ];
 
   for (const query of migrations) {

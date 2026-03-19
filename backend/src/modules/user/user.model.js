@@ -40,6 +40,12 @@ const rowToUser = (row) => {
         linkedIn: row.linked_in || '',
         github: row.github || '',
         portfolio: row.portfolio || '',
+        edu10thSchool: row.edu_10th_school || '',
+        edu10thYear: row.edu_10th_year || '',
+        edu10thPercent: row.edu_10th_percent || '',
+        edu12thSchool: row.edu_12th_school || '',
+        edu12thYear: row.edu_12th_year || '',
+        edu12thPercent: row.edu_12th_percent || '',
         resetPasswordToken: row.reset_password_token || undefined,
         resetPasswordExpire: row.reset_password_expire ? new Date(row.reset_password_expire) : undefined,
         lastLogin: row.last_login ? new Date(row.last_login) : undefined,
@@ -73,6 +79,8 @@ const rowToUser = (row) => {
                     enrollment_no=?, student_id=?, phone=?, bio=?, profile_image=?,
                     batch=?, semester=?, section=?, is_active=?, is_verified=?,
                     linked_in=?, github=?, portfolio=?,
+                    edu_10th_school=?, edu_10th_year=?, edu_10th_percent=?,
+                    edu_12th_school=?, edu_12th_year=?, edu_12th_percent=?,
                     reset_password_token=?, reset_password_expire=?, last_login=?,
                     updated_at=datetime('now')
                     WHERE id=?`,
@@ -83,6 +91,8 @@ const rowToUser = (row) => {
                     this.batch || null, this.semester || null, this.section || null,
                     this.isActive ? 1 : 0, this.isVerified ? 1 : 0,
                     this.linkedIn || '', this.github || '', this.portfolio || '',
+                    this.edu10thSchool || null, this.edu10thYear || null, this.edu10thPercent || null,
+                    this.edu12thSchool || null, this.edu12thYear || null, this.edu12thPercent || null,
                     this.resetPasswordToken || null,
                     this.resetPasswordExpire ? this.resetPasswordExpire.toISOString() : null,
                     this.lastLogin ? this.lastLogin.toISOString() : null,
@@ -245,6 +255,8 @@ const User = {
             semester: 'semester', section: 'section', linkedIn: 'linked_in',
             github: 'github', portfolio: 'portfolio', profileImage: 'profile_image',
             isActive: 'is_active', role: 'role',
+            edu10thSchool: 'edu_10th_school', edu10thYear: 'edu_10th_year', edu10thPercent: 'edu_10th_percent',
+            edu12thSchool: 'edu_12th_school', edu12thYear: 'edu_12th_year', edu12thPercent: 'edu_12th_percent',
         };
 
         const setParts = [];

@@ -43,6 +43,16 @@
     margin-bottom: 0.5rem;
 }
 
+.form-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem;
+}
+
+.span-full-res {
+    grid-column: span 2;
+}
+
 /* Mobile Responsiveness Strategy */
 @media (max-width: 1024px) {
     .identity-form-layout {

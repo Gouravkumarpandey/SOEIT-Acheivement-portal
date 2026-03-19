@@ -102,6 +102,34 @@ export const generateResumeDocx = async (data) => {
         false, true, false, true
     ));
     
+    // 12th Education
+    if (student.edu12thSchool) {
+        sections.push(createRow(
+            student.edu12thSchool,
+            student.edu12thPercent ? `Percentage: ${student.edu12thPercent}` : '',
+            true, false, false, false
+        ));
+        sections.push(createRow(
+            'Senior Secondary (PCM/PCB)',
+            student.edu12thYear || '',
+            false, true, false, true
+        ));
+    }
+
+    // 10th Education
+    if (student.edu10thSchool) {
+        sections.push(createRow(
+            student.edu10thSchool,
+            student.edu10thPercent ? `Percentage: ${student.edu10thPercent}` : '',
+            true, false, false, false
+        ));
+        sections.push(createRow(
+            'Secondary Education',
+            student.edu10thYear || '',
+            false, true, false, true
+        ));
+    }
+    
     sections.push(new Paragraph({ spacing: { after: 150 } }));
 
     // Experience / Achievements Section

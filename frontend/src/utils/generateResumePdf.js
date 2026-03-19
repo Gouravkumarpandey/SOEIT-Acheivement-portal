@@ -95,8 +95,40 @@ export const generateResumePdf = (data) => {
         `<em>Bachelor of Technology (or Equivalent)</em>`, 
         `<em>${student.semester ? `Semester ${student.semester}` : ''} ${student.batch ? `| Batch ${student.batch}` : ''}</em>`
     );
-    degRow.style.marginBottom = '8px';
+    degRow.style.marginBottom = '2px';
     container.appendChild(degRow);
+
+    // 12th Education
+    if (student.edu12thSchool) {
+        const edu12Row = createRow(
+            `<strong>${student.edu12thSchool}</strong>`,
+            student.edu12thPercent ? `Percentage: ${student.edu12thPercent}` : ''
+        );
+        container.appendChild(edu12Row);
+        
+        const edu12SubRow = createRow(
+            `<em>Senior Secondary (PCM/PCB)</em>`,
+            student.edu12thYear ? `<em>${student.edu12thYear}</em>` : ''
+        );
+        edu12SubRow.style.marginBottom = '2px';
+        container.appendChild(edu12SubRow);
+    }
+
+    // 10th Education
+    if (student.edu10thSchool) {
+        const edu10Row = createRow(
+            `<strong>${student.edu10thSchool}</strong>`,
+            student.edu10thPercent ? `Percentage: ${student.edu10thPercent}` : ''
+        );
+        container.appendChild(edu10Row);
+        
+        const edu10SubRow = createRow(
+            `<em>Secondary Education</em>`,
+            student.edu10thYear ? `<em>${student.edu10thYear}</em>` : ''
+        );
+        edu10SubRow.style.marginBottom = '8px';
+        container.appendChild(edu10SubRow);
+    }
 
     // Experience / Achievements Section
     if (achievements && achievements.length > 0) {
