@@ -145,7 +145,7 @@ const AdminTabs = () => (
       }}
     />
     <Tab.Screen
-      name="AdminProfile"
+      name="Profile"
       component={ProfileScreen}
       options={{
         title: 'Profile',
@@ -198,7 +198,7 @@ const FacultyTabs = () => (
       }}
     />
     <Tab.Screen
-      name="FacultyProfile"
+      name="Profile"
       component={ProfileScreen}
       options={{
         title: 'Profile',
