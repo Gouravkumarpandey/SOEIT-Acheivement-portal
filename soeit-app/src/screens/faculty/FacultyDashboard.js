@@ -75,14 +75,14 @@ const FacultyDashboard = ({ navigation }) => {
       showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
     >
-      <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.header}>
+      <LinearGradient colors={['#eef2ff', '#f8fafc']} style={styles.header}>
         <View style={styles.headerTop}>
           <View>
              <Text style={styles.badge}>SoEIT FACULTY PORTAL</Text>
              <Text style={styles.greeting}>Insight Dashboard</Text>
           </View>
           <TouchableOpacity style={styles.profileBtn} onPress={() => navigation.navigate('Profile')}>
-            <Ionicons name="person-circle" size={40} color="#fff" />
+            <Ionicons name="person-circle" size={44} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
 
@@ -153,13 +153,13 @@ const styles = StyleSheet.create({
   header: { padding: 25, paddingTop: 60, paddingBottom: 40, borderBottomLeftRadius: 32, borderBottomRightRadius: 32 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 },
   badge: { color: COLORS.secondary, fontSize: 10, fontWeight: '900', letterSpacing: 2, marginBottom: 5 },
-  greeting: { color: '#fff', fontSize: 26, fontWeight: '800' },
+  greeting: { color: COLORS.textPrimary, fontSize: 26, fontWeight: '800' },
   profileBtn: { padding: 2 },
-  heroStats: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  heroStats: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, elevation: 6, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 },
   heroStatItem: { flex: 1, alignItems: 'center' },
-  heroStatValue: { color: '#fff', fontSize: 20, fontWeight: '900' },
-  heroStatLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '700', marginTop: 4 },
-  heroDivider: { width: 1, height: 25, backgroundColor: 'rgba(255,255,255,0.1)', alignSelf: 'center' },
+  heroStatValue: { color: COLORS.primary, fontSize: 22, fontWeight: '900' },
+  heroStatLabel: { color: COLORS.textMuted, fontSize: 11, fontWeight: '700', marginTop: 4 },
+  heroDivider: { width: 1, height: 25, backgroundColor: COLORS.border, alignSelf: 'center' },
   content: { padding: 20 },
   actionGrid: { flexDirection: 'row', gap: 15, marginBottom: 30 },
   actionCard: { flex: 1, backgroundColor: COLORS.bgCard, padding: 20, borderRadius: 24, borderWidth: 1, borderColor: COLORS.border },

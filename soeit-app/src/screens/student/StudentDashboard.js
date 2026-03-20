@@ -89,10 +89,10 @@ const StudentDashboard = ({ navigation }) => {
       showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
     >
-      <LinearGradient colors={['#1e1b4b', '#000']} style={styles.header}>
+      <LinearGradient colors={['#eef2ff', '#f8fafc']} style={styles.header}>
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-            <LinearGradient colors={['#818cf8', '#4f46e5']} style={styles.avatar}>
+            <LinearGradient colors={COLORS.gradientPrimary} style={styles.avatar}>
               <Text style={styles.avatarChar}>{user?.name[0]}</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -101,7 +101,7 @@ const StudentDashboard = ({ navigation }) => {
             <Text style={styles.statusText}>{user?.enrollmentNo || 'Student Portal'}</Text>
           </View>
           <TouchableOpacity style={styles.notifBtn} onPress={() => navigation.navigate('Events')}>
-            <Ionicons name="notifications-outline" size={24} color="#fff" />
+            <Ionicons name="notifications-outline" size={24} color={COLORS.textPrimary} />
             <View style={styles.notifDot} />
           </TouchableOpacity>
         </View>
@@ -119,7 +119,7 @@ const StudentDashboard = ({ navigation }) => {
           <View style={styles.divider} />
           <View style={styles.statBox}>
              <Text style={styles.statLabel}>Rank</Text>
-             <Text style={[styles.statValue, { color: COLORS.secondary }]}>14</Text>
+             <Text style={[styles.statValue, { color: COLORS.primary }]}>14</Text>
           </View>
         </View>
       </LinearGradient>
@@ -202,23 +202,27 @@ const styles = StyleSheet.create({
   avatar: { width: 50, height: 50, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   avatarChar: { color: '#fff', fontSize: 22, fontWeight: '800' },
   headerInfo: { flex: 1 },
-  welcomeText: { color: '#fff', fontSize: 20, fontWeight: '800' },
-  statusText: { color: 'rgba(255,255,255,0.6)', fontSize: 13, marginTop: 2 },
-  notifBtn: { width: 44, height: 44, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
-  notifDot: { position: 'absolute', top: 12, right: 12, width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.secondary, borderWidth: 2, borderColor: '#1e1b4b' },
+  welcomeText: { color: COLORS.textPrimary, fontSize: 20, fontWeight: '800' },
+  statusText: { color: COLORS.textSecondary, fontSize: 13, marginTop: 2 },
+  notifBtn: { width: 44, height: 44, borderRadius: 15, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5 },
+  notifDot: { position: 'absolute', top: 12, right: 12, width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.secondary, borderWidth: 2, borderColor: '#fff' },
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#fff',
     borderRadius: 24,
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.border,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
   },
   statBox: { flex: 1, alignItems: 'center' },
-  statLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', marginBottom: 5 },
+  statLabel: { color: COLORS.textMuted, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', marginBottom: 5 },
   statValue: { fontSize: 22, fontWeight: '900' },
-  divider: { width: 1, height: 30, backgroundColor: 'rgba(255,255,255,0.1)' },
+  divider: { width: 1, height: 30, backgroundColor: COLORS.border },
   trendingContainer: { marginTop: -25 },
   trendingScroll: { paddingHorizontal: 20, gap: 15 },
   trendingCard: {

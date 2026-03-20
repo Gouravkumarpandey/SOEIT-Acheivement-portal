@@ -59,18 +59,18 @@ const ProfileScreen = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account Information</Text>
         <View style={styles.card}>
-          <ProfileItem 
-            icon="mail-outline" 
-            label="Email Address" 
-            value={user?.email} 
+          <ProfileItem
+            icon="mail-outline"
+            label="Email Address"
+            value={user?.email}
           />
           <View style={styles.divider} />
           {user?.enrollmentNo && (
             <>
-              <ProfileItem 
-                icon="id-card-outline" 
-                label="Enrollment Number" 
-                value={user?.enrollmentNo} 
+              <ProfileItem
+                icon="id-card-outline"
+                label="Enrollment Number"
+                value={user?.enrollmentNo}
                 color={COLORS.secondary}
               />
               <View style={styles.divider} />
@@ -78,7 +78,7 @@ const ProfileScreen = () => {
           )}
           {!isAdmin && (
             <>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.resumeBtn}
                 activeOpacity={0.8}
                 onPress={() => Alert.alert('Resume Hub', 'Your professional resume is being generated using the SOEIT Engine...')}
@@ -97,10 +97,10 @@ const ProfileScreen = () => {
               <View style={styles.divider} />
             </>
           )}
-          <ProfileItem 
-            icon="call-outline" 
-            label="Joined On" 
-            value={user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'August 2024'} 
+          <ProfileItem
+            icon="call-outline"
+            label="Joined On"
+            value={user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'August 2024'}
             color="#ec4899"
           />
         </View>
@@ -135,12 +135,12 @@ const ProfileScreen = () => {
         variant="danger"
         style={styles.logoutBtn}
       />
-      
+
       <View style={styles.footer}>
-        <Text style={styles.footerText}>SOEIT Achievement Portal v1.0.0</Text>
-        <Text style={styles.footerSub}>Designed by Team SOEIT</Text>
+        <Text style={styles.footerText}>SoEIT Achievement Portal v1.0.0</Text>
+        <Text style={styles.footerSub}>Designed by Ritesh Kumar</Text>
       </View>
-      
+
       <View style={{ height: 100 }} />
     </ScrollView>
   );
@@ -162,11 +162,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 15,
-    elevation: 10,
+    elevation: 8,
   },
   avatarChar: {
     fontSize: 40,
@@ -206,6 +206,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: COLORS.border,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   profileItem: {
     flexDirection: 'row',

@@ -1,58 +1,61 @@
 export const COLORS = {
-  // Primary brand colors
-  primary: '#3b82f6',
-  primaryDark: '#2563eb',
-  primaryLight: '#60a5fa',
+  // Primary brand colors (Indigo based for premium feel)
+  primary: '#4f46e5',
+  primaryDark: '#3730a3',
+  primaryLight: '#818cf8',
+  primaryVeryLight: '#eef2ff',
 
-  // Secondary
-  secondary: '#8b5cf6',
-  secondaryDark: '#7c3aed',
-  secondaryLight: '#a78bfa',
+  // Secondary (Amber/Amber for energy)
+  secondary: '#f59e0b',
+  secondaryDark: '#d97706',
+  secondaryLight: '#fbbf24',
+  secondaryVeryLight: '#fffbeb',
 
-  // Accent
-  accent: '#06b6d4',
-  success: '#22c55e',
+  // Semantic
+  success: '#10b981',
   warning: '#f59e0b',
   danger: '#ef4444',
   info: '#3b82f6',
 
-  // Backgrounds
-  bgPrimary: '#0a0f1e',
-  bgSecondary: '#111827',
-  bgCard: '#1e293b',
-  bgCardHover: '#253245',
-  bgInput: '#1a2234',
-  bgOverlay: 'rgba(0,0,0,0.7)',
+  // Backgrounds (Clean Light Theme)
+  bgPrimary: '#f8fafc',
+  bgSecondary: '#ffffff',
+  bgCard: '#ffffff',
+  bgCardHover: '#f1f5f9',
+  bgInput: '#ffffff',
+  bgOverlay: 'rgba(15, 23, 42, 0.4)',
 
-  // Text
-  textPrimary: '#f8fafc',
-  textSecondary: '#94a3b8',
-  textMuted: '#64748b',
-  textAccent: '#60a5fa',
+  // Text (Slate based for readability)
+  textPrimary: '#0f172a',
+  textSecondary: '#475569',
+  textMuted: '#94a3b8',
+  textAccent: '#4f46e5',
+  textWhite: '#ffffff',
 
   // Borders
-  border: 'rgba(255,255,255,0.08)',
-  borderLight: 'rgba(255,255,255,0.15)',
+  border: '#e2e8f0',
+  borderLight: '#f1f5f9',
 
-  // Gradients (use as array for LinearGradient)
-  gradientPrimary: ['#3b82f6', '#8b5cf6'],
-  gradientSecondary: ['#06b6d4', '#3b82f6'],
-  gradientDark: ['#0a0f1e', '#111827'],
-  gradientCard: ['#1e293b', '#253245'],
+  // Gradients
+  gradientPrimary: ['#4f46e5', '#3730a3'],
+  gradientSecondary: ['#f59e0b', '#d97706'],
+  gradientLight: ['#ffffff', '#f8fafc'],
+  gradientCard: ['#ffffff', '#f1f5f9'],
+  gradientSoft: ['#f8fafc', '#f1f5f9'],
 
   // Status colors
   statusPending: '#f59e0b',
-  statusVerified: '#22c55e',
+  statusVerified: '#10b981',
   statusRejected: '#ef4444',
-  statusDraft: '#64748b',
+  statusDraft: '#94a3b8',
 
-  // Category colors
+  // Category colors (Modern Palette)
   categoryColors: {
-    technical: '#3b82f6',
-    sports: '#22c55e',
+    technical: '#4f46e5',
+    sports: '#10b981',
     cultural: '#f59e0b',
     academic: '#8b5cf6',
     research: '#06b6d4',
-    default: '#64748b',
+    default: '#94a3b8',
   },
 };

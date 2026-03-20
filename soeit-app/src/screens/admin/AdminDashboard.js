@@ -68,7 +68,7 @@ const AdminDashboard = ({ navigation }) => {
       showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
     >
-      <LinearGradient colors={['#1e1b4b', '#312e81']} style={styles.header}>
+      <LinearGradient colors={['#eff6ff', '#f8fafc']} style={styles.header}>
         <View style={styles.headerTop}>
            <View>
               <Text style={styles.headerTag}>SoEIT INSTITUTIONAL ADMIN</Text>
@@ -135,14 +135,14 @@ const styles = StyleSheet.create({
   header: { padding: 25, paddingTop: 60, paddingBottom: 40, borderBottomLeftRadius: 36, borderBottomRightRadius: 36 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 35 },
   headerTag: { color: COLORS.secondary, fontSize: 11, fontWeight: '900', letterSpacing: 2, marginBottom: 5 },
-  headerTitle: { color: '#fff', fontSize: 28, fontWeight: '800' },
-  avatarMini: { width: 44, height: 44, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
-  avatarText: { color: '#fff', fontWeight: '800', fontSize: 18 },
-  statsGrid: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  headerTitle: { color: COLORS.textPrimary, fontSize: 28, fontWeight: '800' },
+  avatarMini: { width: 44, height: 44, borderRadius: 15, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border, elevation: 4 },
+  avatarText: { color: COLORS.primary, fontWeight: '800', fontSize: 18 },
+  statsGrid: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, elevation: 6, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 },
   statItem: { flex: 1, alignItems: 'center' },
-  statValue: { color: '#fff', fontSize: 20, fontWeight: '900' },
-  statLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: '800', marginTop: 4, textTransform: 'uppercase' },
-  statDivider: { width: 1, height: 25, backgroundColor: 'rgba(255,255,255,0.1)', alignSelf: 'center' },
+  statValue: { color: COLORS.primary, fontSize: 22, fontWeight: '900' },
+  statLabel: { color: COLORS.textMuted, fontSize: 10, fontWeight: '800', marginTop: 4, textTransform: 'uppercase' },
+  statDivider: { width: 1, height: 25, backgroundColor: COLORS.border, alignSelf: 'center' },
   content: { padding: 20 },
   sectionTitle: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '800', marginBottom: 20, marginLeft: 5 },
   actionCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.bgCard, padding: 15, borderRadius: 24, marginBottom: 15, borderWidth: 1, borderColor: COLORS.border },
