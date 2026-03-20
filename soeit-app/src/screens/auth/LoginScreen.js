@@ -73,7 +73,7 @@ const LoginScreen = ({ navigation }) => {
             >
               <Ionicons name="school" size={40} color="#fff" />
             </LinearGradient>
-            <Text style={styles.title}>SOEIT Portal</Text>
+            <Text style={styles.title}>SoEIT Portal</Text>
             <Text style={styles.subtitle}>Achievement & Management System</Text>
           </View>
 

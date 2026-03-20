@@ -78,7 +78,7 @@ const FacultyDashboard = ({ navigation }) => {
       <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.header}>
         <View style={styles.headerTop}>
           <View>
-             <Text style={styles.badge}>FACULTY PORTAL</Text>
+             <Text style={styles.badge}>SoEIT FACULTY PORTAL</Text>
              <Text style={styles.greeting}>Insight Dashboard</Text>
           </View>
           <TouchableOpacity style={styles.profileBtn} onPress={() => navigation.navigate('Profile')}>

@@ -71,7 +71,7 @@ const AdminDashboard = ({ navigation }) => {
       <LinearGradient colors={['#1e1b4b', '#312e81']} style={styles.header}>
         <View style={styles.headerTop}>
            <View>
-              <Text style={styles.headerTag}>INSTITUTIONAL ADMIN</Text>
+              <Text style={styles.headerTag}>SoEIT INSTITUTIONAL ADMIN</Text>
               <Text style={styles.headerTitle}>Operational Hub</Text>
            </View>
            <TouchableOpacity style={styles.profileBtn} onPress={() => navigation.navigate('Profile')}>
