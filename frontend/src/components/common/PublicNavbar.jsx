@@ -43,7 +43,7 @@ const PublicNavbar = () => {
                             <GraduationCap size={24} color="#fff" />
                         </div>
                         <div className="hidden sm:block">
-                            <div className="nav-logo-text">SOEIT Portal</div>
+                            <div className="nav-logo-text">SoEIT Portal</div>
                             <div className="nav-logo-subtitle">Technical Excellence</div>
                         </div>
                     </Link>
