@@ -8,46 +8,53 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  TextInput,
+  Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
-import { SPACING, getResponsiveFontSize } from '../../utils/responsive';
+import { SPACING, getResponsiveFontSize, percentWidth } from '../../utils/responsive';
+
+const { width } = Dimensions.get('window');
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
+  const [enrollmentNo, setEnrollmentNo] = useState('');
   const [password, setPassword] = useState('');
+  const [captcha, setCaptcha] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const { login, loginDemo } = useAuth();
+  const [captchaCode] = useState('4447');
+  const { login } = useAuth();
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email';
+    if (!enrollmentNo.trim()) {
+      Alert.alert('Required', 'Please enter enrollment number');
+      return false;
     }
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    if (!password.trim()) {
+      Alert.alert('Required', 'Please enter password');
+      return false;
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!captcha.trim()) {
+      Alert.alert('Required', 'Please enter captcha code');
+      return false;
+    }
+    if (captcha !== captchaCode) {
+      Alert.alert('Invalid', 'Captcha code is incorrect. Please try again.');
+      return false;
+    }
+    return true;
   };
 
   const handleLogin = async () => {
-    if (!validateForm()) {
-      Alert.alert('Validation Error', 'Please correct the errors in the form');
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
     try {
+      const email = `${enrollmentNo.toLowerCase()}@arkajainuniversity.ac.in`;
       await login(email, password);
     } catch (error) {
       const msg = error.response?.data?.message || 'Login failed. Please check your credentials.';
@@ -57,380 +64,333 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  const handleDemoLogin = async (role) => {
-    setLoading(true);
-    try {
-      await loginDemo(role);
-    } catch (error) {
-      Alert.alert('Demo Error', 'Could not start demo');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <LinearGradient
-      colors={[COLORS.bgPrimary, COLORS.bgSecondary]}
-      style={styles.container}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+    <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={['#ffffff', '#f8f9fa']}
+        style={styles.gradient}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          scrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
         >
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => navigation.goBack()}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            accessibilityHint="Returns to the welcome screen"
-          >
-            <Ionicons name="arrow-back" size={24} color={COLORS.textPrimary} />
-          </TouchableOpacity>
+          {/* Header with University Info */}
+          <View style={styles.headerSection}>
+            <View style={styles.headerTop}>
+              {/* Logo */}
+              <LinearGradient
+                colors={['#2c3e50', '#34495e']}
+                style={styles.logoCircle}
+              >
+                <Text style={styles.logoText}>JGi</Text>
+              </LinearGradient>
 
-          <View style={styles.header}>
-            <LinearGradient
-              colors={COLORS.gradientPrimary}
-              style={styles.logoContainer}
-            >
-              <Ionicons name="school" size={40} color="#fff" />
-            </LinearGradient>
-            <Text
-              style={styles.title}
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
-            >
-              SoEIT Portal
-            </Text>
-            <Text
-              style={styles.subtitle}
-              allowFontScaling
-              maxFontSizeMultiplier={1.2}
-            >
-              Achievement & Management System
-            </Text>
+              {/* University Name */}
+              <View style={styles.universityInfo}>
+                <View style={styles.nameRow}>
+                  <Text style={styles.universityName}>ARKA JAIN</Text>
+                  <View style={styles.divider} />
+                </View>
+                <Text style={styles.universityName}>UNIVERSITY</Text>
+                <Text style={styles.universityLocation}>Jharkhand</Text>
+              </View>
+
+              {/* NAAC Badge */}
+              <View style={styles.naacBadge}>
+                <Text style={styles.naacText}>NAAC</Text>
+                <Text style={styles.naacGrade}>A</Text>
+              </View>
+            </View>
           </View>
 
-          <View style={styles.card}>
-            <Text
-              style={styles.cardTitle}
-              accessible
-              accessibilityRole="header"
-              allowFontScaling
-              maxFontSizeMultiplier={1.3}
-            >
-              Sign In
-            </Text>
-
-            <View style={styles.formContainer}>
-              <Input
-                label="Email Address"
-                placeholder="e.g. john@university.ac.in"
-                value={email}
-                onChangeText={(value) => {
-                  setEmail(value);
-                  if (errors.email) setErrors({ ...errors, email: null });
-                }}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                error={errors.email}
-                icon={<Ionicons name="mail-outline" size={20} color={COLORS.textSecondary} />}
-                accessibilityLabel="Email address input"
-                accessibilityHint="Enter your university email address"
-                testID="emailInput"
-                required
-              />
-
-              <Input
-                label="Password"
-                placeholder="••••••••"
-                value={password}
-                onChangeText={(value) => {
-                  setPassword(value);
-                  if (errors.password) setErrors({ ...errors, password: null });
-                }}
-                secureTextEntry
-                error={errors.password}
-                icon={<Ionicons name="lock-closed-outline" size={20} color={COLORS.textSecondary} />}
-                accessibilityLabel="Password input"
-                accessibilityHint="Enter your password. At least 6 characters"
-                testID="passwordInput"
-                required
-              />
-
-              <TouchableOpacity
-                style={styles.forgotPass}
-                onPress={() => Alert.alert('Info', 'Password reset feature coming soon')}
-                accessible
-                accessibilityRole="button"
-                accessibilityLabel="Forgot password"
-                accessibilityHint="Opens the password reset screen"
-              >
-                <Text style={styles.forgotPassText}>Forgot Password?</Text>
-              </TouchableOpacity>
-
-              <Button
-                title="Sign In"
-                onPress={handleLogin}
-                loading={loading}
-                style={styles.loginBtn}
-                accessibilityLabel="Sign in to your account"
-                accessibilityHint="Submits the login form"
-                accessibilityState={{ disabled: loading }}
-                testID="loginButton"
-              />
+          {/* Form Card */}
+          <View style={styles.formCard}>
+            {/* Enrollment No Field */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>USERNAME / ENROLLMENT NO.</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. AJU/221403"
+                  placeholderTextColor="#b0bec5"
+                  value={enrollmentNo}
+                  onChangeText={setEnrollmentNo}
+                  editable={!loading}
+                  accessible
+                  accessibilityLabel="Enrollment number"
+                  accessibilityHint="Enter your enrollment number like AJU/221403"
+                />
+              </View>
             </View>
 
-            <View style={styles.demoSection}>
-              <Text
-                style={styles.demoTitle}
-                accessible
-                accessibilityRole="header"
-                allowFontScaling
-                maxFontSizeMultiplier={1.2}
-              >
-                Quick Demo Access
-              </Text>
-              <View
-                style={styles.demoButtons}
-                accessible
-                accessibilityRole="group"
-                accessibilityLabel="Demo login options"
-              >
+            {/* Password Field */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>PASSWORD</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your password"
+                  placeholderTextColor="#b0bec5"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  editable={!loading}
+                  accessible
+                  accessibilityLabel="Password"
+                  accessibilityHint="Enter your password"
+                />
                 <TouchableOpacity
-                  style={[styles.demoBtn, { backgroundColor: COLORS.success + '20' }]}
-                  onPress={() => handleDemoLogin('student')}
+                  onPress={() => setShowPassword(!showPassword)}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   accessible
                   accessibilityRole="button"
-                  accessibilityLabel="Login as student (demo)"
-                  accessibilityHint="Opens student demo dashboard"
+                  accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  <Ionicons name="person" size={18} color={COLORS.success} />
-                  <Text style={[styles.demoBtnText, { color: COLORS.success }]}>Student</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.demoBtn, { backgroundColor: COLORS.secondary + '20' }]}
-                  onPress={() => handleDemoLogin('admin')}
-                  accessible
-                  accessibilityRole="button"
-                  accessibilityLabel="Login as admin (demo)"
-                  accessibilityHint="Opens admin demo dashboard"
-                >
-                  <Ionicons name="shield" size={18} color={COLORS.secondary} />
-                  <Text style={[styles.demoBtnText, { color: COLORS.secondary }]}>Admin</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.demoBtn, { backgroundColor: '#8b5cf620' }]}
-                  onPress={() => handleDemoLogin('faculty')}
-                  accessible
-                  accessibilityRole="button"
-                  accessibilityLabel="Login as faculty (demo)"
-                  accessibilityHint="Opens faculty demo dashboard"
-                >
-                  <Ionicons name="school" size={18} color="#8b5cf6" />
-                  <Text style={[styles.demoBtnText, { color: '#8b5cf6' }]}>Faculty</Text>
+                  <Ionicons
+                    name={showPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#90a4ae"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
 
-            <View style={styles.footer}>
-              <Text
-                style={styles.footerText}
-                allowFontScaling
-                maxFontSizeMultiplier={1.2}
-              >
-                Don't have an account?{' '}
+            {/* Captcha Field */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>SECURITY CHECK</Text>
+              <View style={styles.captchaContainer}>
+                <TextInput
+                  style={[styles.input, styles.captchaInput]}
+                  placeholder="Captcha code"
+                  placeholderTextColor="#b0bec5"
+                  value={captcha}
+                  onChangeText={setCaptcha}
+                  editable={!loading}
+                  accessible
+                  accessibilityLabel="Captcha code"
+                  accessibilityHint="Enter the captcha code shown in the image"
+                />
+                <View style={styles.captchaBox}>
+                  <Text style={styles.captchaText}>{captchaCode}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.refreshBtn}
+                  onPress={() => setCaptcha('')}
+                  accessible
+                  accessibilityRole="button"
+                  accessibilityLabel="Refresh captcha"
+                >
+                  <MaterialCommunityIcons name="refresh" size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Login Button */}
+            <TouchableOpacity
+              style={[styles.loginBtn, loading && styles.loginBtnDisabled]}
+              onPress={handleLogin}
+              disabled={loading}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel="Login button"
+              accessibilityState={{ disabled: loading }}
+            >
+              <Text style={styles.loginBtnText}>
+                {loading ? 'LOGGING IN...' : 'LOGIN'}
               </Text>
+            </TouchableOpacity>
+
+            {/* Sign Up Link */}
+            <View style={styles.signupContainer}>
+              <Text style={styles.signupText}>Don't have an account?{' '}</Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate('Register')}
                 accessible
                 accessibilityRole="button"
-                accessibilityLabel="Create a new account"
+                accessibilityLabel="Sign up"
               >
-                <Text style={styles.registerLink}>Register</Text>
+                <Text style={styles.signupLink}>Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>
-
-          <View style={styles.universityBranding}>
-            <Text
-              style={styles.brandingText}
-              allowFontScaling
-              maxFontSizeMultiplier={1.1}
-            >
-              Arka Jain University
-            </Text>
-            <Text
-              style={styles.brandingSubtext}
-              allowFontScaling
-              maxFontSizeMultiplier={1.1}
-            >
-              School of Engineering & IT
-            </Text>
-          </View>
         </ScrollView>
-      </KeyboardAvoidingView>
-    </LinearGradient>
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  gradient: {
+    flex: 1,
   },
   scrollContent: {
-    padding: SPACING.xl,
-    paddingTop: Platform.OS === 'ios' ? SPACING.xxxl + 20 : SPACING.xxxl,
-    flexGrow: 1,
-    justifyContent: 'flex-start',
+    padding: SPACING.lg,
+    paddingTop: SPACING.lg,
   },
-  backBtn: {
-    position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 30,
-    left: SPACING.lg,
-    zIndex: 10,
-    padding: SPACING.md,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-  },
-  header: {
-    alignItems: 'center',
+  headerSection: {
     marginBottom: SPACING.xxxl,
+    alignItems: 'center',
   },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 24,
+  headerTop: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: SPACING.lg,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
+    gap: SPACING.md,
+    width: '100%',
   },
-  title: {
-    fontSize: getResponsiveFontSize(32),
-    fontWeight: '800',
-    color: COLORS.textPrimary,
-    fontFamily: 'System',
-    textAlign: 'center',
+  logoCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  subtitle: {
-    fontSize: getResponsiveFontSize(16),
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginTop: SPACING.sm,
+  logoText: {
+    color: '#fff',
+    fontSize: getResponsiveFontSize(18),
+    fontWeight: 'bold',
   },
-  card: {
-    backgroundColor: COLORS.bgCard,
-    borderRadius: 24,
-    padding: SPACING.xl,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 8,
-    marginBottom: SPACING.xl,
+  universityInfo: {
+    flex: 1,
+    justifyContent: 'center',
   },
-  cardTitle: {
-    fontSize: getResponsiveFontSize(24),
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.xl,
-  },
-  formContainer: {
-    marginBottom: SPACING.xl,
-  },
-  loginBtn: {
-    marginTop: SPACING.lg,
-    marginBottom: 0,
-  },
-  demoSection: {
-    marginTop: SPACING.xxxl,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    paddingTop: SPACING.xl,
-  },
-  demoTitle: {
-    fontSize: getResponsiveFontSize(14),
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: SPACING.lg,
-    fontWeight: '600',
-  },
-  demoButtons: {
+  nameRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: SPACING.md,
   },
-  demoBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    height: 56,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: SPACING.sm,
-    paddingHorizontal: SPACING.sm,
+  universityName: {
+    color: '#8b0000',
+    fontSize: getResponsiveFontSize(14),
+    fontWeight: '800',
+    letterSpacing: 1,
   },
-  demoBtnText: {
-    fontSize: getResponsiveFontSize(13),
-    fontWeight: '700',
+  divider: {
+    width: 3,
+    height: 25,
+    backgroundColor: '#8b0000',
   },
-  forgotPass: {
-    alignSelf: 'flex-end',
-    marginBottom: SPACING.lg,
-    paddingVertical: SPACING.sm,
+  universityLocation: {
+    color: '#90a4ae',
+    fontSize: getResponsiveFontSize(11),
+    marginTop: 2,
+  },
+  naacBadge: {
+    backgroundColor: '#8b0000',
     paddingHorizontal: SPACING.md,
-  },
-  forgotPassText: {
-    color: COLORS.primary,
-    fontSize: getResponsiveFontSize(14),
-    fontWeight: '600',
-  },
-  footer: {
-    flexDirection: 'row',
+    paddingVertical: SPACING.sm,
+    borderRadius: 6,
+    alignItems: 'center',
     justifyContent: 'center',
-    marginTop: SPACING.xl,
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    flexWrap: 'wrap',
+    minWidth: 60,
   },
-  footerText: {
-    color: COLORS.textSecondary,
-    fontSize: getResponsiveFontSize(14),
-  },
-  registerLink: {
-    color: COLORS.primary,
-    fontSize: getResponsiveFontSize(14),
+  naacText: {
+    color: '#fff',
+    fontSize: getResponsiveFontSize(9),
     fontWeight: '700',
+    letterSpacing: 1,
   },
-  universityBranding: {
-    marginTop: SPACING.xxxl,
-    paddingVertical: SPACING.xxxl,
+  naacGrade: {
+    color: '#fff',
+    fontSize: getResponsiveFontSize(11),
+    fontWeight: '900',
+  },
+  formCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: SPACING.xl,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  fieldGroup: {
+    marginBottom: SPACING.xl,
+  },
+  fieldLabel: {
+    color: '#455a64',
+    fontSize: getResponsiveFontSize(10),
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    marginBottom: SPACING.sm,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    paddingHorizontal: SPACING.md,
+    backgroundColor: '#fafafa',
+  },
+  input: {
+    flex: 1,
+    paddingVertical: SPACING.md,
+    color: '#212121',
+    fontSize: getResponsiveFontSize(14),
+  },
+  captchaContainer: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
     alignItems: 'center',
   },
-  brandingText: {
-    color: COLORS.textMuted,
+  captchaInput: {
+    flex: 1,
+  },
+  captchaBox: {
+    backgroundColor: '#eceff1',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 6,
+    minWidth: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  captchaText: {
+    color: '#1abc9c',
+    fontSize: getResponsiveFontSize(18),
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  refreshBtn: {
+    padding: SPACING.sm,
+  },
+  loginBtn: {
+    backgroundColor: '#2c3e50',
+    paddingVertical: SPACING.lg,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  loginBtnDisabled: {
+    opacity: 0.6,
+  },
+  loginBtnText: {
+    color: '#fff',
     fontSize: getResponsiveFontSize(14),
     fontWeight: '700',
     letterSpacing: 1,
   },
-  brandingSubtext: {
-    color: COLORS.textMuted,
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  signupText: {
+    color: '#78909c',
     fontSize: getResponsiveFontSize(12),
-    marginTop: SPACING.xs,
+  },
+  signupLink: {
+    color: '#8b0000',
+    fontSize: getResponsiveFontSize(12),
+    fontWeight: '700',
   },
 });
 
