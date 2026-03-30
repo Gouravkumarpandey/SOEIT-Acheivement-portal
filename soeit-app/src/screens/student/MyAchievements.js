@@ -54,7 +54,8 @@ const MyAchievements = ({ navigation }) => {
       const res = await api.get('/achievements/my');
       setAchievements(res.data.achievements || []);
     } catch (error) {
-      console.error('Fetch achievements error:', error);
+      // API connection failed silently - show cached or empty state
+      setAchievements([]);
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -24,7 +24,7 @@ const InternshipsPage = () => {
       const res = await api.get('/internships');
       setInternships(res.data.internships || []);
     } catch (error) {
-      console.error('Fetch internships error:', error);
+      // API connection failed silently - show empty state
       setInternships([]);
     } finally {
       setLoading(false);

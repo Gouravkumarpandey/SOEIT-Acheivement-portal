@@ -100,7 +100,7 @@ const StudentDashboard = ({ navigation }) => {
             <Text style={styles.welcomeText}>Welcome, {user?.name.split(' ')[0]}</Text>
             <Text style={styles.statusText}>{user?.enrollmentNo || 'Student Portal'}</Text>
           </View>
-          <TouchableOpacity style={styles.notifBtn} onPress={() => navigation.navigate('Events')}>
+          <TouchableOpacity style={styles.notifBtn} onPress={() => navigation.navigate('Broadcasts')}>
             <Ionicons name="notifications-outline" size={24} color={COLORS.textPrimary} />
             <View style={styles.notifDot} />
           </TouchableOpacity>
