@@ -124,7 +124,7 @@ export const registerScreenStyles = StyleSheet.create({
     borderRadius: 16,
     padding: SPACING.xl,
     elevation: 0,
-    shadowColor: 'transparent',
+    boxShadow: 'none',
     borderWidth: 1,
     borderColor: '#f0f0f0',
   },
@@ -184,7 +184,7 @@ export const registerScreenStyles = StyleSheet.create({
     backgroundColor: '#f8f9fb',
     minHeight: 48,
     elevation: 0,
-    shadowColor: 'transparent',
+    boxShadow: 'none',
   },
   input: {
     flex: 1,
@@ -198,7 +198,7 @@ export const registerScreenStyles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: '#ffffff',
     elevation: 0,
-    shadowColor: 'transparent',
+    boxShadow: 'none',
   },
 
   // Picker
@@ -241,7 +241,7 @@ export const registerScreenStyles = StyleSheet.create({
     marginTop: SPACING.xl,
     marginBottom: SPACING.lg,
     elevation: 0,
-    shadowColor: 'transparent',
+    boxShadow: 'none',
   },
   signupBtnDisabled: {
     opacity: 0.6,

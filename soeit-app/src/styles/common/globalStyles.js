@@ -94,10 +94,7 @@ export const globalStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   },
   buttonSecondary: {
     backgroundColor: COLORS.gray100,
@@ -125,10 +122,7 @@ export const globalStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.gray200,
     elevation: 1,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 1 },
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)',
   },
 
   // Form Styles

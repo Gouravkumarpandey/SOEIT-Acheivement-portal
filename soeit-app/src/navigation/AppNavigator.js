@@ -60,7 +60,7 @@ const StudentTabs = () => (
       headerStyle: {
         backgroundColor: COLORS.bgSecondary,
         elevation: 0,
-        shadowOpacity: 0,
+        boxShadow: 'none',
       },
       headerTintColor: COLORS.textPrimary,
       headerRight: () => <LogoutButton />,

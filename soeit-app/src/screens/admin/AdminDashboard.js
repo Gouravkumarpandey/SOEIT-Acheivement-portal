@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   headerTitle: { color: COLORS.textPrimary, fontSize: 28, fontWeight: '800' },
   avatarMini: { width: 44, height: 44, borderRadius: 15, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.border, elevation: 4 },
   avatarText: { color: COLORS.primary, fontWeight: '800', fontSize: 18 },
-  statsGrid: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, elevation: 6, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 },
+  statsGrid: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, elevation: 6, boxShadow: '0 6px 10px rgba(0, 0, 0, 0.05)' },
   statItem: { flex: 1, alignItems: 'center' },
   statValue: { color: COLORS.primary, fontSize: 22, fontWeight: '900' },
   statLabel: { color: COLORS.textMuted, fontSize: 10, fontWeight: '800', marginTop: 4, textTransform: 'uppercase' },

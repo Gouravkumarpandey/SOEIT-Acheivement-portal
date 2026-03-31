@@ -236,9 +236,7 @@ const styles = StyleSheet.create({
     right: 25,
     borderRadius: 30,
     elevation: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
   },
   fabGradient: {
     width: 60,

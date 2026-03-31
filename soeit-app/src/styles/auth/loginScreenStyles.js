@@ -101,10 +101,7 @@ export const loginScreenStyles = StyleSheet.create({
     padding: SPACING.xl,
     marginVertical: SPACING.xl,
     elevation: 1,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 1 },
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)',
   },
   formGroup: {
     marginBottom: SPACING.lg,
@@ -158,10 +155,7 @@ export const loginScreenStyles = StyleSheet.create({
     alignItems: 'center',
     marginTop: SPACING.xl,
     elevation: 2,
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
+    boxShadow: '0 3px 6px rgba(139, 0, 0, 0.3)',
   },
   loginBtnText: {
     color: COLORS.white,

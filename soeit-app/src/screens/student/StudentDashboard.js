@@ -312,9 +312,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
   },
   notifDot: {
     position: 'absolute',
@@ -336,9 +334,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
   },
   statBox: {
     flex: 1,
@@ -543,9 +539,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: '#3b82f6',
     elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.05)',
   },
   alertContent: {
     flexDirection: 'row',

@@ -155,10 +155,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   cardHeader: {

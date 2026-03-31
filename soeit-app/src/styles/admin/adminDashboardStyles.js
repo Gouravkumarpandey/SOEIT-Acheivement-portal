@@ -68,10 +68,7 @@ export const adminDashboardStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)',
   },
   actionIcon: {
     width: 50,

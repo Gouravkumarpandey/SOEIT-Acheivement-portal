@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   badge: { color: COLORS.secondary, fontSize: 10, fontWeight: '900', letterSpacing: 2, marginBottom: 5 },
   greeting: { color: COLORS.textPrimary, fontSize: 26, fontWeight: '800' },
   profileBtn: { padding: 2 },
-  heroStats: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, elevation: 6, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 },
+  heroStats: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 24, padding: 20, borderWidth: 1, borderColor: COLORS.border, elevation: 6, boxShadow: '0 6px 10px rgba(0, 0, 0, 0.05)' },
   heroStatItem: { flex: 1, alignItems: 'center' },
   heroStatValue: { color: COLORS.primary, fontSize: 22, fontWeight: '900' },
   heroStatLabel: { color: COLORS.textMuted, fontSize: 11, fontWeight: '700', marginTop: 4 },

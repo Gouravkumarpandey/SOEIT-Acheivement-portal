@@ -303,10 +303,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.lg,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
+    boxShadow: '0 10px 15px rgba(139, 0, 0, 0.2)',
     elevation: 8,
   },
   avatarChar: {
@@ -347,9 +344,7 @@ const styles = StyleSheet.create({
     padding: SPACING.xl,
     borderWidth: 1,
     borderColor: COLORS.border,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)',
     elevation: 2,
   },
   profileItem: {

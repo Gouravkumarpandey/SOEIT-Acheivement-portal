@@ -37,10 +37,7 @@ export const facultyDashboardStyles = StyleSheet.create({
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -114,10 +111,7 @@ export const manageInternshipsStyles = StyleSheet.create({
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)',
   },
   internshipTitle: {
     fontSize: getResponsiveFontSize(16),
