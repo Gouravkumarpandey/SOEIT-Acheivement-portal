@@ -9,6 +9,7 @@
 
 ---
 
+
 ## 🏛️ Project Overview
 
 The **SOEIT Achievement Portal** is a specialized management system designed for the **School of Engineering & IT (SOEIT)** at Arka Jain University. It streamlines the tracking of student milestones, professional achievements, and academic progress while providing faculty and administrators with tools for verification and analytics.
