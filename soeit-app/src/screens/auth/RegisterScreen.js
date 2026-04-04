@@ -11,8 +11,8 @@ import {
   TextInput,
   Dimensions,
   SafeAreaView,
-  Picker,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
@@ -263,11 +263,13 @@ const RegisterScreen = ({ navigation }) => {
               {/* Enrollment No & Email - Row */}
               <View style={styles.twoColumnRow}>
                 <View style={[styles.fieldGroup, { flex: 1 }]}>
-                  <Text style={styles.fieldLabel}>Enrollment No. *</Text>
+                  <Text style={styles.fieldLabel}>
+                    {userType === 'faculty' ? 'University ID' : 'Enrollment No.'} *
+                  </Text>
                   <View style={styles.inputContainer}>
                     <TextInput
                       style={styles.input}
-                      placeholder="AJU/221403"
+                      placeholder={userType === 'faculty' ? 'ARKA/AJU/1234' : 'AJU/221403'}
                       placeholderTextColor="#b0bec5"
                       value={formData.enrollmentNo}
                       onChangeText={(value) => updateForm('enrollmentNo', value)}
