@@ -9,6 +9,7 @@ import {
   Dimensions,
   Image,
   FlatList,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -311,8 +312,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
     elevation: 2,
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+      },
+      web: {
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+      }
+    }),
   },
   notifDot: {
     position: 'absolute',
@@ -333,8 +346,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.border,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     elevation: 4,
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+      },
+      web: {
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+      }
+    }),
   },
   statBox: {
     flex: 1,
@@ -539,7 +564,17 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: '#3b82f6',
     elevation: 2,
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.05)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+      },
+      web: {
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.05)',
+      }
+    }),
   },
   alertContent: {
     flexDirection: 'row',
