@@ -125,8 +125,7 @@ const LoginScreen = ({ navigation }) => {
 
               {/* NAAC Badge */}
               <View style={styles.naacBadge}>
-                <Text style={styles.naacText}>NAAC</Text>
-                <Text style={styles.naacGrade}>A</Text>
+                <Text style={styles.naacText}>NAAC GRADE A</Text>
               </View>
             </View>
           </View>
@@ -327,18 +326,17 @@ const styles = StyleSheet.create({
   },
   naacBadge: {
     backgroundColor: '#8b0000',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 60,
   },
   naacText: {
     color: '#fff',
-    fontSize: getResponsiveFontSize(9),
+    fontSize: getResponsiveFontSize(11),
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 1.2,
   },
   naacGrade: {
     color: '#fff',
