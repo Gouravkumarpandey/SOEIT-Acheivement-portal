@@ -56,24 +56,7 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-    origin: function (origin, callback) {
-        // Log origin for debugging (check Render logs)
-        if (origin) console.log(`Incoming request from origin: ${origin}`);
-
-        if (!origin) return callback(null, true);
-
-        const isAllowed = allowedOrigins.includes(origin) ||
-            origin.includes('vercel.app') ||
-            origin.includes('onrender.com') ||
-            origin.includes('localhost:');
-
-        if (isAllowed) {
-            callback(null, true);
-        } else {
-            console.warn(`CORS blocked for: ${origin}`);
-            callback(null, true); // Allow anyway (change if needed)
-        }
-    },
+    origin: true, // Allow all origins during development or specify exact ones
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
