@@ -310,13 +310,13 @@ const styles = StyleSheet.create({
   },
   universityName: {
     color: '#8b0000',
-    fontSize: getResponsiveFontSize(14),
+    fontSize: getResponsiveFontSize(11),
     fontWeight: '800',
-    letterSpacing: 1,
+    letterSpacing: 0.6,
   },
   divider: {
-    width: 3,
-    height: 25,
+    width: 2,
+    height: 16,
     backgroundColor: '#8b0000',
   },
   universityLocation: {
@@ -327,10 +327,11 @@ const styles = StyleSheet.create({
   naacBadge: {
     backgroundColor: '#8b0000',
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.sm,
     borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
+
   },
   naacText: {
     color: '#fff',
