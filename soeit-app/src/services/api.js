@@ -14,14 +14,19 @@ api.interceptors.request.use(
   async (config) => {
     try {
       let token = null;
-      if (Platform.OS === 'web') {
+      
+      // Try to get token from localStorage first (web), then SecureStore (native)
+      if (typeof localStorage !== 'undefined') {
         token = localStorage.getItem('soeit_token');
-      } else {
+      } else if (Platform.OS !== 'web') {
         token = await SecureStore.getItemAsync('soeit_token');
       }
-      if (token) config.headers.Authorization = `Bearer ${token}`;
+      
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     } catch (e) {
-      console.warn('SecureStore error:', e);
+      console.warn('Token retrieval error:', e);
     }
     return config;
   },

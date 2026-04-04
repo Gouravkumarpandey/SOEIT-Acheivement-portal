@@ -19,7 +19,7 @@ export const ROUTES = {
   // Achievements
   ACHIEVEMENTS: '/achievements',
   MY_ACHIEVEMENTS: '/achievements/my',
-  UPLOAD_ACHIEVEMENT: '/achievements/upload',
+  UPLOAD_ACHIEVEMENT: '/achievements',
 
   // Admin
   ADMIN_STATS: '/admin/stats',
