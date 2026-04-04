@@ -10,8 +10,8 @@ import {
   Alert,
   TextInput,
   Dimensions,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
@@ -117,10 +117,9 @@ const LoginScreen = ({ navigation }) => {
               {/* University Name */}
               <View style={styles.universityInfo}>
                 <View style={styles.nameRow}>
-                  <Text style={styles.universityName}>ARKA JAIN</Text>
+                  <Text style={styles.universityName}>ARKA JAIN UNIVERSITY</Text>
                   <View style={styles.divider} />
                 </View>
-                <Text style={styles.universityName}>UNIVERSITY</Text>
                 <Text style={styles.universityLocation}>Jharkhand</Text>
               </View>
 
@@ -259,6 +258,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: SPACING.lg,
     paddingTop: SPACING.sm,
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   backButton: {
     flexDirection: 'row',
@@ -277,14 +278,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   headerSection: {
-    marginBottom: SPACING.xxxl,
+    marginBottom: SPACING.xl,
     alignItems: 'center',
   },
   headerTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: SPACING.md,
+    gap: SPACING.xs,
     width: '100%',
   },
   logoCircle: {

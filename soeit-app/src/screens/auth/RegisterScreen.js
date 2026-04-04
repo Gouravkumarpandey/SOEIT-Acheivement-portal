@@ -10,8 +10,8 @@ import {
   Alert,
   TextInput,
   Dimensions,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -174,10 +174,9 @@ const RegisterScreen = ({ navigation }) => {
               {/* University Name */}
               <View style={styles.universityInfo}>
                 <View style={styles.nameRow}>
-                  <Text style={styles.universityName}>ARKA JAIN</Text>
+                  <Text style={styles.universityName}>ARKA JAIN UNIVERSITY</Text>
                   <View style={styles.divider} />
                 </View>
-                <Text style={styles.universityName}>UNIVERSITY</Text>
                 <Text style={styles.universityLocation}>Jharkhand</Text>
               </View>
 

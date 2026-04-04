@@ -17,9 +17,9 @@ export const loginScreenStyles = StyleSheet.create({
   },
   scrollContent: {
     padding: SPACING.md,
-    paddingTop: SPACING.sm,
+    paddingTop: SPACING.xl * 1.5,
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   headerSection: {
     marginBottom: SPACING.sm,
