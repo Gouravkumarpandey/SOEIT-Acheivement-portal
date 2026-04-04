@@ -69,7 +69,8 @@ app.use(cors({
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-    exposedHeaders: ['Set-Cookie']
+    exposedHeaders: ['Set-Cookie'],
+    optionsSuccessStatus: 200 // Some legacy browsers crash on 204
 }));
 
 // Body parsers
