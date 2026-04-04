@@ -21,13 +21,23 @@ import api from '../../services/api';
 const { width } = Dimensions.get('window');
 
 const StudentDashboard = ({ navigation }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({ verified: 0, pending: 0, total: 0 });
   const [trending, setTrending] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
 
   const fetchStats = useCallback(async () => {
+    // 🚨 If in demo mode, use mock data instead of real API call to avoid 401 Unauthorized 🚨
+    if (token === 'demo-token-123') {
+      setStats({
+        verified: 2,
+        pending: 1,
+        total: 3,
+      });
+      return;
+    }
+
     try {
       const res = await api.get('/achievements/my');
       const achs = res.data.data || [];
@@ -38,12 +48,9 @@ const StudentDashboard = ({ navigation }) => {
       });
     } catch (error) {
       console.warn('Dashboard stats fetch failed:', error.message);
-      // Fallback for demo mode or unauthorized access
-      if (stats.total === 0) {
-        setStats({ verified: 0, pending: 0, total: 0 });
-      }
+      if (stats.total === 0) setStats({ verified: 0, pending: 0, total: 0 });
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     fetchStats();

@@ -15,9 +15,11 @@ LogBox.ignoreLogs([
   'Cannot record touch end without a touch start',
 ]);
 
-// Silence warnings in the browser console for specific messages
+// Silence warnings/errors in the browser console for specific recurring React Native Web issues
 if (typeof window !== 'undefined') {
   const originalWarn = console.warn;
+  const originalError = console.error;
+  
   console.warn = (...args) => {
     if (args[0] && typeof args[0] === 'string' &&
       (args[0].includes('props.pointerEvents is deprecated') ||
@@ -26,6 +28,14 @@ if (typeof window !== 'undefined') {
       return;
     }
     originalWarn(...args);
+  };
+
+  console.error = (...args) => {
+    if (args[0] && typeof args[0] === 'string' &&
+      (args[0].includes('aria-hidden') || args[0].includes('retained focus'))) {
+      return;
+    }
+    originalError(...args);
   };
 }
 
