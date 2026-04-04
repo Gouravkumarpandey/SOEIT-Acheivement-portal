@@ -669,8 +669,10 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
-    gap: SPACING.sm,
+    gap: SPACING.md,
     alignItems: 'center',
+    flexWrap: 'wrap',
+    marginTop: SPACING.sm,
   },
   infoBadge: {
     backgroundColor: '#dcfce7',
@@ -679,13 +681,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   infoBadgeText: {
-    fontSize: getResponsiveFontSize(11),
+    fontSize: getResponsiveFontSize(12),
     fontWeight: '600',
     color: '#166534',
   },
   infoText: {
-    fontSize: getResponsiveFontSize(11),
-    fontWeight: '500',
+    fontSize: getResponsiveFontSize(12),
+    fontWeight: '600',
     color: '#4b5563',
   },
   statsGrid: {
