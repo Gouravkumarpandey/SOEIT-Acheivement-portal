@@ -15,17 +15,23 @@ api.interceptors.request.use(
     try {
       let token = null;
 
-      // Try to get token from SecureStore first (Native), then fallback to localStorage (Web)
-      if (Platform.OS !== 'web') {
-        token = await SecureStore.getItemAsync('soeit_token').catch(() => null);
+      // Try to get token from SecureStore (Native) with proper fallback
+      try {
+        token = await SecureStore.getItemAsync('soeit_token');
+      } catch (e) {
+        // SecureStore might not be available on web/certain environments
+        console.warn('SecureStore error, trying localStorage:', e.message);
       }
 
+      // If still no token, try localStorage
       if (!token && typeof localStorage !== 'undefined') {
         token = localStorage.getItem('soeit_token');
       }
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+      } else {
+        console.warn('No authentication token found for request to:', config.url);
       }
 
       // MOCK DATA LOGIC: If using demo token, intercept certain GET requests to prevent 401s
@@ -45,6 +51,9 @@ api.interceptors.request.use(
           return { ...config, adapter: () => Promise.resolve(mockRes([])) };
         }
         if (url.includes('/courses')) {
+          return { ...config, adapter: () => Promise.resolve(mockRes([])) };
+        }
+        if (url.includes('/projects')) {
           return { ...config, adapter: () => Promise.resolve(mockRes([])) };
         }
         if (url.includes('/notices')) {

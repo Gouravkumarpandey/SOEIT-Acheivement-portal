@@ -20,6 +20,7 @@ import StudentCoursesPage from '../screens/student/StudentCoursesPage';
 import StudentProjectsPage from '../screens/student/StudentProjectsPage';
 import ProfileScreen from '../screens/shared/ProfileScreen';
 import EventsPage from '../screens/shared/EventsPage';
+import PublicPortfolioScreen from '../screens/student/PublicPortfolioScreen';
 
 // Admin/Faculty Screens
 import AdminDashboard from '../screens/admin/AdminDashboard';
@@ -116,7 +117,10 @@ const CustomDrawerContent = (props) => {
 
       {/* Footer Buttons */}
       <View style={styles.drawerFooter}>
-        <TouchableOpacity style={styles.portfolioBtn}>
+        <TouchableOpacity 
+          style={styles.portfolioBtn}
+          onPress={() => navigation.navigate('Portfolio')}
+        >
           <Ionicons name="star" size={20} color="#059669" style={{ marginRight: 10 }} />
           <Text style={styles.portfolioBtnText}>Public Portfolio</Text>
         </TouchableOpacity>
@@ -313,6 +317,7 @@ const AppNavigator = () => {
               <Stack.Screen name="Hackathons" component={HackathonsPage} />
               <Stack.Screen name="Courses" component={StudentCoursesPage} />
               <Stack.Screen name="Projects" component={StudentProjectsPage} />
+              <Stack.Screen name="Portfolio" component={PublicPortfolioScreen} options={{ headerShown: false }} />
             </Stack.Group>
           ) : user?.role === 'faculty' ? (
             <Stack.Group>
@@ -398,8 +403,17 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#f1f5f9',
-    boxShadow: '0px 2px 10px rgba(0,0,0,0.05)',
-    elevation: 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   avatarContainer: {
     marginRight: 16,
