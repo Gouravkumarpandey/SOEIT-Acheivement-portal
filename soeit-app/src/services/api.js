@@ -31,14 +31,42 @@ api.interceptors.request.use(
       // MOCK DATA LOGIC: If using demo token, intercept certain GET requests to prevent 401s
       if (token === 'demo-token-123' && config.method === 'get') {
         const url = config.url;
+        
+        // Helper to wrap data in standard response format
+        const mockRes = (data) => ({ 
+          data: { success: true, data: data, notices: data, courses: data, internships: data }, 
+          status: 200, statusText: 'OK', headers: {}, config 
+        });
+
         if (url.includes('/achievements/my')) {
-          return { ...config, adapter: () => Promise.resolve({ data: { success: true, data: [] }, status: 200, statusText: 'OK', headers: {}, config }) };
+          return { ...config, adapter: () => Promise.resolve(mockRes([])) };
         }
         if (url.includes('/internships')) {
-          return { ...config, adapter: () => Promise.resolve({ data: { success: true, data: [] }, status: 200, statusText: 'OK', headers: {}, config }) };
+          return { ...config, adapter: () => Promise.resolve(mockRes([])) };
         }
         if (url.includes('/courses')) {
-          return { ...config, adapter: () => Promise.resolve({ data: { success: true, data: [] }, status: 200, statusText: 'OK', headers: {}, config }) };
+          return { ...config, adapter: () => Promise.resolve(mockRes([])) };
+        }
+        if (url.includes('/notices')) {
+          const demoNotices = [
+            {
+              id: 1,
+              title: 'Upcoming Hackathon: Code AJU 2026',
+              content: 'Registration is open for the annual university hackathon. Teams of 2-4 can apply.',
+              type: 'Event',
+              createdAt: new Date().toISOString(),
+              priority: 'high',
+            },
+            {
+              id: 2,
+              title: 'Achievement Verification Deadline',
+              content: 'Please submit all achievement documents by the end of the semester for credit processing.',
+              type: 'Notice',
+              createdAt: new Date().toISOString(),
+              priority: 'normal',
+            }
+          ];
+          return { ...config, adapter: () => Promise.resolve(mockRes(demoNotices)) };
         }
       }
     } catch (e) {
