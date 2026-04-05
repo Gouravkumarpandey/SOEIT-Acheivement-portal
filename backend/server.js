@@ -14,7 +14,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const { connectDB } = require('./src/config/db');
+const { connectDB, getDb } = require('./src/config/db');
 const compression = require('compression');
 const errorHandler = require('./src/middleware/errorHandler');
 
@@ -31,8 +31,8 @@ const internshipPostingRoutes = require('./src/modules/internship/internship-pos
 const projectRoutes = require('./src/modules/project/project.routes');
 const notificationRoutes = require('./src/modules/notification/notification.routes');
 
-// Connect to Turso Database
-connectDB();
+// Connect to Turso Database (called in startServer)
+// connectDB();
 
 const app = express();
 
@@ -47,15 +47,10 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:5173',
-    'http://localhost:8081',
-    'http://localhost:19006',
-    'http://localhost:19000',
     'https://soeit-acheivement-portal.vercel.app',
     'https://soeit-acheivement-portal-5ojpz1d9b.vercel.app',
     'https://soeit-achievement-portal.onrender.com',
     'https://soeit-acheivement-portal.onrender.com',
-    'http://127.0.0.1:8081',
-    'http://127.0.0.1:5173',
     process.env.CLIENT_URL
 ].filter(Boolean);
 
@@ -101,15 +96,35 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const { getStats } = require('./src/utils/cache');
 
 // Health check
-app.get('/api/health', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: 'SOEIT Achievements Portal API is running',
-        database: 'Turso (LibSQL)',
-        cache: getStats(),
-        version: '2.0.0',
-        timestamp: new Date().toISOString(),
-    });
+app.get('/api/health', async (req, res) => {
+    try {
+        let dbStatus = 'Disconnected';
+        try {
+            const db = getDb();
+            if (db) {
+                await db.execute('SELECT 1');
+                dbStatus = 'Connected';
+            }
+        } catch (dbErr) {
+            dbStatus = `Uninitialized: ${dbErr.message}`;
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'SOEIT Achievements Portal API is running',
+            database: `Turso (LibSQL) - ${dbStatus}`,
+            cache: typeof getStats === 'function' ? getStats() : 'N/A',
+            version: '2.0.1',
+            timestamp: new Date().toISOString(),
+        });
+    } catch (err) {
+        res.status(503).json({
+            success: false,
+            message: 'API is running but encountered a critical error',
+            error: err.message,
+            timestamp: new Date().toISOString(),
+        });
+    }
 });
 
 // API Routes
@@ -133,18 +148,30 @@ app.use((req, res) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-    console.log(`\n🚀 SOEIT Achievements Portal API`);
-    console.log(`📡 Server running on: http://localhost:${PORT}`);
-    console.log(`🗄️  Database: Turso (LibSQL)`);
-    console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
-    console.log(`📁 Uploads: http://localhost:${PORT}/uploads\n`);
-});
+// Start Server
+const startServer = async () => {
+    try {
+        await connectDB();
+        const PORT = process.env.PORT || 5000;
+        const server = app.listen(PORT, () => {
+            console.log(`\n🚀 SOEIT Achievements Portal API`);
+            console.log(`📡 Server running on: http://localhost:${PORT}`);
+            console.log(`🗄️  Database: Turso (LibSQL)`);
+            console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+            console.log(`📁 Uploads: http://localhost:${PORT}/uploads\n`);
+        });
 
-process.on('unhandledRejection', (err) => {
-    console.error('Unhandled Rejection:', err.message);
-    server.close(() => process.exit(1));
-});
+        process.on('unhandledRejection', (err) => {
+            console.error('Unhandled Rejection:', err.message);
+            // In production, you might not want to exit immediately
+            // server.close(() => process.exit(1));
+        });
+    } catch (err) {
+        console.error('Failed to start server:', err.message);
+        process.exit(1);
+    }
+};
+
+startServer();
 
 module.exports = app;

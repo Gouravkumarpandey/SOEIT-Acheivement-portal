@@ -88,6 +88,14 @@ api.interceptors.request.use(
           ];
           return { ...config, adapter: () => Promise.resolve(mockRes(demoNotices)) };
         }
+
+        if (url.includes('/notifications')) {
+          const demoNotifications = [
+            { _id: '1', title: 'Welcome to SOEIT', message: 'Explore your new dashboard!', type: 'system', isRead: false, createdAt: new Date().toISOString() },
+            { _id: '2', title: 'Achievement Approved', message: 'Your Google Hash Code entry is live.', type: 'achievement', isRead: true, createdAt: new Date().toISOString() }
+          ];
+          return { ...config, adapter: () => Promise.resolve(mockRes(demoNotifications)) };
+        }
       }
     } catch (e) {
       console.warn('[API] Request Error:', e);
