@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOEIT Achievement Portal - Complete Level 2 DFD (All Modules)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            padding: 20px;
+            color: #1a1a2e;
+        }
+        h1 {
+            text-align: center;
+            color: #1a1a2e;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px auto;
+            max-width: 900px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .toc h2 {
+            color: #4361ee;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4361ee;
+            padding-bottom: 10px;
+        }
+        .toc ul {
+            list-style: none;
+            columns: 2;
+        }
+        .toc li {
+            padding: 8px 0;
+        }
+        .toc a {
+            color: #1a1a2e;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .toc a:hover {
+            color: #4361ee;
+        }
+        .section {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 1400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        .section h2 {
+            color: #4361ee;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-desc {
+            color: #666;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4361ee;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+        .data-table th {
+            background: #4361ee;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .data-table tr:hover {
+            background: #e8f4f8;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .badge-get { background: #10b981; color: white; }
+        .badge-post { background: #3b82f6; color: white; }
+        .badge-put { background: #f59e0b; color: white; }
+        .badge-delete { background: #ef4444; color: white; }
+        .page-break {
+            page-break-after: always;
+            margin: 40px 0;
+            border-top: 3px dashed #ccc;
+            padding-top: 20px;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        .instructions {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 900px;
+            text-align: center;
+        }
+        .instructions h3 {
+            margin-bottom: 10px;
+        }
+        @media print {
+            body { background: white; }
+            .section { box-shadow: none; border: 1px solid #ddd; }
+            .instructions { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎓 SOEIT Achievement Portal</h1>
+<p class="subtitle">Complete Level 2 Data Flow Diagrams - All Modules & Pages</p>
+
+<div class="instructions">
+    <h3>📸 Image Save करने के लिए:</h3>
+    <p>1. Browser में open करो → Ctrl+P → Print to PDF (Best Quality)</p>
+    <p>2. या Right-click on any diagram → Save image as PNG</p>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+    <h2>📋 Table of Contents</h2>
+    <ul>
+        <li>1. <a href="#overview">System Overview DFD</a></li>
+        <li>2. <a href="#auth">Authentication Module</a></li>
+        <li>3. <a href="#student-dashboard">Student Dashboard</a></li>
+        <li>4. <a href="#achievement">Achievement Management</a></li>
+        <li>5. <a href="#verification">Verification Workflow</a></li>
+        <li>6. <a href="#courses">Course Management</a></li>
+        <li>7. <a href="#projects">Project Management</a></li>
+        <li>8. <a href="#internships">Internship Management</a></li>
+        <li>9. <a href="#events">Event Management</a></li>
+        <li>10. <a href="#notices">Notice Management</a></li>
+        <li>11. <a href="#hackathons">Hackathon Management</a></li>
+        <li>12. <a href="#notifications">Notification System</a></li>
+        <li>13. <a href="#portfolio">Public Portfolio</a></li>
+        <li>14. <a href="#admin-dashboard">Admin Dashboard</a></li>
+        <li>15. <a href="#reports">Reports & Analytics</a></li>
+        <li>16. <a href="#file-management">File Management</a></li>
+    </ul>
+</div>
+
+<!-- LEGEND -->
+<div class="section">
+    <h2>🎨 DFD Symbols Legend</h2>
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4361ee; border-radius: 50%;"></div>
+            <span>External Entity (User)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #10b981;"></div>
+            <span>Process (P1, P2...)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #f59e0b; border-radius: 0;"></div>
+            <span>Data Store (D1, D2...)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #3b82f6; height: 3px; width: 30px;"></div>
+            <span>Data Flow</span>
+        </div>
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 1. SYSTEM OVERVIEW -->
+<div class="section" id="overview">
+    <h2>1️⃣ System Overview - Complete Level 2 DFD</h2>
+    <div class="section-desc">
+        <strong>Description:</strong> Complete system architecture showing all 3 external entities (Student, Faculty, Admin), 
+        11 main processes, and 13 data stores connected via Turso/LibSQL database.
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph External["👥 External Entities"]
+        E1["👨‍🎓 STUDENT<br/>Role: student"]
+        E2["👨‍🏫 FACULTY<br/>Role: faculty"]
+        E3["👨‍💼 ADMIN<br/>Role: admin"]
+    end
+
+    subgraph Frontend["🖥️ FRONTEND LAYER - React.js (Port 5173)"]
+        direction TB
+        UI_PUB["Public Pages<br/>(Landing, About, Contact)"]
+        UI_AUTH["Auth Pages<br/>(Login, Register, Forgot)"]
+        UI_STU["Student Pages<br/>(Dashboard, Achievements, Courses)"]
+        UI_FAC["Faculty Pages<br/>(Dashboard, Verify, Events)"]
+        UI_ADM["Admin Pages<br/>(Dashboard, Reports, Users)"]
+    end
+
+    subgraph Backend["⚙️ BACKEND LAYER - Express.js (Port 5000)"]
+        direction TB
+        P1["P1: Authentication<br/>Module"]
+        P2["P2: Achievement<br/>Module"]
+        P3["P3: Course<br/>Module"]
+        P4["P4: Project<br/>Module"]
+        P5["P5: Internship<br/>Module"]
+        P6["P6: Event<br/>Module"]
+        P7["P7: Notice<br/>Module"]
+        P8["P8: Hackathon<br/>Module"]
+        P9["P9: Notification<br/>Module"]
+        P10["P10: File<br/>Module"]
+        P11["P11: Admin<br/>Module"]
+    end
+
+    subgraph Database["🗄️ DATABASE LAYER - Turso/LibSQL"]
+        direction TB
+        D1[("D1: USERS")]
+        D2[("D2: ACHIEVEMENTS")]
+        D3[("D3: COURSES")]
+        D4[("D4: PROJECTS")]
+        D5[("D5: INTERNSHIPS")]
+        D6[("D6: EVENTS")]
+        D7[("D7: NOTICES")]
+        D8[("D8: HACKATHONS")]
+        D9[("D9: NOTIFICATIONS")]
+        D10[("D10: VERIFICATIONS")]
+        D11[("D11: FILES")]
+        D12[("D12: INTERNSHIP_POSTINGS")]
+        D13[("D13: COURSE_ASSIGNMENTS")]
+    end
+
+    E1 --> UI_PUB & UI_AUTH & UI_STU
+    E2 --> UI_AUTH & UI_FAC
+    E3 --> UI_AUTH & UI_ADM
+
+    UI_AUTH -->|"JWT Auth"| P1
+    UI_STU -->|"CRUD Ops"| P2 & P3 & P4 & P5
+    UI_FAC -->|"Manage"| P6 & P7 & P11
+    UI_ADM -->|"Admin Ops"| P11
+
+    P1 <--> D1
+    P2 <--> D2
+    P2 --> P10
+    P10 <--> D11
+    P3 <--> D3 & D13
+    P4 <--> D4
+    P5 <--> D5 & D12
+    P6 <--> D6
+    P7 <--> D7
+    P8 <--> D8
+    P9 <--> D9
+    P11 <--> D10
+    P11 <--> D1 & D2
+
+    P2 & P6 & P7 --> P9
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 2. AUTHENTICATION MODULE -->
+<div class="section" id="auth">
+    <h2>2️⃣ Authentication Module (P1)</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /login, /admin-login, /register, /forgot-password, /reset-password/:token<br/>
+        <strong>Purpose:</strong> User registration, login with JWT, password recovery, profile management
+    </div>
+    <div class="mermaid">
+flowchart LR
+    subgraph Users["👥 Users"]
+        STU["👨‍🎓 Student"]
+        FAC["👨‍🏫 Faculty"]
+        ADM["👨‍💼 Admin"]
+    end
+
+    subgraph AuthPages["🖥️ Auth Pages"]
+        LP["Login Page<br/>/login"]
+        ALP["Admin Login<br/>/admin-login"]
+        RP["Register Page<br/>/register"]
+        FP["Forgot Password<br/>/forgot-password"]
+        RSP["Reset Password<br/>/reset-password/:token"]
+    end
+
+    subgraph P1["⚙️ P1: Authentication Module"]
+        P1_1["P1.1: Validate<br/>Credentials"]
+        P1_2["P1.2: Generate<br/>JWT Token"]
+        P1_3["P1.3: Hash<br/>Password"]
+        P1_4["P1.4: Send<br/>Reset Email"]
+        P1_5["P1.5: Update<br/>Profile"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D1[("D1: USERS<br/>id, name, email,<br/>password, role")]
+    end
+
+    subgraph External["📧 External"]
+        EMAIL["Brevo SMTP<br/>Email Service"]
+    end
+
+    STU --> LP
+    FAC --> ALP
+    ADM --> ALP
+    STU --> RP
+
+    LP -->|"1. enrollment, password"| P1_1
+    ALP -->|"1. admin_id, password"| P1_1
+    RP -->|"1. form data"| P1_3
+    FP -->|"1. email"| P1_4
+    RSP -->|"1. new password"| P1_3
+
+    P1_1 -->|"2. verify"| D1
+    D1 -->|"3. user data"| P1_1
+    P1_1 -->|"4. valid"| P1_2
+    P1_2 -->|"5. JWT (365d)"| LP & ALP
+    P1_3 -->|"6. bcrypt hash"| D1
+    P1_4 -->|"7. reset link"| EMAIL
+    EMAIL -->|"8. email sent"| FP
+    P1_5 <-->|"9. CRUD"| D1
+    </div>
+
+    <table class="data-table">
+        <tr>
+            <th>API Endpoint</th>
+            <th>Method</th>
+            <th>Input</th>
+            <th>Output</th>
+        </tr>
+        <tr>
+            <td>/api/auth/register</td>
+            <td><span class="badge badge-post">POST</span></td>
+            <td>name, email, password, role, department, enrollment_no</td>
+            <td>JWT Token, User Data</td>
+        </tr>
+        <tr>
+            <td>/api/auth/login</td>
+            <td><span class="badge badge-post">POST</span></td>
+            <td>enrollment_no/email, password</td>
+            <td>JWT Token, User Data, Role</td>
+        </tr>
+        <tr>
+            <td>/api/auth/forgot-password</td>
+            <td><span class="badge badge-post">POST</span></td>
+            <td>email</td>
+            <td>Success Message, Email Sent</td>
+        </tr>
+        <tr>
+            <td>/api/auth/reset-password/:token</td>
+            <td><span class="badge badge-put">PUT</span></td>
+            <td>new password, token</td>
+            <td>Success Message</td>
+        </tr>
+        <tr>
+            <td>/api/auth/profile</td>
+            <td><span class="badge badge-get">GET</span></td>
+            <td>JWT Token (Header)</td>
+            <td>User Profile Data</td>
+        </tr>
+        <tr>
+            <td>/api/auth/profile</td>
+            <td><span class="badge badge-put">PUT</span></td>
+            <td>Profile fields, profile_image (multipart)</td>
+            <td>Updated Profile</td>
+        </tr>
+        <tr>
+            <td>/api/auth/change-password</td>
+            <td><span class="badge badge-put">PUT</span></td>
+            <td>current_password, new_password</td>
+            <td>Success Message</td>
+        </tr>
+    </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 3. STUDENT DASHBOARD -->
+<div class="section" id="student-dashboard">
+    <h2>3️⃣ Student Dashboard Module</h2>
+    <div class="section-desc">
+        <strong>Page:</strong> /dashboard<br/>
+        <strong>Purpose:</strong> Central hub for students showing stats, recent achievements, quick actions
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Student["👨‍🎓 Student"]
+        STU["Logged In Student"]
+    end
+
+    subgraph Dashboard["🖥️ Dashboard Page /dashboard"]
+        STATS["📊 Stats Cards<br/>Total Achievements<br/>Total Points<br/>Pending Count"]
+        RECENT["📝 Recent<br/>Achievements"]
+        QUICK["⚡ Quick Actions<br/>Upload, View All"]
+        NOTIF["🔔 Notifications<br/>Unread Count"]
+    end
+
+    subgraph Processes["⚙️ Backend Processes"]
+        P2["P2: Achievement<br/>Module"]
+        P9["P9: Notification<br/>Module"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D2[("D2: ACHIEVEMENTS")]
+        D9[("D9: NOTIFICATIONS")]
+    end
+
+    STU -->|"1. Access Dashboard"| Dashboard
+    STATS -->|"2. GET /achievements/stats"| P2
+    RECENT -->|"3. GET /achievements/my?limit=5"| P2
+    NOTIF -->|"4. GET /notifications"| P9
+    
+    P2 -->|"5. Query"| D2
+    D2 -->|"6. Stats Data"| P2
+    P2 -->|"7. Response"| STATS & RECENT
+    
+    P9 -->|"8. Query"| D9
+    D9 -->|"9. Unread"| P9
+    P9 -->|"10. Count"| NOTIF
+
+    QUICK -->|"Navigate"| UPLOAD["Upload Page"] & MYACH["My Achievements"]
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 4. ACHIEVEMENT MANAGEMENT -->
+<div class="section" id="achievement">
+    <h2>4️⃣ Achievement Management Module (P2)</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /achievements, /achievements/upload, /achievements/edit/:id<br/>
+        <strong>Purpose:</strong> Students can upload, view, edit, delete achievements with proof files
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Student["👨‍🎓 Student"]
+        STU["Student User"]
+    end
+
+    subgraph Pages["🖥️ Achievement Pages"]
+        LIST["My Achievements<br/>/achievements"]
+        UPLOAD["Upload Achievement<br/>/achievements/upload"]
+        EDIT["Edit Achievement<br/>/achievements/edit/:id"]
+    end
+
+    subgraph P2["⚙️ P2: Achievement Module"]
+        P2_1["P2.1: Create<br/>Achievement"]
+        P2_2["P2.2: List My<br/>Achievements"]
+        P2_3["P2.3: Update<br/>Achievement"]
+        P2_4["P2.4: Delete<br/>Achievement"]
+        P2_5["P2.5: Calculate<br/>Points"]
+    end
+
+    subgraph P10["⚙️ P10: File Module"]
+        P10_1["P10.1: Upload<br/>Files"]
+        P10_2["P10.2: Compress<br/>(gzip)"]
+        P10_3["P10.3: Serve<br/>Files"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D2[("D2: ACHIEVEMENTS<br/>id, student_id, title,<br/>category, level, status,<br/>points, proof_files")]
+        D11[("D11: FILES<br/>id, filename,<br/>mimetype, data")]
+    end
+
+    STU --> LIST & UPLOAD
+
+    LIST -->|"1. GET /achievements/my"| P2_2
+    P2_2 -->|"2. Query by student_id"| D2
+    D2 -->|"3. Achievement List"| P2_2
+    P2_2 -->|"4. With file URLs"| LIST
+
+    UPLOAD -->|"5. POST /achievements<br/>+ files (multipart)"| P2_1
+    P2_1 -->|"6. Process files"| P10_1
+    P10_1 -->|"7. Compress"| P10_2
+    P10_2 -->|"8. Store BLOB"| D11
+    D11 -->|"9. file_ids"| P10_1
+    P10_1 -->|"10. proof_files JSON"| P2_1
+    P2_1 -->|"11. Calculate"| P2_5
+    P2_5 -->|"12. points based on level"| P2_1
+    P2_1 -->|"13. INSERT status=pending"| D2
+
+    LIST -->|"14. Edit click"| EDIT
+    EDIT -->|"15. PUT /achievements/:id"| P2_3
+    P2_3 -->|"16. UPDATE"| D2
+
+    LIST -->|"17. Delete click"| P2_4
+    P2_4 -->|"18. DELETE"| D2
+    P2_4 -->|"19. Delete files"| D11
+    </div>
+
+    <h3>Points Calculation Logic</h3>
+    <table class="data-table">
+        <tr>
+            <th>Level</th>
+            <th>Points</th>
+            <th>Example</th>
+        </tr>
+        <tr><td>International</td><td>100</td><td>IEEE Conference, ACM Competition</td></tr>
+        <tr><td>National</td><td>75</td><td>Smart India Hackathon, GATE</td></tr>
+        <tr><td>State</td><td>50</td><td>State Level Sports, Tech Fest</td></tr>
+        <tr><td>University</td><td>30</td><td>Arka Jain University Events</td></tr>
+        <tr><td>College</td><td>20</td><td>SOEIT Internal Events</td></tr>
+        <tr><td>Department</td><td>10</td><td>Department Seminars, Workshops</td></tr>
+    </table>
+
+    <h3>Achievement Categories</h3>
+    <table class="data-table">
+        <tr>
+            <th>Category</th>
+            <th>Examples</th>
+        </tr>
+        <tr><td>Academic</td><td>Scholarships, Research Papers, Patents</td></tr>
+        <tr><td>Technical</td><td>Hackathons, Coding Competitions, Certifications</td></tr>
+        <tr><td>Sports</td><td>Tournaments, Championships, Medals</td></tr>
+        <tr><td>Cultural</td><td>Dance, Music, Drama Competitions</td></tr>
+        <tr><td>Social</td><td>NGO Work, Blood Donation, Community Service</td></tr>
+        <tr><td>Other</td><td>Miscellaneous Achievements</td></tr>
+    </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 5. VERIFICATION WORKFLOW -->
+<div class="section" id="verification">
+    <h2>5️⃣ Verification Workflow (P11)</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /admin/verify, /admin/achievements<br/>
+        <strong>Purpose:</strong> Faculty/Admin reviews pending achievements, approves/rejects with remarks
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Student["👨‍🎓 Student"]
+        STU["Submits Achievement"]
+    end
+
+    subgraph Faculty["👨‍🏫 Faculty/Admin"]
+        FAC["Reviews Pending"]
+    end
+
+    subgraph Pages["🖥️ Verification Pages"]
+        VERIFY["Verify Page<br/>/admin/verify"]
+        ALLACH["All Achievements<br/>/admin/achievements"]
+    end
+
+    subgraph P11["⚙️ P11: Verification Module"]
+        P11_1["P11.1: Get Pending<br/>Achievements"]
+        P11_2["P11.2: View Proof<br/>Documents"]
+        P11_3["P11.3: Approve<br/>Achievement"]
+        P11_4["P11.4: Reject<br/>Achievement"]
+        P11_5["P11.5: Log<br/>Verification"]
+    end
+
+    subgraph P9["⚙️ P9: Notification"]
+        P9_1["P9.1: Create<br/>Notification"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D2[("D2: ACHIEVEMENTS<br/>status: pending→approved/rejected")]
+        D10[("D10: VERIFICATIONS<br/>action, remarks, timestamp")]
+        D11[("D11: FILES<br/>proof documents")]
+        D9[("D9: NOTIFICATIONS")]
+    end
+
+    STU -->|"1. Submit"| D2
+    D2 -->|"2. status=pending"| P11_1
+    FAC --> VERIFY
+    
+    VERIFY -->|"3. GET /admin/achievements?status=pending"| P11_1
+    P11_1 -->|"4. Filter by dept/category"| D2
+    D2 -->|"5. Pending List"| P11_1
+    P11_1 -->|"6. Display"| VERIFY
+
+    VERIFY -->|"7. Select Achievement"| P11_2
+    P11_2 -->|"8. GET /achievements/files/:id"| D11
+    D11 -->|"9. Decompress & Serve"| P11_2
+
+    VERIFY -->|"10a. Approve with remarks"| P11_3
+    VERIFY -->|"10b. Reject with remarks"| P11_4
+
+    P11_3 -->|"11. PUT /admin/achievements/:id/verify"| D2
+    P11_4 -->|"11. PUT /admin/achievements/:id/verify"| D2
+
+    P11_3 & P11_4 -->|"12. Log action"| P11_5
+    P11_5 -->|"13. INSERT"| D10
+
+    P11_3 & P11_4 -->|"14. Trigger"| P9_1
+    P9_1 -->|"15. INSERT"| D9
+    D9 -->|"16. Notify Student"| STU
+    </div>
+
+    <h3>Verification Status Flow</h3>
+    <div class="mermaid">
+stateDiagram-v2
+    [*] --> Pending: Student Submits
+    Pending --> Approved: Faculty Approves
+    Pending --> Rejected: Faculty Rejects
+    Rejected --> Pending: Student Resubmits
+    Approved --> [*]: Final State
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 6. COURSE MANAGEMENT -->
+<div class="section" id="courses">
+    <h2>6️⃣ Course Management Module (P3)</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /courses (Student), /admin/courses (Admin/Faculty)<br/>
+        <strong>Purpose:</strong> Students track online courses, Faculty assigns courses to departments
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Users["👥 Users"]
+        STU["👨‍🎓 Student"]
+        FAC["👨‍🏫 Faculty"]
+    end
+
+    subgraph StudentPages["🖥️ Student Course Page"]
+        MY_COURSES["My Courses<br/>/courses"]
+        ADD_COURSE["Add Course<br/>Modal"]
+        ASSIGNED["Assigned Courses<br/>Tab"]
+    end
+
+    subgraph FacultyPages["🖥️ Faculty Course Page"]
+        ALL_COURSES["All Courses<br/>/admin/courses"]
+        ASSIGN["Assign Course<br/>Modal"]
+    end
+
+    subgraph P3["⚙️ P3: Course Module"]
+        P3_1["P3.1: Add<br/>Personal Course"]
+        P3_2["P3.2: Track<br/>Progress"]
+        P3_3["P3.3: Sync with<br/>Platform"]
+        P3_4["P3.4: Assign<br/>Course"]
+        P3_5["P3.5: List<br/>Assignments"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D3[("D3: COURSES<br/>student_id, course_name,<br/>platform, progress, status")]
+        D13[("D13: COURSE_ASSIGNMENTS<br/>course_name, department,<br/>semester, assigned_by")]
+    end
+
+    STU --> MY_COURSES
+    MY_COURSES --> ADD_COURSE
+    ADD_COURSE -->|"1. POST /courses"| P3_1
+    P3_1 -->|"2. INSERT"| D3
+
+    MY_COURSES -->|"3. Update progress"| P3_2
+    P3_2 -->|"4. PUT /courses/:id/progress"| D3
+
+    MY_COURSES -->|"5. Sync button"| P3_3
+    P3_3 -->|"6. POST /courses/:id/sync"| D3
+
+    MY_COURSES --> ASSIGNED
+    ASSIGNED -->|"7. GET /courses/assignments/my"| P3_5
+    P3_5 -->|"8. Filter by dept/semester"| D13
+    D13 -->|"9. Assigned List"| ASSIGNED
+
+    FAC --> ALL_COURSES
+    ALL_COURSES --> ASSIGN
+    ASSIGN -->|"10. POST /courses/assignments"| P3_4
+    P3_4 -->|"11. INSERT"| D13
+    </div>
+
+    <h3>Course Status Types</h3>
+    <table class="data-table">
+        <tr><th>Status</th><th>Description</th><th>Progress Range</th></tr>
+        <tr><td>Ongoing</td><td>Currently taking the course</td><td>1-99%</td></tr>
+        <tr><td>Completed</td><td>Course finished with certificate</td><td>100%</td></tr>
+        <tr><td>Dropped</td><td>Left the course midway</td><td>Any</td></tr>
+    </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 7. PROJECT MANAGEMENT -->
+<div class="section" id="projects">
+    <h2>7️⃣ Project Management Module (P4)</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /projects (Student), /admin/projects (Admin/Faculty)<br/>
+        <strong>Purpose:</strong> Students showcase technical projects with GitHub/live links
+    </div>
+    <div class="mermaid">
+flowchart LR
+    subgraph Student["👨‍🎓 Student"]
+        STU["Logged In"]
+    end
+
+    subgraph Pages["🖥️ Project Pages"]
+        MY_PROJ["My Projects<br/>/projects"]
+        ADD_PROJ["Add Project<br/>Modal"]
+    end
+
+    subgraph P4["⚙️ P4: Project Module"]
+        P4_1["P4.1: Create<br/>Project"]
+        P4_2["P4.2: List My<br/>Projects"]
+        P4_3["P4.3: Delete<br/>Project"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D4[("D4: PROJECTS<br/>student_id, title,<br/>description, github_link,<br/>live_link, tech_stack")]
+    end
+
+    STU --> MY_PROJ
+    MY_PROJ -->|"1. GET /projects/my"| P4_2
+    P4_2 -->|"2. Query"| D4
+    D4 -->|"3. Project List"| P4_2
+    P4_2 -->|"4. Display"| MY_PROJ
+
+    MY_PROJ --> ADD_PROJ
+    ADD_PROJ -->|"5. POST /projects"| P4_1
+    P4_1 -->|"6. INSERT"| D4
+    D4 -->|"7. Created"| ADD_PROJ
+
+    MY_PROJ -->|"8. Delete click"| P4_3
+    P4_3 -->|"9. DELETE"| D4
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 8. INTERNSHIP MANAGEMENT -->
+<div class="section" id="internships">
+    <h2>8️⃣ Internship Management Module (P5)</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /internships (Student), /internship-opportunities, /admin/manage-internships<br/>
+        <strong>Purpose:</strong> Students track internships, Faculty posts opportunities
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Users["👥 Users"]
+        STU["👨‍🎓 Student"]
+        FAC["👨‍🏫 Faculty"]
+    end
+
+    subgraph StudentPages["🖥️ Student Pages"]
+        MY_INT["My Internships<br/>/internships"]
+        OPP["Opportunities<br/>/internship-opportunities"]
+    end
+
+    subgraph FacultyPages["🖥️ Faculty Pages"]
+        MANAGE["Manage Postings<br/>/admin/manage-internships"]
+    end
+
+    subgraph P5["⚙️ P5: Internship Module"]
+        P5_1["P5.1: Add My<br/>Internship"]
+        P5_2["P5.2: List My<br/>Internships"]
+        P5_3["P5.3: Post<br/>Opportunity"]
+        P5_4["P5.4: List<br/>Opportunities"]
+        P5_5["P5.5: Delete<br/>Posting"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D5[("D5: INTERNSHIPS<br/>student_id, company,<br/>role, status, dates")]
+        D12[("D12: INTERNSHIP_POSTINGS<br/>company, role, stipend,<br/>deadline, created_by")]
+    end
+
+    STU --> MY_INT & OPP
+    FAC --> MANAGE
+
+    MY_INT -->|"1. GET /internships/my"| P5_2
+    P5_2 -->|"2. Query"| D5
+    D5 -->|"3. My List"| MY_INT
+
+    MY_INT -->|"4. POST /internships"| P5_1
+    P5_1 -->|"5. INSERT"| D5
+
+    OPP -->|"6. GET /internship-postings"| P5_4
+    P5_4 -->|"7. Query"| D12
+    D12 -->|"8. Postings List"| OPP
+    OPP -->|"9. External Link"| EXT["External Application"]
+
+    MANAGE -->|"10. POST /internship-postings"| P5_3
+    P5_3 -->|"11. INSERT"| D12
+
+    MANAGE -->|"12. DELETE /internship-postings/:id"| P5_5
+    P5_5 -->|"13. DELETE"| D12
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 9. EVENT MANAGEMENT -->
+<div class="section" id="events">
+    <h2>9️⃣ Event Management Module (P6)</h2>
+    <div class="section-desc">
+        <strong>Page:</strong> /events (All authenticated users)<br/>
+        <strong>Purpose:</strong> Faculty/Admin creates events, all users view by category
+    </div>
+    <div class="mermaid">
+flowchart LR
+    subgraph Users["👥 Users"]
+        STU["👨‍🎓 Student<br/>(View Only)"]
+        FAC["👨‍🏫 Faculty<br/>(Full CRUD)"]
+    end
+
+    subgraph EventsPage["🖥️ Events Page /events"]
+        LIST["Event List<br/>by Category"]
+        FILTER["Category Filter<br/>(Technical, Cultural,<br/>Sports, Workshop)"]
+        CREATE["Create Event<br/>(Faculty Only)"]
+    end
+
+    subgraph P6["⚙️ P6: Event Module"]
+        P6_1["P6.1: Create<br/>Event"]
+        P6_2["P6.2: List<br/>Events"]
+        P6_3["P6.3: Update<br/>Event"]
+        P6_4["P6.4: Delete<br/>Event"]
+    end
+
+    subgraph P9["⚙️ P9: Notification"]
+        P9_1["P9.1: Broadcast<br/>to All"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D6[("D6: EVENTS<br/>title, description,<br/>category, date, venue")]
+        D9[("D9: NOTIFICATIONS")]
+    end
+
+    STU --> LIST
+    FAC --> LIST & CREATE
+
+    LIST -->|"1. GET /events"| P6_2
+    FILTER -->|"2. ?category=technical"| P6_2
+    P6_2 -->|"3. Query"| D6
+    D6 -->|"4. Event List"| LIST
+
+    CREATE -->|"5. POST /events"| P6_1
+    P6_1 -->|"6. INSERT"| D6
+    P6_1 -->|"7. Trigger"| P9_1
+    P9_1 -->|"8. Notify All Students"| D9
+
+    LIST -->|"9. Edit"| P6_3
+    P6_3 -->|"10. PUT /events/:id"| D6
+
+    LIST -->|"11. Delete"| P6_4
+    P6_4 -->|"12. DELETE"| D6
+    </div>
+
+    <h3>Event Categories</h3>
+    <table class="data-table">
+        <tr><th>Category</th><th>Examples</th></tr>
+        <tr><td>Technical</td><td>Hackathons, Coding Contests, Tech Talks</td></tr>
+        <tr><td>Cultural</td><td>Freshers, Farewell, Annual Day</td></tr>
+        <tr><td>Sports</td><td>Cricket, Football, Athletics</td></tr>
+        <tr><td>Workshop</td><td>Skill Development, Hands-on Training</td></tr>
+        <tr><td>Seminar</td><td>Guest Lectures, Industry Talks</td></tr>
+    </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 10. NOTICE MANAGEMENT -->
+<div class="section" id="notices">
+    <h2>🔟 Notice Management Module (P7)</h2>
+    <div class="section-desc">
+        <strong>Access:</strong> Faculty Dashboard modal, Admin Dashboard<br/>
+        <strong>Purpose:</strong> Faculty/Admin publishes notices to students with priority levels
+    </div>
+    <div class="mermaid">
+flowchart LR
+    subgraph Faculty["👨‍🏫 Faculty/Admin"]
+        FAC["Create Notice"]
+    end
+
+    subgraph FacultyDashboard["🖥️ Faculty Dashboard"]
+        MODAL["Notice Creation<br/>Modal"]
+    end
+
+    subgraph P7["⚙️ P7: Notice Module"]
+        P7_1["P7.1: Create<br/>Notice"]
+        P7_2["P7.2: List<br/>Notices"]
+        P7_3["P7.3: Delete<br/>Notice"]
+    end
+
+    subgraph P9["⚙️ P9: Notification"]
+        P9_1["P9.1: Broadcast<br/>to Department"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D7[("D7: NOTICES<br/>title, content,<br/>priority, created_by")]
+        D9[("D9: NOTIFICATIONS")]
+    end
+
+    subgraph Students["👨‍🎓 Students"]
+        STU["Receive Alert"]
+    end
+
+    FAC --> MODAL
+    MODAL -->|"1. POST /notices"| P7_1
+    P7_1 -->|"2. INSERT"| D7
+    P7_1 -->|"3. Trigger"| P9_1
+    P9_1 -->|"4. Create for students"| D9
+    D9 -->|"5. Push"| STU
+
+    MODAL -->|"6. GET /notices"| P7_2
+    P7_2 -->|"7. Query"| D7
+    D7 -->|"8. Notice List"| MODAL
+
+    MODAL -->|"9. DELETE /notices/:id"| P7_3
+    P7_3 -->|"10. DELETE"| D7
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 11. HACKATHON MANAGEMENT -->
+<div class="section" id="hackathons">
+    <h2>1️⃣1️⃣ Hackathon Management Module (P8)</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /hackathons (Student), /admin/hackathons (Admin)<br/>
+        <strong>Purpose:</strong> Browse 40+ hackathons, track student activities, admin manages listings
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Users["👥 Users"]
+        STU["👨‍🎓 Student"]
+        ADM["👨‍💼 Admin"]
+    end
+
+    subgraph StudentPage["🖥️ Hackathon Page /hackathons"]
+        LIST["Hackathon List<br/>(40+ Pre-populated)"]
+        FILTER["Filter by Type<br/>(Govt, AI/ML, Web, Mobile)"]
+        APPLY["Apply Button<br/>(External Link)"]
+    end
+
+    subgraph AdminPage["🖥️ Admin Hackathon /admin/hackathons"]
+        ACTIVITY["Activity Logs<br/>Tab"]
+        MANAGE["Manage Challenges<br/>Tab"]
+    end
+
+    subgraph P8["⚙️ P8: Hackathon Module"]
+        P8_1["P8.1: List<br/>Hackathons"]
+        P8_2["P8.2: Log<br/>Activity"]
+        P8_3["P8.3: Get<br/>Activities"]
+        P8_4["P8.4: Add<br/>Hackathon"]
+        P8_5["P8.5: Delete<br/>Hackathon"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D8[("D8: HACKATHONS<br/>title, type, prize,<br/>deadline, link")]
+        D8A[("D8A: HACKATHON_ACTIVITIES<br/>student_id, hackathon_title,<br/>action_type")]
+    end
+
+    STU --> LIST
+    LIST --> FILTER
+    FILTER -->|"1. GET /hackathons?type=AI/ML"| P8_1
+    P8_1 -->|"2. Query"| D8
+    D8 -->|"3. Filtered List"| LIST
+
+    LIST --> APPLY
+    APPLY -->|"4. POST /hackathons/activity"| P8_2
+    P8_2 -->|"5. Log visit/apply"| D8A
+    APPLY -->|"6. Redirect"| EXT["External Hackathon Site"]
+
+    ADM --> ACTIVITY & MANAGE
+    ACTIVITY -->|"7. GET /hackathons/applied"| P8_3
+    P8_3 -->|"8. Query"| D8A
+    D8A -->|"9. Activity List"| ACTIVITY
+
+    MANAGE -->|"10. POST /hackathons"| P8_4
+    P8_4 -->|"11. INSERT"| D8
+
+    MANAGE -->|"12. DELETE /hackathons/:id"| P8_5
+    P8_5 -->|"13. DELETE"| D8
+    </div>
+
+    <h3>Hackathon Types</h3>
+    <table class="data-table">
+        <tr><th>Type</th><th>Examples</th></tr>
+        <tr><td>Govt of India</td><td>Smart India Hackathon, Toycathon, KAVACH</td></tr>
+        <tr><td>AI/ML</td><td>Google AI Challenge, IBM Watson</td></tr>
+        <tr><td>Web Development</td><td>HackerEarth, DevPost challenges</td></tr>
+        <tr><td>Mobile</td><td>Flutter Hackathon, React Native Challenge</td></tr>
+        <tr><td>Cybersecurity</td><td>CTF Competitions, Bug Bounty</td></tr>
+        <tr><td>Blockchain</td><td>ETHGlobal, Polygon Hackathon</td></tr>
+        <tr><td>Women in Tech</td><td>SheHacks, WomenTechMakers</td></tr>
+        <tr><td>Startup</td><td>Startup Weekend, Pitch Competitions</td></tr>
+    </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 12. NOTIFICATION SYSTEM -->
+<div class="section" id="notifications">
+    <h2>1️⃣2️⃣ Notification System (P9)</h2>
+    <div class="section-desc">
+        <strong>Access:</strong> All authenticated users via Topbar bell icon<br/>
+        <strong>Purpose:</strong> Real-time alerts for achievement status, events, notices
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Triggers["🎯 Notification Triggers"]
+        T1["Achievement<br/>Approved/Rejected"]
+        T2["New Event<br/>Created"]
+        T3["New Notice<br/>Published"]
+        T4["Course<br/>Assigned"]
+    end
+
+    subgraph P9["⚙️ P9: Notification Module"]
+        P9_1["P9.1: Create<br/>Notification"]
+        P9_2["P9.2: Get User<br/>Notifications"]
+        P9_3["P9.3: Mark<br/>as Read"]
+        P9_4["P9.4: Mark<br/>All Read"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D9[("D9: NOTIFICATIONS<br/>user_id, type, title,<br/>message, link, is_read")]
+    end
+
+    subgraph UI["🖥️ UI Components"]
+        BELL["🔔 Bell Icon<br/>with Badge"]
+        DROPDOWN["Notification<br/>Dropdown"]
+    end
+
+    subgraph User["👨‍🎓 User"]
+        USR["Any User"]
+    end
+
+    T1 & T2 & T3 & T4 -->|"1. Trigger"| P9_1
+    P9_1 -->|"2. INSERT"| D9
+
+    USR --> BELL
+    BELL -->|"3. GET /notifications"| P9_2
+    P9_2 -->|"4. Query unread"| D9
+    D9 -->|"5. Notification List"| DROPDOWN
+
+    DROPDOWN -->|"6. Click notification"| P9_3
+    P9_3 -->|"7. PUT /notifications/:id/read"| D9
+
+    DROPDOWN -->|"8. Mark all read"| P9_4
+    P9_4 -->|"9. PUT /notifications/read-all"| D9
+    </div>
+
+    <h3>Notification Types</h3>
+    <table class="data-table">
+        <tr><th>Type</th><th>Trigger</th><th>Message Template</th></tr>
+        <tr><td>achievement</td><td>Verification complete</td><td>"Your achievement '{title}' has been {approved/rejected}"</td></tr>
+        <tr><td>event</td><td>New event created</td><td>"New event: {title} on {date}"</td></tr>
+        <tr><td>notice</td><td>New notice published</td><td>"New notice: {title}"</td></tr>
+        <tr><td>course</td><td>Course assigned</td><td>"New course assigned: {course_name}"</td></tr>
+        <tr><td>internship</td><td>New posting</td><td>"New internship at {company}"</td></tr>
+    </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 13. PUBLIC PORTFOLIO -->
+<div class="section" id="portfolio">
+    <h2>1️⃣3️⃣ Public Portfolio Module</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /public-portfolio (Directory), /portfolio/:userId (Individual)<br/>
+        <strong>Purpose:</strong> Public showcase of verified student achievements (no login required)
+    </div>
+    <div class="mermaid">
+flowchart LR
+    subgraph Visitor["👤 Public Visitor"]
+        VIS["Anyone<br/>(No Login)"]
+    end
+
+    subgraph PublicPages["🖥️ Public Portfolio Pages"]
+        DIR["Student Directory<br/>/public-portfolio"]
+        SINGLE["Individual Portfolio<br/>/portfolio/:userId"]
+    end
+
+    subgraph P2["⚙️ P2: Achievement Module"]
+        P2_PUB["P2.6: Get Public<br/>Students"]
+        P2_PORT["P2.7: Get User<br/>Portfolio"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D1[("D1: USERS<br/>name, department,<br/>profile_image")]
+        D2[("D2: ACHIEVEMENTS<br/>status=approved,<br/>is_public=1")]
+    end
+
+    VIS --> DIR
+    DIR -->|"1. GET /achievements/public-students"| P2_PUB
+    P2_PUB -->|"2. Query students with public achievements"| D1 & D2
+    D1 & D2 -->|"3. Student cards with stats"| DIR
+
+    DIR -->|"4. Search by name/enrollment"| P2_PUB
+    DIR -->|"5. Filter by department"| P2_PUB
+
+    DIR -->|"6. Click student card"| SINGLE
+    SINGLE -->|"7. GET /achievements/portfolio/:userId"| P2_PORT
+    P2_PORT -->|"8. Query verified public achievements"| D2
+    D2 -->|"9. Achievement list + stats"| SINGLE
+
+    SINGLE -->|"10. Share link"| SHARE["Shareable URL<br/>soeit-portal.com/portfolio/xyz123"]
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 14. ADMIN DASHBOARD -->
+<div class="section" id="admin-dashboard">
+    <h2>1️⃣4️⃣ Admin Dashboard Module</h2>
+    <div class="section-desc">
+        <strong>Pages:</strong> /admin/dashboard, /admin/students, /admin/faculty<br/>
+        <strong>Purpose:</strong> Admin overview with stats, user management, system health
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Admin["👨‍💼 Admin"]
+        ADM["Logged In Admin"]
+    end
+
+    subgraph AdminDashboard["🖥️ Admin Dashboard /admin/dashboard"]
+        STATS["📊 Stats Cards<br/>Total Students, Achievements,<br/>Pending, Faculty Count"]
+        CHARTS["📈 Charts<br/>Trends, Department Breakdown,<br/>Category Distribution"]
+        QUICK["⚡ Quick Actions"]
+    end
+
+    subgraph ManagePages["🖥️ Management Pages"]
+        STU_MGT["Student Management<br/>/admin/students"]
+        FAC_MGT["Faculty Management<br/>/admin/faculty"]
+    end
+
+    subgraph P11["⚙️ P11: Admin Module"]
+        P11_DASH["P11.6: Get<br/>Dashboard Stats"]
+        P11_STU["P11.7: List<br/>Students"]
+        P11_FAC["P11.8: List<br/>Faculty"]
+        P11_TOGGLE["P11.9: Toggle<br/>User Status"]
+        P11_DELETE["P11.10: Bulk<br/>Delete"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D1[("D1: USERS")]
+        D2[("D2: ACHIEVEMENTS")]
+    end
+
+    ADM --> AdminDashboard
+    STATS -->|"1. GET /admin/dashboard"| P11_DASH
+    P11_DASH -->|"2. Aggregate queries"| D1 & D2
+    D1 & D2 -->|"3. Stats data"| STATS & CHARTS
+
+    AdminDashboard --> STU_MGT
+    STU_MGT -->|"4. GET /admin/students"| P11_STU
+    P11_STU -->|"5. Query with filters"| D1
+    D1 -->|"6. Student list"| STU_MGT
+
+    STU_MGT -->|"7. Bulk delete"| P11_DELETE
+    P11_DELETE -->|"8. DELETE multiple"| D1
+
+    AdminDashboard --> FAC_MGT
+    FAC_MGT -->|"9. GET /admin/faculty"| P11_FAC
+    P11_FAC -->|"10. Query role=faculty"| D1
+    D1 -->|"11. Faculty list"| FAC_MGT
+
+    FAC_MGT -->|"12. Toggle access"| P11_TOGGLE
+    P11_TOGGLE -->|"13. UPDATE is_active"| D1
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 15. REPORTS & ANALYTICS -->
+<div class="section" id="reports">
+    <h2>1️⃣5️⃣ Reports & Analytics Module</h2>
+    <div class="section-desc">
+        <strong>Page:</strong> /admin/reports<br/>
+        <strong>Purpose:</strong> Visual analytics with charts, leaderboards, export capabilities
+    </div>
+    <div class="mermaid">
+flowchart LR
+    subgraph Admin["👨‍💼 Admin"]
+        ADM["Access Reports"]
+    end
+
+    subgraph ReportsPage["🖥️ Reports Page /admin/reports"]
+        TREND["📈 Achievement<br/>Trends (Line)"]
+        CAT["🥧 Category<br/>Breakdown (Pie)"]
+        DEPT["📊 Department<br/>Performance (Bar)"]
+        LEAD["🏆 Leaderboard<br/>(Top Students)"]
+        EXPORT["📥 Export<br/>(PDF/Excel)"]
+    end
+
+    subgraph P11["⚙️ P11: Admin Module"]
+        P11_REP["P11.11: Get<br/>Report Data"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D1[("D1: USERS")]
+        D2[("D2: ACHIEVEMENTS")]
+    end
+
+    subgraph External["📤 Export Libraries"]
+        PDF["jsPDF"]
+        XLSX["SheetJS/XLSX"]
+    end
+
+    ADM --> ReportsPage
+    TREND & CAT & DEPT & LEAD -->|"1. GET /admin/reports"| P11_REP
+    P11_REP -->|"2. Aggregate by date/category/dept"| D2
+    P11_REP -->|"3. Join with users"| D1
+    D1 & D2 -->|"4. Chart data"| TREND & CAT & DEPT & LEAD
+
+    EXPORT -->|"5. Generate PDF"| PDF
+    EXPORT -->|"6. Generate Excel"| XLSX
+    PDF & XLSX -->|"7. Download"| ADM
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 16. FILE MANAGEMENT -->
+<div class="section" id="file-management">
+    <h2>1️⃣6️⃣ File Management Module (P10)</h2>
+    <div class="section-desc">
+        <strong>Purpose:</strong> Upload, compress, store, and serve proof documents as BLOB in database
+    </div>
+    <div class="mermaid">
+flowchart TB
+    subgraph Upload["📤 Upload Flow"]
+        STU["Student uploads<br/>proof files"]
+        FORM["Multipart Form<br/>(up to 5 files,<br/>100MB each)"]
+    end
+
+    subgraph P10["⚙️ P10: File Module"]
+        P10_1["P10.1: Receive<br/>Files (Multer)"]
+        P10_2["P10.2: Validate<br/>(type, size)"]
+        P10_3["P10.3: Compress<br/>(gzip)"]
+        P10_4["P10.4: Store<br/>in DB"]
+        P10_5["P10.5: Serve<br/>File"]
+        P10_6["P10.6: Decompress<br/>(gunzip)"]
+    end
+
+    subgraph Cache["⚡ Caching"]
+        MEM["NodeCache<br/>(10 min TTL)"]
+        BROWSER["Browser Cache<br/>(24 hours)"]
+    end
+
+    subgraph DataStores["🗄️ Data Stores"]
+        D11[("D11: FILES<br/>id, filename,<br/>mimetype, data (BLOB)")]
+    end
+
+    subgraph Serve["📥 Serve Flow"]
+        REQ["Request file<br/>GET /achievements/files/:id"]
+        RES["Response<br/>(PDF, Image, etc.)"]
+    end
+
+    STU --> FORM
+    FORM -->|"1. POST multipart"| P10_1
+    P10_1 -->|"2. Validate"| P10_2
+    P10_2 -->|"3. Compress"| P10_3
+    P10_3 -->|"4. Store BLOB"| P10_4
+    P10_4 -->|"5. INSERT"| D11
+    D11 -->|"6. file_id"| P10_4
+
+    REQ -->|"7. GET"| P10_5
+    P10_5 -->|"8. Check cache"| MEM
+    MEM -->|"9a. Cache hit"| RES
+    MEM -->|"9b. Cache miss"| P10_5
+    P10_5 -->|"10. Query"| D11
+    D11 -->|"11. BLOB data"| P10_6
+    P10_6 -->|"12. Decompress"| MEM
+    MEM -->|"13. Store in cache"| P10_5
+    P10_5 -->|"14. Set headers"| BROWSER
+    BROWSER -->|"15. Response"| RES
+    </div>
+
+    <h3>Supported File Types</h3>
+    <table class="data-table">
+        <tr><th>Type</th><th>MIME Types</th><th>Max Size</th></tr>
+        <tr><td>Documents</td><td>application/pdf</td><td>100 MB</td></tr>
+        <tr><td>Images</td><td>image/jpeg, image/png, image/gif, image/webp</td><td>100 MB</td></tr>
+        <tr><td>Profile Image</td><td>image/jpeg, image/png</td><td>2 MB</td></tr>
+    </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- COMPLETE API REFERENCE -->
+<div class="section">
+    <h2>📚 Complete API Reference</h2>
+    
+    <h3>Authentication APIs</h3>
+    <table class="data-table">
+        <tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>/api/auth/register</td><td><span class="badge badge-post">POST</span></td><td>❌</td><td>Register new user</td></tr>
+        <tr><td>/api/auth/login</td><td><span class="badge badge-post">POST</span></td><td>❌</td><td>Login, get JWT</td></tr>
+        <tr><td>/api/auth/forgot-password</td><td><span class="badge badge-post">POST</span></td><td>❌</td><td>Send reset email</td></tr>
+        <tr><td>/api/auth/reset-password/:token</td><td><span class="badge badge-put">PUT</span></td><td>❌</td><td>Reset password</td></tr>
+        <tr><td>/api/auth/profile</td><td><span class="badge badge-get">GET</span></td><td>✅</td><td>Get profile</td></tr>
+        <tr><td>/api/auth/profile</td><td><span class="badge badge-put">PUT</span></td><td>✅</td><td>Update profile</td></tr>
+        <tr><td>/api/auth/change-password</td><td><span class="badge badge-put">PUT</span></td><td>✅</td><td>Change password</td></tr>
+    </table>
+
+    <h3>Achievement APIs</h3>
+    <table class="data-table">
+        <tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>/api/achievements</td><td><span class="badge badge-post">POST</span></td><td>✅ Student</td><td>Create achievement</td></tr>
+        <tr><td>/api/achievements/my</td><td><span class="badge badge-get">GET</span></td><td>✅ Student</td><td>Get my achievements</td></tr>
+        <tr><td>/api/achievements/stats</td><td><span class="badge badge-get">GET</span></td><td>✅ Student</td><td>Get my stats</td></tr>
+        <tr><td>/api/achievements/:id</td><td><span class="badge badge-get">GET</span></td><td>✅</td><td>Get single achievement</td></tr>
+        <tr><td>/api/achievements/:id</td><td><span class="badge badge-put">PUT</span></td><td>✅ Owner</td><td>Update achievement</td></tr>
+        <tr><td>/api/achievements/:id</td><td><span class="badge badge-delete">DELETE</span></td><td>✅ Owner</td><td>Delete achievement</td></tr>
+        <tr><td>/api/achievements/files/:id</td><td><span class="badge badge-get">GET</span></td><td>✅</td><td>Get proof file</td></tr>
+        <tr><td>/api/achievements/public-students</td><td><span class="badge badge-get">GET</span></td><td>❌</td><td>Public student directory</td></tr>
+        <tr><td>/api/achievements/portfolio/:userId</td><td><span class="badge badge-get">GET</span></td><td>❌</td><td>Public portfolio</td></tr>
+    </table>
+
+    <h3>Admin APIs</h3>
+    <table class="data-table">
+        <tr><th>Endpoint</th><th>Method</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>/api/admin/dashboard</td><td><span class="badge badge-get">GET</span></td><td>✅ Admin/Faculty</td><td>Dashboard stats</td></tr>
+        <tr><td>/api/admin/achievements</td><td><span class="badge badge-get">GET</span></td><td>✅ Admin/Faculty</td><td>All achievements</td></tr>
+        <tr><td>/api/admin/achievements/:id/verify</td><td><span class="badge badge-put">PUT</span></td><td>✅ Admin/Faculty</td><td>Verify achievement</td></tr>
+        <tr><td>/api/admin/students</td><td><span class="badge badge-get">GET</span></td><td>✅ Admin/Faculty</td><td>List students</td></tr>
+        <tr><td>/api/admin/faculty</td><td><span class="badge badge-get">GET</span></td><td>✅ Admin</td><td>List faculty</td></tr>
+        <tr><td>/api/admin/users/:id</td><td><span class="badge badge-put">PUT</span></td><td>✅ Admin</td><td>Toggle user status</td></tr>
+        <tr><td>/api/admin/users</td><td><span class="badge badge-delete">DELETE</span></td><td>✅ Admin</td><td>Bulk delete users</td></tr>
+        <tr><td>/api/admin/reports</td><td><span class="badge badge-get">GET</span></td><td>✅ Admin</td><td>Analytics data</td></tr>
+    </table>
+
+    <h3>Other Module APIs</h3>
+    <table class="data-table">
+        <tr><th>Module</th><th>Endpoints</th></tr>
+        <tr><td>Courses</td><td>POST/GET/PUT/DELETE /api/courses, /api/courses/assignments</td></tr>
+        <tr><td>Projects</td><td>POST/GET/DELETE /api/projects</td></tr>
+        <tr><td>Internships</td><td>POST/GET/PUT/DELETE /api/internships, /api/internship-postings</td></tr>
+        <tr><td>Events</td><td>POST/GET/PUT/DELETE /api/events</td></tr>
+        <tr><td>Notices</td><td>POST/GET/DELETE /api/notices</td></tr>
+        <tr><td>Hackathons</td><td>GET/POST/DELETE /api/hackathons, /api/hackathons/activity</td></tr>
+        <tr><td>Notifications</td><td>GET /api/notifications, PUT /api/notifications/:id/read</td></tr>
+    </table>
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        themeVariables: {
+            primaryColor: '#4361ee',
+            primaryTextColor: '#1a1a2e',
+            primaryBorderColor: '#3a0ca3',
+            lineColor: '#4cc9f0',
+            secondaryColor: '#10b981',
+            tertiaryColor: '#ffffff',
+            background: '#ffffff',
+            mainBkg: '#e8f4f8',
+            nodeBorder: '#4361ee',
+            clusterBkg: '#f8f9fa',
+            clusterBorder: '#dee2e6',
+            titleColor: '#1a1a2e',
+            edgeLabelBackground: '#ffffff',
+            fontSize: '14px'
+        },
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis',
+            rankSpacing: 50,
+            nodeSpacing: 30
+        },
+        er: {
+            useMaxWidth: true,
+            layoutDirection: 'TB'
+        }
+    });
+</script>
+
+</body>
+</html>

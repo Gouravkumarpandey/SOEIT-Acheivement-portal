@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOEIT Achievement Portal - Complete ER Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            padding: 20px;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(67, 97, 238, 0.3);
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .instructions {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 900px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #4361ee;
+        }
+        .instructions h3 {
+            color: #4361ee;
+            margin-bottom: 10px;
+        }
+        .section {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 1600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        .section h2 {
+            color: #4361ee;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4361ee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .table-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .table-card:hover {
+            border-color: #4361ee;
+            box-shadow: 0 5px 20px rgba(67, 97, 238, 0.2);
+            transform: translateY(-2px);
+        }
+        .table-card h3 {
+            color: #4361ee;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .table-card h3 .icon {
+            font-size: 1.2em;
+        }
+        .field-list {
+            list-style: none;
+        }
+        .field-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .field-list li:last-child {
+            border-bottom: none;
+        }
+        .field-name {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .field-type {
+            font-size: 0.85em;
+            padding: 3px 10px;
+            border-radius: 15px;
+            background: #e8f4f8;
+            color: #4361ee;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .badge-pk { background: #ffd60a; color: #1a1a2e; }
+        .badge-fk { background: #4cc9f0; color: #1a1a2e; }
+        .badge-uk { background: #f72585; color: white; }
+        .badge-idx { background: #10b981; color: white; }
+        .relationship-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .relationship-table th {
+            background: #4361ee;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        .relationship-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .relationship-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .relationship-table tr:hover {
+            background: #e8f4f8;
+        }
+        .rel-type {
+            font-weight: bold;
+            color: #4361ee;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .page-break {
+            page-break-after: always;
+            margin: 40px 0;
+            border-top: 3px dashed #ccc;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .stat-card .label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .index-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        .index-table th {
+            background: #10b981;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        .index-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .index-table tr:nth-child(even) {
+            background: #f0fdf4;
+        }
+        @media print {
+            body { background: white; }
+            .section { box-shadow: none; border: 1px solid #ddd; }
+            .header { background: #4361ee; }
+        }
+        @media (max-width: 768px) {
+            .table-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>🎓 SOEIT Achievement Portal</h1>
+    <p>Complete Entity-Relationship (ER) Diagram | Database: Turso (LibSQL)</p>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="instructions">
+    <h3>📸 Image/PDF Save करने के लिए:</h3>
+    <p>Browser में open करो → <strong>Ctrl + P</strong> → Destination: "Save as PDF" → Save</p>
+    <p>या Individual diagram पर Right-click → "Save image as..."</p>
+</div>
+
+<!-- STATISTICS -->
+<div class="section">
+    <h2>📊 Database Statistics</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="number">14</div>
+            <div class="label">Total Tables</div>
+        </div>
+        <div class="stat-card">
+            <div class="number">150+</div>
+            <div class="label">Total Fields</div>
+        </div>
+        <div class="stat-card">
+            <div class="number">20+</div>
+            <div class="label">Indexes</div>
+        </div>
+        <div class="stat-card">
+            <div class="number">15+</div>
+            <div class="label">Foreign Keys</div>
+        </div>
+    </div>
+</div>
+
+<!-- LEGEND -->
+<div class="section">
+    <h2>🎨 ER Diagram Legend</h2>
+    <div class="legend">
+        <div class="legend-item">
+            <span class="badge badge-pk">PK</span>
+            <span>Primary Key</span>
+        </div>
+        <div class="legend-item">
+            <span class="badge badge-fk">FK</span>
+            <span>Foreign Key</span>
+        </div>
+        <div class="legend-item">
+            <span class="badge badge-uk">UK</span>
+            <span>Unique Key</span>
+        </div>
+        <div class="legend-item">
+            <span class="badge badge-idx">IDX</span>
+            <span>Indexed Column</span>
+        </div>
+        <div class="legend-item">
+            <strong>||--o{</strong>
+            <span>One-to-Many Relationship</span>
+        </div>
+        <div class="legend-item">
+            <strong>||--||</strong>
+            <span>One-to-One Relationship</span>
+        </div>
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- MAIN ER DIAGRAM -->
+<div class="section">
+    <h2>📐 Complete ER Diagram - All 14 Tables</h2>
+    <div class="mermaid">
+erDiagram
+    USERS ||--o{ ACHIEVEMENTS : "submits"
+    USERS ||--o{ VERIFICATIONS : "verifies"
+    USERS ||--o{ COURSES : "enrolls"
+    USERS ||--o{ PROJECTS : "creates"
+    USERS ||--o{ INTERNSHIPS : "tracks"
+    USERS ||--o{ NOTIFICATIONS : "receives"
+    USERS ||--o{ HACKATHON_ACTIVITIES : "performs"
+    USERS ||--o{ EVENTS : "creates"
+    USERS ||--o{ NOTICES : "publishes"
+    USERS ||--o{ HACKATHONS : "manages"
+    USERS ||--o{ INTERNSHIP_POSTINGS : "posts"
+    USERS ||--o{ COURSE_ASSIGNMENTS : "assigns"
+    ACHIEVEMENTS ||--o{ VERIFICATIONS : "has_audit"
+    ACHIEVEMENTS ||--o{ FILES : "has_proof"
+
+    USERS {
+        TEXT id PK
+        TEXT name
+        TEXT email UK
+        TEXT password
+        TEXT role
+        TEXT department
+        TEXT enrollment_no UK
+        TEXT phone
+        TEXT bio
+        TEXT profile_image
+        TEXT batch
+        INTEGER semester
+        TEXT section
+        TEXT skills
+        TEXT linkedin
+        TEXT github
+        TEXT portfolio
+        INTEGER is_active
+        INTEGER is_verified
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    ACHIEVEMENTS {
+        TEXT id PK
+        TEXT student_id FK
+        TEXT title
+        TEXT category
+        TEXT description
+        TEXT level
+        TEXT date
+        TEXT institution
+        TEXT certificate_url
+        TEXT proof_files
+        TEXT status
+        TEXT remarks
+        TEXT verified_by FK
+        TEXT verified_at
+        INTEGER is_public
+        TEXT tags
+        INTEGER points
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    VERIFICATIONS {
+        TEXT id PK
+        TEXT achievement_id FK
+        TEXT verified_by FK
+        TEXT action
+        TEXT remarks
+        TEXT previous_status
+        TEXT new_status
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    COURSES {
+        TEXT id PK
+        TEXT student_id FK
+        TEXT course_name
+        TEXT platform
+        TEXT status
+        INTEGER progress
+        TEXT start_date
+        TEXT completion_date
+        TEXT course_link
+        TEXT category
+        TEXT certificate_url
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    PROJECTS {
+        TEXT id PK
+        TEXT student_id FK
+        TEXT title
+        TEXT description
+        TEXT github_link
+        TEXT live_link
+        TEXT tech_stack
+        TEXT status
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    INTERNSHIPS {
+        TEXT id PK
+        TEXT student_id FK
+        TEXT company_name
+        TEXT role
+        TEXT start_date
+        TEXT end_date
+        TEXT status
+        TEXT description
+        TEXT certificate_url
+        TEXT location
+        TEXT internship_type
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    INTERNSHIP_POSTINGS {
+        TEXT id PK
+        TEXT company_name
+        TEXT role
+        TEXT location
+        TEXT stipend
+        TEXT deadline
+        TEXT description
+        TEXT requirements
+        TEXT apply_link
+        TEXT created_by FK
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    EVENTS {
+        TEXT id PK
+        TEXT title
+        TEXT description
+        TEXT category
+        TEXT date
+        TEXT venue
+        TEXT registration_link
+        TEXT created_by FK
+        TEXT created_at
+    }
+
+    NOTICES {
+        TEXT id PK
+        TEXT title
+        TEXT content
+        TEXT priority
+        TEXT created_by FK
+        TEXT created_at
+    }
+
+    HACKATHONS {
+        TEXT id PK
+        TEXT title
+        TEXT type
+        TEXT img_url
+        TEXT prize
+        TEXT students_count
+        TEXT deadline_date
+        TEXT badge
+        TEXT link
+        TEXT created_by FK
+        TEXT created_at
+    }
+
+    HACKATHON_ACTIVITIES {
+        TEXT id PK
+        TEXT student_id FK
+        TEXT hackathon_title
+        TEXT action_type
+        TEXT created_at
+    }
+
+    NOTIFICATIONS {
+        TEXT id PK
+        TEXT user_id FK
+        TEXT type
+        TEXT title
+        TEXT message
+        TEXT link
+        INTEGER is_read
+        TEXT created_at
+    }
+
+    COURSE_ASSIGNMENTS {
+        TEXT id PK
+        TEXT course_name
+        TEXT subject
+        TEXT description
+        TEXT course_link
+        TEXT department
+        INTEGER semester
+        TEXT assigned_by FK
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    FILES {
+        TEXT id PK
+        TEXT filename
+        TEXT mimetype
+        BLOB data
+        TEXT created_at
+    }
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- CORE TABLES ER -->
+<div class="section">
+    <h2>🔷 Core Tables - Users & Achievements</h2>
+    <div class="mermaid">
+erDiagram
+    USERS ||--o{ ACHIEVEMENTS : "student submits"
+    USERS ||--o{ VERIFICATIONS : "faculty verifies"
+    ACHIEVEMENTS ||--o{ VERIFICATIONS : "has audit trail"
+    ACHIEVEMENTS ||--o{ FILES : "has proof documents"
+
+    USERS {
+        TEXT id PK "nanoid generated"
+        TEXT name "Full name"
+        TEXT email UK "Unique email"
+        TEXT password "bcrypt hashed"
+        TEXT role "student/faculty/admin"
+        TEXT department "B.Tech/BCA/Diploma"
+        TEXT enrollment_no UK "AJU/xxx format"
+        TEXT student_id "Student ID"
+        TEXT phone "Contact number"
+        TEXT bio "User biography"
+        TEXT profile_image "Image URL"
+        TEXT batch "2021-2025"
+        INTEGER semester "1-8"
+        TEXT section "A/B/C"
+        TEXT skills "JSON array"
+        TEXT linkedin "LinkedIn URL"
+        TEXT github "GitHub URL"
+        TEXT portfolio "Portfolio URL"
+        TEXT edu_10th_school "10th school name"
+        TEXT edu_10th_year "10th passing year"
+        TEXT edu_10th_percent "10th percentage"
+        TEXT edu_12th_school "12th school name"
+        TEXT edu_12th_year "12th passing year"
+        TEXT edu_12th_percent "12th percentage"
+        TEXT university_name "Arka Jain University"
+        TEXT university_cgpa "Current CGPA"
+        INTEGER is_active "1=active 0=inactive"
+        INTEGER is_verified "Email verified"
+        TEXT reset_password_token "Reset token"
+        TEXT reset_password_expire "Token expiry"
+        TEXT last_login "Last login timestamp"
+        TEXT created_at "Creation timestamp"
+        TEXT updated_at "Update timestamp"
+    }
+
+    ACHIEVEMENTS {
+        TEXT id PK "nanoid generated"
+        TEXT student_id FK "References USERS.id"
+        TEXT title "Achievement title"
+        TEXT category "academic/technical/sports/cultural/social"
+        TEXT description "Detailed description"
+        TEXT level "International/National/State/University/College/Department"
+        TEXT date "Achievement date"
+        TEXT institution "Organizing institution"
+        TEXT certificate_url "Certificate link"
+        TEXT proof_files "JSON array of file IDs"
+        TEXT status "pending/approved/rejected"
+        TEXT remarks "Verification remarks"
+        TEXT verified_by FK "References USERS.id (faculty)"
+        TEXT verified_at "Verification timestamp"
+        INTEGER is_public "1=public portfolio 0=private"
+        TEXT tags "JSON array of tags"
+        INTEGER points "Auto-calculated: Intl=100 Natl=75 State=50 Univ=30 Coll=20 Dept=10"
+        TEXT created_at "Creation timestamp"
+        TEXT updated_at "Update timestamp"
+    }
+
+    VERIFICATIONS {
+        TEXT id PK "nanoid generated"
+        TEXT achievement_id FK "References ACHIEVEMENTS.id"
+        TEXT verified_by FK "References USERS.id"
+        TEXT action "approved/rejected/commented"
+        TEXT remarks "Verification comments"
+        TEXT previous_status "Status before action"
+        TEXT new_status "Status after action"
+        TEXT created_at "Action timestamp"
+        TEXT updated_at "Update timestamp"
+    }
+
+    FILES {
+        TEXT id PK "nanoid generated"
+        TEXT filename "Original filename"
+        TEXT mimetype "application/pdf image/jpeg etc"
+        BLOB data "gzip compressed binary"
+        TEXT created_at "Upload timestamp"
+    }
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- LEARNING TABLES ER -->
+<div class="section">
+    <h2>📚 Learning & Career Tables</h2>
+    <div class="mermaid">
+erDiagram
+    USERS ||--o{ COURSES : "enrolls in"
+    USERS ||--o{ PROJECTS : "creates"
+    USERS ||--o{ INTERNSHIPS : "completes"
+    USERS ||--o{ COURSE_ASSIGNMENTS : "assigns (faculty)"
+    USERS ||--o{ INTERNSHIP_POSTINGS : "posts (faculty)"
+
+    COURSES {
+        TEXT id PK "nanoid"
+        TEXT student_id FK "USERS.id"
+        TEXT course_name "Course title"
+        TEXT platform "Coursera/Udemy/NPTEL/etc"
+        TEXT status "Ongoing/Completed/Dropped"
+        INTEGER progress "0-100 percent"
+        TEXT start_date "Course start"
+        TEXT completion_date "Completion date"
+        TEXT course_link "Course URL"
+        TEXT category "Web Dev/AI-ML/Cloud/etc"
+        TEXT expected_completion_date "Expected finish"
+        TEXT skills_to_be_learnt "Skills JSON"
+        TEXT certificate_url "Certificate link"
+        TEXT last_synced_at "Platform sync time"
+        TEXT sync_credentials "Encrypted sync data"
+        TEXT created_at "Timestamp"
+        TEXT updated_at "Timestamp"
+    }
+
+    PROJECTS {
+        TEXT id PK "nanoid"
+        TEXT student_id FK "USERS.id"
+        TEXT title "Project name"
+        TEXT description "Project details"
+        TEXT github_link "GitHub repo URL"
+        TEXT live_link "Live deployment URL"
+        TEXT tech_stack "React/Node/MongoDB etc"
+        TEXT status "Completed/In Progress"
+        TEXT created_at "Timestamp"
+        TEXT updated_at "Timestamp"
+    }
+
+    INTERNSHIPS {
+        TEXT id PK "nanoid"
+        TEXT student_id FK "USERS.id"
+        TEXT company_name "Company name"
+        TEXT role "Job title/position"
+        TEXT start_date "Start date"
+        TEXT end_date "End date"
+        TEXT status "Ongoing/Completed"
+        TEXT description "Work description"
+        TEXT certificate_url "Certificate link"
+        TEXT location "City/Remote"
+        TEXT internship_type "Part-time/Full-time/Remote"
+        TEXT created_at "Timestamp"
+        TEXT updated_at "Timestamp"
+    }
+
+    COURSE_ASSIGNMENTS {
+        TEXT id PK "nanoid"
+        TEXT course_name "Assigned course"
+        TEXT subject "Subject area"
+        TEXT description "Course description"
+        TEXT course_link "Course URL"
+        TEXT department "Target department"
+        INTEGER semester "Target semester 1-8"
+        TEXT assigned_by FK "USERS.id (faculty)"
+        TEXT created_at "Timestamp"
+        TEXT updated_at "Timestamp"
+    }
+
+    INTERNSHIP_POSTINGS {
+        TEXT id PK "nanoid"
+        TEXT company_name "Company name"
+        TEXT role "Position title"
+        TEXT location "Work location"
+        TEXT stipend "Monthly stipend"
+        TEXT deadline "Application deadline"
+        TEXT description "Job description"
+        TEXT requirements "Required skills"
+        TEXT apply_link "External apply URL"
+        TEXT created_by FK "USERS.id (faculty)"
+        TEXT created_at "Timestamp"
+        TEXT updated_at "Timestamp"
+    }
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- EVENT & NOTIFICATION TABLES -->
+<div class="section">
+    <h2>📢 Events, Notices & Notifications</h2>
+    <div class="mermaid">
+erDiagram
+    USERS ||--o{ EVENTS : "creates (faculty)"
+    USERS ||--o{ NOTICES : "publishes (faculty)"
+    USERS ||--o{ NOTIFICATIONS : "receives"
+    USERS ||--o{ HACKATHONS : "manages (admin)"
+    USERS ||--o{ HACKATHON_ACTIVITIES : "performs"
+
+    EVENTS {
+        TEXT id PK "nanoid"
+        TEXT title "Event title"
+        TEXT description "Event details"
+        TEXT category "Technical/Cultural/Sports/Workshop/Seminar"
+        TEXT date "Event date-time"
+        TEXT venue "Physical or online location"
+        TEXT registration_link "Registration URL"
+        TEXT created_by FK "USERS.id"
+        TEXT created_at "Timestamp"
+    }
+
+    NOTICES {
+        TEXT id PK "nanoid"
+        TEXT title "Notice title"
+        TEXT content "Notice body"
+        TEXT priority "Low/Medium/High"
+        TEXT created_by FK "USERS.id"
+        TEXT created_at "Timestamp"
+    }
+
+    NOTIFICATIONS {
+        TEXT id PK "nanoid"
+        TEXT user_id FK "USERS.id (recipient)"
+        TEXT type "notice/event/achievement/internship/course"
+        TEXT title "Notification title"
+        TEXT message "Notification body"
+        TEXT link "Deep link to resource"
+        INTEGER is_read "0=unread 1=read"
+        TEXT created_at "Timestamp"
+    }
+
+    HACKATHONS {
+        TEXT id PK "nanoid"
+        TEXT title "Hackathon name"
+        TEXT type "Govt of India/AI-ML/Web Dev/Mobile/Cyber/Blockchain"
+        TEXT img_url "Banner image URL"
+        TEXT prize "Prize amount"
+        TEXT students_count "Expected participants"
+        TEXT deadline_date "Registration deadline"
+        TEXT badge "Featured/New/Popular"
+        TEXT link "Hackathon website URL"
+        TEXT created_by FK "USERS.id (admin)"
+        TEXT created_at "Timestamp"
+    }
+
+    HACKATHON_ACTIVITIES {
+        TEXT id PK "nanoid"
+        TEXT student_id FK "USERS.id"
+        TEXT hackathon_title "Hackathon name"
+        TEXT action_type "visit/apply/submit"
+        TEXT created_at "Timestamp"
+    }
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- DETAILED TABLE SCHEMAS -->
+<div class="section">
+    <h2>📋 Detailed Table Schemas</h2>
+    
+    <div class="table-grid">
+        <!-- USERS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">👤</span> USERS (Central Table)</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">name</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">email</span> <span class="field-type">TEXT <span class="badge badge-uk">UK</span></span></li>
+                <li><span class="field-name">password</span> <span class="field-type">TEXT (bcrypt)</span></li>
+                <li><span class="field-name">role</span> <span class="field-type">TEXT <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">department</span> <span class="field-type">TEXT <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">enrollment_no</span> <span class="field-type">TEXT <span class="badge badge-uk">UK</span></span></li>
+                <li><span class="field-name">phone</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">bio</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">profile_image</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">batch</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">semester</span> <span class="field-type">INTEGER</span></li>
+                <li><span class="field-name">section</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">skills</span> <span class="field-type">TEXT (JSON)</span></li>
+                <li><span class="field-name">linkedin</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">github</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">portfolio</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">is_active</span> <span class="field-type">INTEGER (0/1)</span></li>
+                <li><span class="field-name">is_verified</span> <span class="field-type">INTEGER (0/1)</span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">updated_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- ACHIEVEMENTS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">🏆</span> ACHIEVEMENTS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">student_id</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span> <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">title</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">category</span> <span class="field-type">TEXT <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">description</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">level</span> <span class="field-type">TEXT <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">date</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">institution</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">certificate_url</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">proof_files</span> <span class="field-type">TEXT (JSON)</span></li>
+                <li><span class="field-name">status</span> <span class="field-type">TEXT <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">remarks</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">verified_by</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">verified_at</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">is_public</span> <span class="field-type">INTEGER (0/1)</span></li>
+                <li><span class="field-name">tags</span> <span class="field-type">TEXT (JSON)</span></li>
+                <li><span class="field-name">points</span> <span class="field-type">INTEGER (auto)</span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">updated_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- VERIFICATIONS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">✅</span> VERIFICATIONS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">achievement_id</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">verified_by</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">action</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">remarks</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">previous_status</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">new_status</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">updated_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- COURSES TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">📚</span> COURSES</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">student_id</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span> <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">course_name</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">platform</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">status</span> <span class="field-type">TEXT <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">progress</span> <span class="field-type">INTEGER (0-100)</span></li>
+                <li><span class="field-name">start_date</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">completion_date</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">course_link</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">category</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">certificate_url</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">updated_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- PROJECTS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">💻</span> PROJECTS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">student_id</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span> <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">title</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">description</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">github_link</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">live_link</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">tech_stack</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">status</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">updated_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- INTERNSHIPS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">🏢</span> INTERNSHIPS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">student_id</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span> <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">company_name</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">role</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">start_date</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">end_date</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">status</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">description</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">certificate_url</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">location</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">internship_type</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">updated_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- EVENTS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">📅</span> EVENTS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">title</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">description</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">category</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">date</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">venue</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">registration_link</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_by</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- NOTICES TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">📢</span> NOTICES</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">title</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">content</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">priority</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_by</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- NOTIFICATIONS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">🔔</span> NOTIFICATIONS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">user_id</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span> <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">type</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">title</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">message</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">link</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">is_read</span> <span class="field-type">INTEGER <span class="badge badge-idx">IDX</span></span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- HACKATHONS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">🚀</span> HACKATHONS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">title</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">type</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">img_url</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">prize</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">students_count</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">deadline_date</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">badge</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">link</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_by</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- FILES TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">📁</span> FILES</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">filename</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">mimetype</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">data</span> <span class="field-type">BLOB (gzip)</span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- INTERNSHIP_POSTINGS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">📋</span> INTERNSHIP_POSTINGS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">company_name</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">role</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">location</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">stipend</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">deadline</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">description</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">requirements</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">apply_link</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_by</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- COURSE_ASSIGNMENTS TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">📝</span> COURSE_ASSIGNMENTS</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">course_name</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">subject</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">description</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">course_link</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">department</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">semester</span> <span class="field-type">INTEGER</span></li>
+                <li><span class="field-name">assigned_by</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+
+        <!-- HACKATHON_ACTIVITIES TABLE -->
+        <div class="table-card">
+            <h3><span class="icon">📊</span> HACKATHON_ACTIVITIES</h3>
+            <ul class="field-list">
+                <li><span class="field-name">id</span> <span class="field-type">TEXT <span class="badge badge-pk">PK</span></span></li>
+                <li><span class="field-name">student_id</span> <span class="field-type">TEXT <span class="badge badge-fk">FK</span></span></li>
+                <li><span class="field-name">hackathon_title</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">action_type</span> <span class="field-type">TEXT</span></li>
+                <li><span class="field-name">created_at</span> <span class="field-type">TEXT</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- RELATIONSHIPS -->
+<div class="section">
+    <h2>🔗 Table Relationships</h2>
+    <table class="relationship-table">
+        <tr>
+            <th>Parent Table</th>
+            <th>Relationship</th>
+            <th>Child Table</th>
+            <th>Foreign Key</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>ACHIEVEMENTS</td>
+            <td>student_id → USERS.id</td>
+            <td>One student has many achievements</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>ACHIEVEMENTS</td>
+            <td>verified_by → USERS.id</td>
+            <td>One faculty verifies many achievements</td>
+        </tr>
+        <tr>
+            <td>ACHIEVEMENTS</td>
+            <td class="rel-type">1 : N</td>
+            <td>VERIFICATIONS</td>
+            <td>achievement_id → ACHIEVEMENTS.id</td>
+            <td>One achievement has multiple verification records</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>VERIFICATIONS</td>
+            <td>verified_by → USERS.id</td>
+            <td>One faculty creates many verification records</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>COURSES</td>
+            <td>student_id → USERS.id</td>
+            <td>One student enrolls in many courses</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>PROJECTS</td>
+            <td>student_id → USERS.id</td>
+            <td>One student creates many projects</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>INTERNSHIPS</td>
+            <td>student_id → USERS.id</td>
+            <td>One student has many internships</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>NOTIFICATIONS</td>
+            <td>user_id → USERS.id</td>
+            <td>One user receives many notifications</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>EVENTS</td>
+            <td>created_by → USERS.id</td>
+            <td>One faculty creates many events</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>NOTICES</td>
+            <td>created_by → USERS.id</td>
+            <td>One faculty publishes many notices</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>HACKATHONS</td>
+            <td>created_by → USERS.id</td>
+            <td>One admin manages many hackathons</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>HACKATHON_ACTIVITIES</td>
+            <td>student_id → USERS.id</td>
+            <td>One student performs many hackathon activities</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>INTERNSHIP_POSTINGS</td>
+            <td>created_by → USERS.id</td>
+            <td>One faculty posts many internship opportunities</td>
+        </tr>
+        <tr>
+            <td>USERS</td>
+            <td class="rel-type">1 : N</td>
+            <td>COURSE_ASSIGNMENTS</td>
+            <td>assigned_by → USERS.id</td>
+            <td>One faculty assigns many courses</td>
+        </tr>
+        <tr>
+            <td>ACHIEVEMENTS</td>
+            <td class="rel-type">1 : N</td>
+            <td>FILES</td>
+            <td>proof_files (JSON) → FILES.id</td>
+            <td>One achievement has many proof files</td>
+        </tr>
+    </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- INDEXES -->
+<div class="section">
+    <h2>⚡ Database Indexes</h2>
+    <table class="index-table">
+        <tr>
+            <th>Index Name</th>
+            <th>Table</th>
+            <th>Column(s)</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>idx_users_role</td>
+            <td>USERS</td>
+            <td>role</td>
+            <td>Fast role-based filtering (student/faculty/admin)</td>
+        </tr>
+        <tr>
+            <td>idx_users_dept</td>
+            <td>USERS</td>
+            <td>department</td>
+            <td>Department-wise user lookup</td>
+        </tr>
+        <tr>
+            <td>idx_users_email</td>
+            <td>USERS</td>
+            <td>email</td>
+            <td>Login authentication</td>
+        </tr>
+        <tr>
+            <td>idx_achievements_student_status</td>
+            <td>ACHIEVEMENTS</td>
+            <td>student_id, status</td>
+            <td>Student's achievements by status</td>
+        </tr>
+        <tr>
+            <td>idx_achievements_category</td>
+            <td>ACHIEVEMENTS</td>
+            <td>category</td>
+            <td>Category-wise filtering</td>
+        </tr>
+        <tr>
+            <td>idx_achievements_level</td>
+            <td>ACHIEVEMENTS</td>
+            <td>level</td>
+            <td>Level-wise filtering</td>
+        </tr>
+        <tr>
+            <td>idx_notifications_user_unread</td>
+            <td>NOTIFICATIONS</td>
+            <td>user_id, is_read</td>
+            <td>User's unread notifications</td>
+        </tr>
+        <tr>
+            <td>idx_courses_student</td>
+            <td>COURSES</td>
+            <td>student_id</td>
+            <td>Student's course list</td>
+        </tr>
+        <tr>
+            <td>idx_courses_status</td>
+            <td>COURSES</td>
+            <td>status</td>
+            <td>Course status filtering</td>
+        </tr>
+        <tr>
+            <td>idx_projects_student</td>
+            <td>PROJECTS</td>
+            <td>student_id</td>
+            <td>Student's project list</td>
+        </tr>
+        <tr>
+            <td>idx_internships_student</td>
+            <td>INTERNSHIPS</td>
+            <td>student_id</td>
+            <td>Student's internship list</td>
+        </tr>
+        <tr>
+            <td>idx_verifications_achievement</td>
+            <td>VERIFICATIONS</td>
+            <td>achievement_id</td>
+            <td>Verification history lookup</td>
+        </tr>
+    </table>
+</div>
+
+<!-- ENUM VALUES -->
+<div class="section">
+    <h2>📋 Enum/Constant Values</h2>
+    <div class="table-grid">
+        <div class="table-card">
+            <h3><span class="icon">👤</span> User Roles</h3>
+            <ul class="field-list">
+                <li><span class="field-name">student</span> <span class="field-type">Standard user</span></li>
+                <li><span class="field-name">faculty</span> <span class="field-type">Teacher/Verifier</span></li>
+                <li><span class="field-name">admin</span> <span class="field-type">Administrator</span></li>
+            </ul>
+        </div>
+        <div class="table-card">
+            <h3><span class="icon">🏆</span> Achievement Status</h3>
+            <ul class="field-list">
+                <li><span class="field-name">pending</span> <span class="field-type">Awaiting review</span></li>
+                <li><span class="field-name">approved</span> <span class="field-type">Verified by faculty</span></li>
+                <li><span class="field-name">rejected</span> <span class="field-type">Rejected by faculty</span></li>
+            </ul>
+        </div>
+        <div class="table-card">
+            <h3><span class="icon">🎯</span> Achievement Levels</h3>
+            <ul class="field-list">
+                <li><span class="field-name">International</span> <span class="field-type">100 points</span></li>
+                <li><span class="field-name">National</span> <span class="field-type">75 points</span></li>
+                <li><span class="field-name">State</span> <span class="field-type">50 points</span></li>
+                <li><span class="field-name">University</span> <span class="field-type">30 points</span></li>
+                <li><span class="field-name">College</span> <span class="field-type">20 points</span></li>
+                <li><span class="field-name">Department</span> <span class="field-type">10 points</span></li>
+            </ul>
+        </div>
+        <div class="table-card">
+            <h3><span class="icon">📂</span> Achievement Categories</h3>
+            <ul class="field-list">
+                <li><span class="field-name">academic</span> <span class="field-type">Scholarships, Research</span></li>
+                <li><span class="field-name">technical</span> <span class="field-type">Hackathons, Coding</span></li>
+                <li><span class="field-name">sports</span> <span class="field-type">Tournaments, Athletics</span></li>
+                <li><span class="field-name">cultural</span> <span class="field-type">Dance, Music, Drama</span></li>
+                <li><span class="field-name">social</span> <span class="field-type">NGO, Community</span></li>
+                <li><span class="field-name">other</span> <span class="field-type">Miscellaneous</span></li>
+            </ul>
+        </div>
+        <div class="table-card">
+            <h3><span class="icon">📚</span> Course Status</h3>
+            <ul class="field-list">
+                <li><span class="field-name">Ongoing</span> <span class="field-type">Currently enrolled</span></li>
+                <li><span class="field-name">Completed</span> <span class="field-type">Finished with cert</span></li>
+                <li><span class="field-name">Dropped</span> <span class="field-type">Left midway</span></li>
+            </ul>
+        </div>
+        <div class="table-card">
+            <h3><span class="icon">📅</span> Event Categories</h3>
+            <ul class="field-list">
+                <li><span class="field-name">Technical</span> <span class="field-type">Tech events</span></li>
+                <li><span class="field-name">Cultural</span> <span class="field-type">Cultural fests</span></li>
+                <li><span class="field-name">Sports</span> <span class="field-type">Sports events</span></li>
+                <li><span class="field-name">Workshop</span> <span class="field-type">Hands-on training</span></li>
+                <li><span class="field-name">Seminar</span> <span class="field-type">Guest lectures</span></li>
+            </ul>
+        </div>
+        <div class="table-card">
+            <h3><span class="icon">🔔</span> Notification Types</h3>
+            <ul class="field-list">
+                <li><span class="field-name">achievement</span> <span class="field-type">Verification updates</span></li>
+                <li><span class="field-name">event</span> <span class="field-type">New events</span></li>
+                <li><span class="field-name">notice</span> <span class="field-type">New notices</span></li>
+                <li><span class="field-name">course</span> <span class="field-type">Course assignments</span></li>
+                <li><span class="field-name">internship</span> <span class="field-type">New postings</span></li>
+            </ul>
+        </div>
+        <div class="table-card">
+            <h3><span class="icon">⚠️</span> Notice Priority</h3>
+            <ul class="field-list">
+                <li><span class="field-name">Low</span> <span class="field-type">General info</span></li>
+                <li><span class="field-name">Medium</span> <span class="field-type">Important</span></li>
+                <li><span class="field-name">High</span> <span class="field-type">Urgent/Critical</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        themeVariables: {
+            primaryColor: '#4361ee',
+            primaryTextColor: '#1a1a2e',
+            primaryBorderColor: '#3a0ca3',
+            lineColor: '#4cc9f0',
+            secondaryColor: '#10b981',
+            tertiaryColor: '#ffffff',
+            background: '#ffffff',
+            mainBkg: '#f8f9fa',
+            nodeBorder: '#4361ee',
+            clusterBkg: '#f8f9fa',
+            clusterBorder: '#dee2e6',
+            titleColor: '#1a1a2e',
+            edgeLabelBackground: '#ffffff',
+            fontSize: '14px'
+        },
+        er: {
+            useMaxWidth: true,
+            layoutDirection: 'TB',
+            minEntityWidth: 100,
+            minEntityHeight: 75,
+            entityPadding: 15
+        }
+    });
+</script>
+
+</body>
+</html>
