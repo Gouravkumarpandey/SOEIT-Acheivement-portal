@@ -6,6 +6,7 @@ import { ProtectedRoute, PublicRoute } from './routes/ProtectedRoute';
 import DashboardLayout from './components/common/DashboardLayout';
 import ScrollToTop from './components/common/ScrollToTop';
 import ScrollToTopButton from './components/common/ScrollToTopButton';
+import CookieConsent from './components/common/CookieConsent';
 
 // Loading Component
 const PageLoader = () => null;
@@ -22,6 +23,8 @@ const TermsOfService = lazy(() => import('./pages/public/TermsOfService'));
 const Support = lazy(() => import('./pages/public/Support'));
 const UserManual = lazy(() => import('./pages/public/UserManual'));
 const FeaturesPage = lazy(() => import('./pages/public/FeaturesPage'));
+const Accessibility = lazy(() => import('./pages/public/Accessibility'));
+const PrivacyPreferences = lazy(() => import('./pages/public/PrivacyPreferences'));
 
 // Auth Pages
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
@@ -64,6 +67,7 @@ function App() {
     <AuthProvider>
       <ScrollToTop />
       <ScrollToTopButton />
+      <CookieConsent />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -96,6 +100,9 @@ function App() {
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/support" element={<Support />} />
           <Route path="/manual" element={<UserManual />} />
+          <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/privacy-preferences" element={<PrivacyPreferences />} />
+          <Route path="/cookies" element={<PrivacyPreferences />} />
 
           {/* Auth Routes (redirect if logged in) */}
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
