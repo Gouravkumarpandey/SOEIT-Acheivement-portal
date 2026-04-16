@@ -1,7 +1,7 @@
 import '../../styles/pages/public/PublicPortfolioPage.css';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { achievementAPI, STATIC_BASE_URL } from '../../services/api';
+import { achievementAPI, badgeAPI, STATIC_BASE_URL } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal, Download, Shield, FileText, File as FileIcon, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
@@ -23,16 +23,25 @@ const PublicPortfolioPage = () => {
     const [error, setError] = useState(null);
     const [selectedCat, setSelectedCat] = useState('');
     const [resumeMenuOpen, setResumeMenuOpen] = useState(false);
+    const [badges, setBadges] = useState([]);
 
     useEffect(() => {
         setLoading(true);
         setError(null);
         achievementAPI.getPortfolio(userId)
-            .then(res => setData(res.data))
+            .then(res => {
+                setData(res.data);
+                // Also fetch badges for this student
+                return badgeAPI.getStudentBadges(res.data.student.id || res.data.student._id || res.data.student.userId || userId);
+            })
+            .then(res => setBadges(res.data.data))
             .catch(err => {
-                const msg = err.response?.data?.message || 'Portfolio not found';
-                setError(msg);
-                toast.error(msg);
+                // If it's a badge fetch error, we don't need to break the whole page, just log it.
+                if (data === null) {
+                    const msg = err.response?.data?.message || 'Portfolio not found';
+                    setError(msg);
+                    toast.error(msg);
+                }
             })
             .finally(() => setLoading(false));
     }, [userId]);
@@ -208,6 +217,18 @@ const PublicPortfolioPage = () => {
                             </p>
                             {student.bio && <p style={{ color: 'var(--text-muted)', maxWidth: 500, lineHeight: 1.7, marginBottom: '1rem', fontSize: '0.9rem' }}>{student.bio}</p>}
                             
+                            {/* Badges Display */}
+                            {badges && badges.length > 0 && (
+                                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)', marginRight: '0.5rem' }}>Weekly Badges:</span>
+                                    {badges.map(b => (
+                                        <div key={b.id} title={`${b.badge_type} - ${b.points_earned} pts (${b.week_start})`} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: b.badge_type === 'Platinum' ? 'linear-gradient(135deg, #e2e8f0, #94a3b8)' : b.badge_type === 'Gold' ? 'linear-gradient(135deg, #fef08a, #f59e0b)' : b.badge_type === 'Silver' ? 'linear-gradient(135deg, #f1f5f9, #cbd5e1)' : 'linear-gradient(135deg, #fed7aa, #f97316)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800, color: '#1e293b', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', border: '1px solid rgba(255,255,255,0.4)' }}>
+                                            <Award size={12} /> {b.badge_type}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             {/* Academic History in Public Portfolio */}
                             {(student.edu12thSchool || student.edu10thSchool) && (
                                 <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>

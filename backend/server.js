@@ -30,6 +30,7 @@ const internshipRoutes = require('./src/modules/internship/internship.routes');
 const internshipPostingRoutes = require('./src/modules/internship/internship-posting.routes');
 const projectRoutes = require('./src/modules/project/project.routes');
 const notificationRoutes = require('./src/modules/notification/notification.routes');
+const badgeRoutes = require('./src/modules/badge/badge.routes');
 
 // Connect to Turso Database (called in startServer)
 // connectDB();
@@ -139,6 +140,7 @@ app.use('/api/internships', internshipRoutes);
 app.use('/api/internship-postings', internshipPostingRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/badges', badgeRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -147,6 +149,8 @@ app.use((req, res) => {
 
 // Error handler (must be last)
 app.use(errorHandler);
+
+const { initCronJobs } = require('./src/utils/cron');
 
 // Start Server
 const startServer = async () => {
@@ -160,6 +164,9 @@ const startServer = async () => {
             console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
             console.log(`📁 Uploads: http://localhost:${PORT}/uploads\n`);
         });
+
+        // Initialize cron jobs
+        initCronJobs();
 
         process.on('unhandledRejection', (err) => {
             console.error('Unhandled Rejection:', err.message);

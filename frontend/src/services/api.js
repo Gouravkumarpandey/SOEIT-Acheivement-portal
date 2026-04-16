@@ -157,4 +157,10 @@ export const notificationAPI = {
     markAllAsRead: () => API.put('/notifications/read-all'),
 };
 
+export const badgeAPI = {
+    getStudentBadges: (studentId) => API.get(`/badges/student/${studentId}`),
+    getLeaderboard: () => API.get('/badges/leaderboard'),
+    calculateWeeklyBadges: () => API.post('/badges/calculate'),
+};
+
 export default API;

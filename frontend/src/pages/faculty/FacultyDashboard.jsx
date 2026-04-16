@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminAPI, noticeAPI } from '../../services/api';
+import { adminAPI, noticeAPI, badgeAPI } from '../../services/api';
 import {
     Users, Trophy, Clock, CheckCircle, GraduationCap,
     Search, Filter, ChevronRight, Eye, Download, UsersRound, XCircle, X
@@ -20,6 +20,8 @@ const FacultyDashboard = () => {
     const [showNoticeModal, setShowNoticeModal] = useState(false);
     const [noticeData, setNoticeData] = useState({ title: '', content: '', priority: 'Medium' });
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [leaderboard, setLeaderboard] = useState([]);
+    const [isCalculatingBadges, setIsCalculatingBadges] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,7 +33,16 @@ const FacultyDashboard = () => {
                 toast.error('Failed to load dashboard data');
             }
         };
+        const loadLeaderboard = async () => {
+            try {
+                const res = await badgeAPI.getLeaderboard();
+                setLeaderboard(res.data.data);
+            } catch (err) {
+                console.error('Failed to load leaderboard', err);
+            }
+        };
         loadStats();
+        loadLeaderboard();
     }, []);
 
     useEffect(() => {
@@ -149,6 +160,22 @@ const FacultyDashboard = () => {
         }
     };
 
+    const handleCalculateBadges = async () => {
+        setIsCalculatingBadges(true);
+        const toastId = toast.loading('Calculating weekly badges based on verified points...');
+        try {
+            const res = await badgeAPI.calculateWeeklyBadges();
+            toast.success(res.data?.message || 'Badges calculated successfully!', { id: toastId });
+            // Reload leaderboard
+            const lbRes = await badgeAPI.getLeaderboard();
+            setLeaderboard(lbRes.data.data);
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to calculate badges', { id: toastId });
+        } finally {
+            setIsCalculatingBadges(false);
+        }
+    };
+
     const statCards = [
         { label: 'Total Students', value: stats?.stats?.totalStudents ?? 0, icon: Users, color: 'var(--brand-600)', bg: 'var(--primary-50)' },
         { label: 'Pending Requests', value: stats?.stats?.pendingCount ?? 0, icon: Clock, color: 'var(--warning-500)', bg: 'rgba(245,158,11,0.08)' },
@@ -210,6 +237,55 @@ const FacultyDashboard = () => {
                         <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{label}</div>
                     </div>
                 ))}
+            </div>
+
+            {/* Weekly Leaderboard & Badges */}
+            <div className="card" style={{ padding: '1.5rem', marginBottom: '2.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <div>
+                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Top Scholars of the Week</h4>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Students awarded weekly badges based on verified (real) points.</p>
+                    </div>
+                    <button 
+                        className="btn btn-secondary btn-sm" 
+                        onClick={handleCalculateBadges} 
+                        disabled={isCalculatingBadges}
+                        style={{ fontWeight: 800 }}
+                    >
+                        {isCalculatingBadges ? <div className="spinner-sm" style={{ borderTopColor: 'var(--brand-600)' }}></div> : <Trophy size={16} />} 
+                        {isCalculatingBadges ? 'Calculating...' : 'Calculate Weekly Badges'}
+                    </button>
+                </div>
+
+                {leaderboard.length === 0 ? (
+                    <div style={{ padding: '2rem', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: '12px' }}>
+                        <Trophy size={32} style={{ color: 'var(--text-muted)', opacity: 0.3, marginBottom: '1rem' }} />
+                        <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>No badges awarded yet for this week.</p>
+                    </div>
+                ) : (
+                    <div className="grid-res grid-res-3">
+                        {leaderboard.map((user, idx) => (
+                            <div key={user.id} style={{ padding: '1rem', border: '1px solid var(--border-primary)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: idx === 0 ? '#f59e0b' : idx === 1 ? '#94a3b8' : idx === 2 ? '#d97706' : 'var(--text-muted)', width: '30px', textAlign: 'center' }}>
+                                    #{idx + 1}
+                                </div>
+                                <div className="avatar avatar-md" style={{ background: 'var(--primary-100)', color: 'var(--brand-700)', fontWeight: 800 }}>
+                                    {user.name?.charAt(0) || 'U'}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <h5 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800 }}>{user.name}</h5>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.department}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div className="badge" style={{ background: user.badge_type === 'Platinum' ? 'linear-gradient(135deg, #e2e8f0, #94a3b8)' : user.badge_type === 'Gold' ? 'linear-gradient(135deg, #fef08a, #f59e0b)' : user.badge_type === 'Silver' ? 'linear-gradient(135deg, #f1f5f9, #cbd5e1)' : 'linear-gradient(135deg, #fed7aa, #f97316)', color: '#1e293b', border: 'none', padding: '0.2rem 0.6rem' }}>
+                                        {user.badge_type}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--text-primary)' }}>{user.points_earned} pts</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Academic Controls */}

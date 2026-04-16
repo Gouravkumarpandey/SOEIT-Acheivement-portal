@@ -206,6 +206,15 @@ const initSchema = async (client) => {
             created_at  TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (user_id) REFERENCES users(id)
         )`,
+    `CREATE TABLE IF NOT EXISTS badges (
+            id              TEXT PRIMARY KEY,
+            student_id      TEXT NOT NULL,
+            badge_type      TEXT NOT NULL,
+            week_start      TEXT NOT NULL,
+            points_earned   INTEGER DEFAULT 0,
+            created_at      TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (student_id) REFERENCES users(id)
+        )`,
     `CREATE TABLE IF NOT EXISTS course_assignments (
             id              TEXT PRIMARY KEY,
             course_name     TEXT NOT NULL,
