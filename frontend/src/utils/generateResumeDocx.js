@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, TabStopType, TabStopPosition, UnderlineType } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, TabStopType, TabStopPosition, UnderlineType, ExternalHyperlink } from 'docx';
 import { saveAs } from 'file-saver';
 import { format } from 'date-fns';
 
@@ -6,23 +6,48 @@ export const generateResumeDocx = async (data) => {
     const { student, achievements, courses, internships, projects } = data;
 
     const createContactInfo = () => {
-        const contactInfo = [];
-        if (student.phone) contactInfo.push(`+91-${student.phone.replace('+91-', '')}`);
-        if (student.email) contactInfo.push(student.email);
-        if (student.linkedIn) contactInfo.push(`LinkedIn`);
-        if (student.github) contactInfo.push(`GitHub`);
-        if (student.portfolio) contactInfo.push(`Portfolio`);
+        const formatUrl = (url) => url.startsWith('http') ? url : `https://${url}`;
+
+        const children = [];
+        const addSeparator = () => {
+            if (children.length > 0) {
+                children.push(new TextRun({ text: "  |  ", size: 20, font: "Calibri", color: "000000" }));
+            }
+        };
+
+        if (student.phone) {
+            addSeparator();
+            children.push(new TextRun({ text: `+91-${student.phone.replace('+91-', '')}`, size: 20, font: "Calibri", color: "000000" }));
+        }
+        if (student.email) {
+            addSeparator();
+            children.push(new TextRun({ text: student.email, size: 20, font: "Calibri", color: "000000" }));
+        }
+        if (student.linkedIn) {
+            addSeparator();
+            children.push(new ExternalHyperlink({
+                children: [new TextRun({ text: "LinkedIn", size: 20, font: "Calibri", color: "1155cc", underline: { type: UnderlineType.SINGLE, color: "1155cc" } })],
+                link: formatUrl(student.linkedIn),
+            }));
+        }
+        if (student.github) {
+            addSeparator();
+            children.push(new ExternalHyperlink({
+                children: [new TextRun({ text: "GitHub", size: 20, font: "Calibri", color: "1155cc", underline: { type: UnderlineType.SINGLE, color: "1155cc" } })],
+                link: formatUrl(student.github),
+            }));
+        }
+        if (student.portfolio) {
+            addSeparator();
+            children.push(new ExternalHyperlink({
+                children: [new TextRun({ text: "Portfolio", size: 20, font: "Calibri", color: "1155cc", underline: { type: UnderlineType.SINGLE, color: "1155cc" } })],
+                link: formatUrl(student.portfolio),
+            }));
+        }
 
         return new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [
-                new TextRun({
-                    text: contactInfo.join('  |  '),
-                    size: 20,
-                    font: "Calibri",
-                    color: "000000"
-                })
-            ],
+            children: children,
             spacing: { after: 150 },
         });
     };
@@ -69,17 +94,24 @@ export const generateResumeDocx = async (data) => {
         });
     };
 
-    const createRow = (leftText, rightText, boldLeft = false, italicLeft = false, boldRight = false, italicRight = false) => {
+    const createRow = (leftText, rightText, boldLeft = false, italicLeft = false, boldRight = false, italicRight = false, rightLink = null) => {
+        const formatUrl = (url) => url.startsWith('http') ? url : `https://${url}`;
+        
+        const rightChildren = [];
+        if (rightLink) {
+            rightChildren.push(new ExternalHyperlink({
+                children: [new TextRun({ text: `\t${rightText}`, bold: boldRight, italics: italicRight, size: 21, font: "Calibri", color: "1155cc", underline: { type: UnderlineType.SINGLE, color: "1155cc" } })],
+                link: formatUrl(rightLink),
+            }));
+        } else {
+            rightChildren.push(new TextRun({ text: `\t${rightText}`, bold: boldRight, italics: italicRight, size: 21, font: "Calibri" }));
+        }
+
         return new Paragraph({
-            tabStops: [
-                {
-                    type: TabStopType.RIGHT,
-                    position: 9500, 
-                },
-            ],
+            tabStops: [{ type: TabStopType.RIGHT, position: 9500 }],
             children: [
                 new TextRun({ text: leftText, bold: boldLeft, italics: italicLeft, size: 21, font: "Calibri" }),
-                new TextRun({ text: `\t${rightText}`, bold: boldRight, italics: italicRight, size: 21, font: "Calibri" })
+                ...rightChildren
             ],
             spacing: { before: 40, after: 40 }
         });
@@ -224,7 +256,8 @@ export const generateResumeDocx = async (data) => {
             sections.push(createRow(
                 leftText, 
                 rightText,
-                true, false, false, false
+                true, false, false, false,
+                proj.githubLink || null
             ));
 
             if (proj.description) {

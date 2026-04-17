@@ -32,13 +32,39 @@ export const generateResumePdf = (data) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     const contactInfo = [];
-    if (student.phone) contactInfo.push(`+91-${student.phone.replace('+91-', '')}`);
-    if (student.email) contactInfo.push(student.email);
-    if (student.linkedIn) contactInfo.push(`LinkedIn`);
-    if (student.github) contactInfo.push(`GitHub`);
-    if (student.portfolio) contactInfo.push(`Portfolio`);
+    if (student.phone) contactInfo.push({ text: `+91-${student.phone.replace('+91-', '')}` });
+    if (student.email) contactInfo.push({ text: student.email });
+    if (student.linkedIn) contactInfo.push({ text: 'LinkedIn', url: student.linkedIn.startsWith('http') ? student.linkedIn : `https://${student.linkedIn}` });
+    if (student.github) contactInfo.push({ text: 'GitHub', url: student.github.startsWith('http') ? student.github : `https://${student.github}` });
+    if (student.portfolio) contactInfo.push({ text: 'Portfolio', url: student.portfolio.startsWith('http') ? student.portfolio : `https://${student.portfolio}` });
     
-    doc.text(contactInfo.join('  |  '), pageWidth / 2, cursorY, { align: 'center' });
+    // Draw contact info centered
+    let totalContactWidth = 0;
+    contactInfo.forEach((info, index) => {
+        totalContactWidth += doc.getTextWidth(info.text);
+        if (index < contactInfo.length - 1) totalContactWidth += doc.getTextWidth('  |  ');
+    });
+    
+    let currentX = (pageWidth - totalContactWidth) / 2;
+    contactInfo.forEach((info, index) => {
+        if (info.url) {
+            doc.setTextColor(17, 85, 204); // URL Blue
+            if (doc.textWithLink) {
+                doc.textWithLink(info.text, currentX, cursorY, { url: info.url });
+            } else {
+                doc.text(info.text, currentX, cursorY); // Fallback
+            }
+            doc.setTextColor(0, 0, 0); // Reset
+        } else {
+            doc.text(info.text, currentX, cursorY);
+        }
+        currentX += doc.getTextWidth(info.text);
+        
+        if (index < contactInfo.length - 1) {
+            doc.text('  |  ', currentX, cursorY);
+            currentX += doc.getTextWidth('  |  ');
+        }
+    });
     cursorY += 30;
 
     // --- Helper specific to ATS formatting ---
@@ -55,7 +81,7 @@ export const generateResumePdf = (data) => {
         cursorY += 15;
     };
 
-    const drawRow = (leftText, rightText, isBoldLeft = true, isItalicRight = false) => {
+    const drawRow = (leftText, rightText, isBoldLeft = true, isItalicRight = false, rightLink = null) => {
         checkPageBreak(20);
         doc.setFont('helvetica', isBoldLeft ? 'bold' : 'normal');
         doc.setFontSize(10.5);
@@ -63,7 +89,18 @@ export const generateResumePdf = (data) => {
 
         if (rightText) {
             doc.setFont('helvetica', isItalicRight ? 'italic' : 'normal');
-            doc.text(rightText, pageWidth - margin, cursorY, { align: 'right' });
+            if (rightLink) {
+                doc.setTextColor(17, 85, 204);
+                const textW = doc.getTextWidth(rightText);
+                if (doc.textWithLink) {
+                    doc.textWithLink(rightText, pageWidth - margin - textW, cursorY, { url: rightLink.startsWith('http') ? rightLink : `https://${rightLink}` });
+                } else {
+                    doc.text(rightText, pageWidth - margin, cursorY, { align: 'right' });
+                }
+                doc.setTextColor(0, 0, 0);
+            } else {
+                doc.text(rightText, pageWidth - margin, cursorY, { align: 'right' });
+            }
         }
         cursorY += 14;
     };
@@ -149,7 +186,7 @@ export const generateResumePdf = (data) => {
     if (projects && projects.length > 0) {
         drawSectionHeader('Projects');
         projects.forEach(proj => {
-            drawRow(`${proj.title} | ${proj.techStack || ''}`, proj.githubLink ? 'GitHub Link' : '', true, false);
+            drawRow(`${proj.title} | ${proj.techStack || ''}`, proj.githubLink ? 'GitHub Link' : '', true, false, proj.githubLink);
             if (proj.description) {
                 proj.description.split('\n').forEach(line => drawBullet(line));
             }
