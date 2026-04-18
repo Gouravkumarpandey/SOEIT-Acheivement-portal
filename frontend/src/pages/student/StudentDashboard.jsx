@@ -2,7 +2,7 @@ import '../../styles/pages/student/StudentDashboard.css';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { achievementAPI } from '../../services/api';
+import { achievementAPI, badgeAPI } from '../../services/api';
 import { Trophy, CheckCircle, Clock, XCircle, Star, Upload, TrendingUp, Award, GraduationCap, ArrowUpRight, Globe } from 'lucide-react';
 import {
     Chart as ChartJS,
@@ -49,6 +49,7 @@ const StudentDashboard = () => {
     const { user } = useAuth();
     const [stats, setStats] = useState({ stats: { all: 0, approved: 0, pending: 0, totalPoints: 0, byCategory: [], byLevel: [] }, recentActivity: [] });
     const [loading, setLoading] = useState(true);
+    const [leaderboard, setLeaderboard] = useState([]);
     const [showProfileModal, setShowProfileModal] = useState(false);
 
     useEffect(() => {
@@ -61,6 +62,13 @@ const StudentDashboard = () => {
                 const isComplete = user?.edu10thSchool && user?.edu12thSchool && user?.universityCgpa;
                 if (!isComplete) {
                     setShowProfileModal(true);
+                }
+
+                try {
+                    const lbData = await badgeAPI.getLeaderboard();
+                    setLeaderboard(lbData.data.data);
+                } catch (err) {
+                    console.error('Failed to load leaderboard', err);
                 }
             } catch {
                 toast.error('Could not load dashboard data. Please check your connection.');
@@ -234,6 +242,63 @@ const StudentDashboard = () => {
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {/* Weekly Scholars Leaderboard */}
+            <div className="card" style={{ padding: '2rem', marginBottom: '2.5rem', border: '1px solid var(--border-primary)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, right: 0, width: '150px', height: '150px', background: 'radial-gradient(circle, rgba(245,158,11,0.1) 0%, rgba(255,255,255,0) 70%)', borderRadius: '50%', transform: 'translate(30%, -30%)' }}></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--warning-50)', color: 'var(--warning-500)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Trophy size={18} />
+                            </div>
+                            <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.2rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Top Scholars of the Week</h4>
+                        </div>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Weekly leaderboard recognizing students with the highest verified points.</p>
+                    </div>
+                </div>
+
+                {leaderboard.length === 0 ? (
+                    <div style={{ padding: '3rem 2rem', textAlign: 'center', background: 'var(--slate-50)', borderRadius: '16px', border: '1px dashed var(--border-primary)' }}>
+                        <Award size={40} style={{ color: 'var(--slate-300)', marginBottom: '1rem', opacity: 0.5 }} />
+                        <h5 style={{ fontWeight: 800, margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>No Badges Yet</h5>
+                        <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>The weekly badge drop hasn't occurred yet or no points were earned. Keep uploading your achievements!</p>
+                    </div>
+                ) : (
+                    <div className="grid-res grid-res-3">
+                        {leaderboard.map((student, idx) => (
+                            <div key={student.id} style={{ 
+                                padding: '1.25rem', 
+                                border: idx === 0 ? '2px solid rgba(245, 158, 11, 0.3)' : '1px solid var(--border-primary)', 
+                                borderRadius: '16px', 
+                                background: idx === 0 ? 'linear-gradient(to bottom right, #fffbeb, #ffffff)' : '#ffffff',
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '1rem',
+                                transition: 'transform 0.2s',
+                                boxShadow: idx === 0 ? '0 10px 25px -5px rgba(245, 158, 11, 0.1)' : 'none'
+                            }}>
+                                <div style={{ fontSize: '1.75rem', fontWeight: 900, color: idx === 0 ? '#f59e0b' : idx === 1 ? '#94a3b8' : idx === 2 ? '#d97706' : 'var(--text-muted)', width: '30px', textAlign: 'center', letterSpacing: '-0.05em' }}>
+                                    #{idx + 1}
+                                </div>
+                                <div className="avatar avatar-md" style={{ background: idx === 0 ? '#fef3c7' : 'var(--primary-100)', color: idx === 0 ? '#d97706' : 'var(--brand-700)', fontWeight: 800, border: idx === 0 ? '2px solid #fde68a' : 'none' }}>
+                                    {student.name?.charAt(0) || 'U'}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <h5 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>{student.name}</h5>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{student.department}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div className="badge" style={{ background: student.badge_type === 'Platinum' ? 'linear-gradient(135deg, #e2e8f0, #94a3b8)' : student.badge_type === 'Gold' ? 'linear-gradient(135deg, #fef08a, #f59e0b)' : student.badge_type === 'Silver' ? 'linear-gradient(135deg, #f1f5f9, #cbd5e1)' : 'linear-gradient(135deg, #fed7aa, #f97316)', color: '#1e293b', border: 'none', padding: '0.25rem 0.6rem', fontWeight: 800 }}>
+                                        {student.badge_type}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', fontWeight: 800, marginTop: '0.35rem', color: 'var(--brand-700)' }}>{student.points_earned} pts</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Analytical Distribution Suite */}
