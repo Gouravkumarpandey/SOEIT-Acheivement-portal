@@ -245,9 +245,9 @@ const StudentDashboard = () => {
             </div>
 
             {/* Weekly Scholars Leaderboard */}
-            <div className="card" style={{ padding: '2rem', marginBottom: '2.5rem', border: '1px solid var(--border-primary)', position: 'relative', overflow: 'hidden' }}>
+            <div className="card leaderboard-card-res" style={{ padding: '2rem', marginBottom: '2.5rem', border: '1px solid var(--border-primary)', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, right: 0, width: '150px', height: '150px', background: 'radial-gradient(circle, rgba(245,158,11,0.1) 0%, rgba(255,255,255,0) 70%)', borderRadius: '50%', transform: 'translate(30%, -30%)' }}></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+                <div className="leaderboard-header-res" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--warning-50)', color: 'var(--warning-500)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -260,13 +260,13 @@ const StudentDashboard = () => {
                 </div>
 
                 {leaderboard.length === 0 ? (
-                    <div style={{ padding: '3rem 2rem', textAlign: 'center', background: 'var(--slate-50)', borderRadius: '16px', border: '1px dashed var(--border-primary)' }}>
+                    <div className="leaderboard-empty-res" style={{ padding: '3rem 2rem', textAlign: 'center', background: 'var(--slate-50)', borderRadius: '16px', border: '1px dashed var(--border-primary)' }}>
                         <Award size={40} style={{ color: 'var(--slate-300)', marginBottom: '1rem', opacity: 0.5 }} />
                         <h5 style={{ fontWeight: 800, margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>No Badges Yet</h5>
                         <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>The weekly badge drop hasn't occurred yet or no points were earned. Keep uploading your achievements!</p>
                     </div>
                 ) : (
-                    <div className="grid-res grid-res-3">
+                    <div className="grid-res leaderboard-grid-mobile" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
                         {leaderboard.map((student, idx) => (
                             <div key={student.id} style={{ 
                                 padding: '1.25rem', 
