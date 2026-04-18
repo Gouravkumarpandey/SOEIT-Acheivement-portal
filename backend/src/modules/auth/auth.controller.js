@@ -16,7 +16,7 @@ const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
 };
 
 const validatePassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
     return regex.test(password);
 };
 
