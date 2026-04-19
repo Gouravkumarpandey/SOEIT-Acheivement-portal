@@ -132,12 +132,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = useCallback(async () => {
-    try { await api.post('/auth/logout'); } catch (_) {}
+    // Only call server logout for real (non-demo) users
+    const isDemo = token && typeof token === 'string' && token.startsWith('demo-token-');
+    if (!isDemo) {
+      try { await api.post('/auth/logout'); } catch (_) {}
+    }
     await StorageManager.removeItem('soeit_token');
     await StorageManager.removeItem('soeit_user');
     setToken(null);
     setUser(null);
-  }, []);
+  }, [token]);
 
   const refreshUser = useCallback(async () => {
     try {
