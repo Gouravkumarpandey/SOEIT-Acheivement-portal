@@ -51,7 +51,9 @@ const InternshipOpportunitiesPage = () => {
         params: { search: q || undefined, limit: 100 },
       });
       setPostings(res.data.data || res.data.internships || []);
-    } catch {
+    } catch (err) {
+      // 401 → backend auth still required; other errors → show empty state
+      console.warn('Internship postings fetch:', err?.response?.status, err?.message);
       setPostings([]);
     } finally {
       setLoading(false);

@@ -72,6 +72,9 @@ api.interceptors.request.use(
         if (url.includes('/achievements/my')) {
           return { ...config, adapter: () => Promise.resolve(mockRes([])) };
         }
+        if (url.includes('/internship-postings')) {
+          return { ...config, adapter: () => Promise.resolve(mockRes([])) };
+        }
         if (url.includes('/internships')) {
           return { ...config, adapter: () => Promise.resolve(mockRes([])) };
         }
