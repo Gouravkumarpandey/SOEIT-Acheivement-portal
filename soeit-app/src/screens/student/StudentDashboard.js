@@ -219,36 +219,6 @@ const StudentDashboard = ({ navigation }) => {
         </View>
       </View>
 
-      {/* AI Career Roadmap Section */}
-      <View style={styles.aiRoadmapSection}>
-        <LinearGradient
-          colors={['#f5f3ff', '#ede9fe']}
-          style={styles.aiRoadmapGradient}
-        >
-          <View style={styles.aiHeader}>
-            <View style={styles.aiIconBox}>
-              <Ionicons name="sparkles" size={20} color="#7c3aed" />
-            </View>
-            <View>
-              <Text style={styles.aiTitle}>AI Career Roadmap</Text>
-              <Text style={styles.aiSub}>Personalized based on your {stats.verified} accomplishments</Text>
-            </View>
-          </View>
-          
-          <View style={styles.roadmapCards}>
-            <View style={styles.roadmapCard}>
-              <Text style={styles.roadmapRole}>Career analysis is based on your verified achievements.</Text>
-              <Text style={styles.roadmapMatch}>Upload & verify more achievements to unlock AI career roadmap.</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity style={styles.aiActionBtn} onPress={() => navigation.navigate('Portfolio')}>
-            <Text style={styles.aiActionText}>View Portfolio</Text>
-            <Ionicons name="chevron-forward" size={16} color="#7c3aed" />
-          </TouchableOpacity>
-        </LinearGradient>
-      </View>
-
       {/* Campus Events Section */}
       <View style={styles.eventsSection}>
         <View style={styles.sectionHeader}>
@@ -819,84 +789,6 @@ const styles = StyleSheet.create({
   },
   filterTextActive: {
     color: '#fff',
-  },
-  // AI Roadmap Styles
-  aiRoadmapSection: {
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.xl,
-  },
-  aiRoadmapGradient: {
-    borderRadius: 20,
-    padding: SPACING.xl,
-    borderWidth: 1,
-    borderColor: '#ddd6fe',
-  },
-  aiHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
-    marginBottom: SPACING.xl,
-  },
-  aiIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-  },
-  aiTitle: {
-    fontSize: getResponsiveFontSize(18),
-    fontWeight: '800',
-    color: '#4c1d95',
-  },
-  aiSub: {
-    fontSize: getResponsiveFontSize(11),
-    color: '#7c3aed',
-    fontWeight: '600',
-  },
-  roadmapCards: {
-    gap: SPACING.md,
-  },
-  roadmapCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    borderRadius: 12,
-    padding: SPACING.md,
-  },
-  roadmapRole: {
-    fontSize: getResponsiveFontSize(14),
-    fontWeight: '700',
-    color: '#1f2937',
-  },
-  roadmapMatch: {
-    fontSize: getResponsiveFontSize(12),
-    color: '#7c3aed',
-    fontWeight: '800',
-    marginTop: 2,
-  },
-  roadmapProgress: {
-    height: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    borderRadius: 3,
-    marginTop: SPACING.sm,
-    overflow: 'hidden',
-  },
-  roadmapFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  aiActionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: SPACING.xl,
-    gap: 4,
-  },
-  aiActionText: {
-    fontSize: getResponsiveFontSize(13),
-    fontWeight: '700',
-    color: '#7c3aed',
   },
 });
 
