@@ -15,6 +15,7 @@ import StudentDashboard from '../screens/student/StudentDashboard';
 import MyAchievements from '../screens/student/MyAchievements';
 import UploadAchievement from '../screens/student/UploadAchievement';
 import InternshipsPage from '../screens/student/InternshipsPage';
+import InternshipOpportunitiesPage from '../screens/student/InternshipOpportunitiesPage';
 import HackathonsPage from '../screens/student/HackathonsPage';
 import StudentCoursesPage from '../screens/student/StudentCoursesPage';
 import StudentProjectsPage from '../screens/student/StudentProjectsPage';
@@ -77,6 +78,7 @@ const CustomDrawerContent = (props) => {
 
       <DrawerSectionHeader title="CAREER & TALENT" />
       <CustomDrawerItem label="My Internships" icon="briefcase-outline" screenName="Internships" active={activeRouteName === 'Internships'} />
+      <CustomDrawerItem label="Internship Opportunities" icon="globe-outline" screenName="InternshipOpportunities" active={activeRouteName === 'InternshipOpportunities'} />
       <CustomDrawerItem label="Live Hackathons" icon="terminal-outline" screenName="Hackathons" active={activeRouteName === 'Hackathons'} />
     </>
   );
@@ -212,7 +214,8 @@ const StudentDrawer = () => (
     <Drawer.Screen name="Upload" component={UploadAchievement} options={{ title: 'Upload New' }} />
     <Drawer.Screen name="Courses" component={StudentCoursesPage} options={{ title: 'Course Registry' }} />
     <Drawer.Screen name="Projects" component={StudentProjectsPage} options={{ title: 'My Projects' }} />
-    <Drawer.Screen name="Internships" component={InternshipsPage} options={{ title: 'Internships' }} />
+    <Drawer.Screen name="Internships" component={InternshipsPage} options={{ title: 'My Internships' }} />
+    <Drawer.Screen name="InternshipOpportunities" component={InternshipOpportunitiesPage} options={{ title: 'Internship Opportunities' }} />
     <Drawer.Screen name="Hackathons" component={HackathonsPage} options={{ title: 'Live Hackathons' }} />
     <Drawer.Screen name="Broadcasts" component={EventsPage} options={{ title: 'Campus Events' }} />
     <Drawer.Screen name="Profile" component={ProfileScreen} options={{ title: 'My Profile' }} />
@@ -350,6 +353,7 @@ const AppNavigator = () => {
               />
               <Stack.Screen name="Upload" component={UploadAchievement} />
               <Stack.Screen name="Internships" component={InternshipsPage} />
+              <Stack.Screen name="InternshipOpportunities" component={InternshipOpportunitiesPage} options={{ title: 'Internship Opportunities' }} />
               <Stack.Screen name="Hackathons" component={HackathonsPage} />
               <Stack.Screen name="Courses" component={StudentCoursesPage} />
               <Stack.Screen name="Projects" component={StudentProjectsPage} />
