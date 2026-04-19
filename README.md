@@ -1001,4 +1001,4 @@ This project is licensed under the **ISC License** - see the [LICENSE](LICENSE) 
 
 *Arka Jain University — Pioneering Technical Education & Student Success*
 
-**Last Updated:** April 3, 2026 | **Version:** 2.0.0
+**Last Updated:** April 18, 2026 | **Version:** 2.0.0
