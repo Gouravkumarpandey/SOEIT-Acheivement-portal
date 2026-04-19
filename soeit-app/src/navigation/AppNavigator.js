@@ -151,18 +151,23 @@ const CustomDrawerContent = (props) => {
       </View>
  
       <DrawerContentScrollView {...props} showsVerticalScrollIndicator={false}>
-        {/* Profile Card */}
-        <View style={styles.profileCard}>
+        {/* Profile Card — tap to go to My Profile */}
+        <TouchableOpacity
+          style={styles.profileCard}
+          onPress={() => { navigation.navigate('Profile'); navigation.closeDrawer(); }}
+          activeOpacity={0.75}
+        >
           <View style={styles.avatarContainer}>
              <View style={styles.avatarCircle}>
                 <Text style={styles.avatarText}>{user?.name?.substring(0, 2).toUpperCase() || 'AJ'}</Text>
              </View>
           </View>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.profileName}>{user?.name || 'Demo User'}</Text>
             <Text style={styles.profileRole}>{user?.role?.toUpperCase() || 'STUDENT'}</Text>
           </View>
-        </View>
+          <Ionicons name="chevron-forward" size={16} color="#94a3b8" />
+        </TouchableOpacity>
 
         {/* Dynamic Items Based on Role */}
         {renderContent()}
