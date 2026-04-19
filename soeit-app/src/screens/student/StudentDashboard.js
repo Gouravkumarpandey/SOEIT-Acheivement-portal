@@ -219,36 +219,7 @@ const StudentDashboard = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Campus Events Section */}
-      <View style={styles.eventsSection}>
-        <View style={styles.sectionHeader}>
-          <View>
-            <Text style={styles.sectionTitle}>Campus Events</Text>
-            <Text style={styles.sectionDesc}>
-              View all upcoming workshops, seminars, and fests on campus.
-            </Text>
-          </View>
-        </View>
 
-        {/* Event Category Filters */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filterScroll}
-          contentContainerStyle={styles.filterContainer}
-        >
-          {['All', 'Technical', 'Cultural', 'Sports', 'Workshop', 'Seminar', 'Other'].map((cat, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={[styles.filterBtn, idx === 0 && styles.filterBtnActive]}
-            >
-              <Text style={[styles.filterText, idx === 0 && styles.filterTextActive]}>
-                {cat}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
 
       <View style={{ height: SPACING.xxxl }} />
     </ScrollView>
@@ -746,50 +717,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginTop: SPACING.sm,
   },
-  eventsSection: {
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.xl,
-  },
-  sectionHeader: {
-    marginBottom: SPACING.lg,
-  },
-  sectionTitle: {
-    fontSize: getResponsiveFontSize(18),
-    fontWeight: '800',
-    color: '#1f2937',
-    marginBottom: SPACING.sm,
-  },
-  sectionDesc: {
-    fontSize: getResponsiveFontSize(13),
-    color: '#6b7280',
-  },
-  filterScroll: {
-    marginHorizontal: -SPACING.lg,
-  },
-  filterContainer: {
-    paddingHorizontal: SPACING.lg,
-    gap: SPACING.md,
-  },
-  filterBtn: {
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-  },
-  filterBtnActive: {
-    backgroundColor: '#1e3a8a',
-    borderColor: '#1e3a8a',
-  },
-  filterText: {
-    fontSize: getResponsiveFontSize(12),
-    fontWeight: '600',
-    color: '#4b5563',
-  },
-  filterTextActive: {
-    color: '#fff',
-  },
+
 });
 
 export default StudentDashboard;
