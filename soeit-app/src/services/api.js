@@ -84,6 +84,9 @@ api.interceptors.request.use(
         if (url.includes('/projects')) {
           return { ...config, adapter: () => Promise.resolve(mockRes([])) };
         }
+        if (url.includes('/badges/student')) {
+          return { ...config, adapter: () => Promise.resolve(mockRes([])) };
+        }
         if (url.includes('/notices')) {
           const demoNotices = [
             { id: 1, title: 'Code AJU 2026 Hackathon', content: 'Regional teams apply now!', type: 'Event', createdAt: new Date().toISOString(), priority: 'high' },
