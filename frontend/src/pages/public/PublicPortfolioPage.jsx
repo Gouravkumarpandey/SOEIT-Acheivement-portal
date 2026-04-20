@@ -31,17 +31,16 @@ const PublicPortfolioPage = () => {
         achievementAPI.getPortfolio(userId)
             .then(res => {
                 setData(res.data);
-                // Also fetch badges for this student
-                return badgeAPI.getStudentBadges(res.data.student.id || res.data.student._id || res.data.student.userId || userId);
+                // Also fetch badges for this student - non-critical
+                const studentId = res.data.student.id || res.data.student._id || res.data.student.userId || userId;
+                badgeAPI.getStudentBadges(studentId)
+                    .then(bRes => setBadges(bRes.data.data))
+                    .catch(() => setBadges([]));
             })
-            .then(res => setBadges(res.data.data))
             .catch(err => {
-                // If it's a badge fetch error, we don't need to break the whole page, just log it.
-                if (data === null) {
-                    const msg = err.response?.data?.message || 'Portfolio not found';
-                    setError(msg);
-                    toast.error(msg);
-                }
+                const msg = err.response?.data?.message || 'Portfolio not found';
+                setError(msg);
+                toast.error(msg);
             })
             .finally(() => setLoading(false));
     }, [userId]);
