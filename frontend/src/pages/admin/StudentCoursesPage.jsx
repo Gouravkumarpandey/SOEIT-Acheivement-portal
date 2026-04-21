@@ -168,13 +168,14 @@ const StudentCoursesPage = () => {
                         </div>
                     </div>
 
-                    <div className="card" style={{ border: '1px solid var(--border-primary)', overflow: 'hidden' }}>
-                        <div className="table-responsive">
-                            <table className="table">
+                    {/* ── Desktop Table ── */}
+                    <div className="card desktop-only" style={{ border: '1px solid var(--border-primary)', overflow: 'hidden' }}>
+                        <div style={{ overflowX: 'auto', width: '100%' }}>
+                            <table className="table" style={{ minWidth: 800 }}>
                                 <thead>
                                     <tr>
                                         <th style={{ paddingLeft: '2rem' }}>Student Name</th>
-                                        <th>Course & Category</th>
+                                        <th>Course &amp; Category</th>
                                         <th>Platform</th>
                                         <th>Target Date</th>
                                         <th style={{ textAlign: 'center' }}>Progress</th>
@@ -185,11 +186,11 @@ const StudentCoursesPage = () => {
                                 <tbody>
                                     {loading ? (
                                         [...Array(5)].map((_, i) => (
-                                            <tr key={i}><td colSpan="6" style={{ padding: '0.75rem 2rem' }}><div className="skeleton" style={{ height: 60, borderRadius: '12px' }} /></td></tr>
+                                            <tr key={i}><td colSpan="7" style={{ padding: '0.75rem 2rem' }}><div className="skeleton" style={{ height: 60, borderRadius: '12px' }} /></td></tr>
                                         ))
                                     ) : courses.length === 0 ? (
                                         <tr>
-                                            <td colSpan="6" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
+                                            <td colSpan="7" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
                                                 <Activity size={48} style={{ opacity: 0.1, margin: '0 auto 1.5rem auto' }} />
                                                 <h4 style={{ fontWeight: 800 }}>No course records found</h4>
                                             </td>
@@ -199,7 +200,7 @@ const StudentCoursesPage = () => {
                                             <tr key={course.id} className="hover-row">
                                                 <td style={{ paddingLeft: '2rem' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.5rem 0' }}>
-                                                        <div style={{ width: 44, height: 44, background: 'var(--primary-100)', color: 'var(--brand-700)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>
+                                                        <div style={{ width: 44, height: 44, background: 'var(--primary-100)', color: 'var(--brand-700)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, flexShrink: 0 }}>
                                                             {course.studentName.charAt(0)}
                                                         </div>
                                                         <div>
@@ -210,7 +211,7 @@ const StudentCoursesPage = () => {
                                                 </td>
                                                 <td>
                                                     <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{course.courseName}</div>
-                                                    <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.2rem' }}>
+                                                    <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.2rem', flexWrap: 'wrap' }}>
                                                         <span style={{ fontSize: '0.65rem', background: 'var(--brand-50)', color: 'var(--brand-700)', padding: '2px 6px', borderRadius: '4px', fontWeight: 900 }}>{course.category}</span>
                                                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800 }}>{course.department}</span>
                                                     </div>
@@ -227,11 +228,11 @@ const StudentCoursesPage = () => {
                                                     </div>
                                                 </td>
                                                 <td style={{ textAlign: 'center' }}>
-                                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '1rem', width: '200px' }}>
+                                                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', width: '180px' }}>
                                                         <div style={{ flex: 1, height: '6px', background: 'var(--slate-100)', borderRadius: '3px', overflow: 'hidden' }}>
                                                             <div style={{ width: `${course.progress}%`, height: '100%', background: 'var(--brand-600)' }} />
                                                         </div>
-                                                        <div style={{ textAlign: 'right' }}>
+                                                        <div style={{ textAlign: 'right', minWidth: 36 }}>
                                                             <div style={{ fontSize: '0.8rem', fontWeight: 900 }}>{course.progress}%</div>
                                                             {course.lastSyncedAt && (
                                                                 <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
@@ -242,7 +243,7 @@ const StudentCoursesPage = () => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td style={{ textAlign: 'center' }}>
+                                                <td>
                                                     <span className={`badge ${course.status === 'Completed' ? 'badge-success' : 'badge-warning'}`} style={{ fontWeight: 800 }}>{course.status}</span>
                                                 </td>
                                                 <td style={{ textAlign: 'right', paddingRight: '2rem' }}>
@@ -254,6 +255,63 @@ const StudentCoursesPage = () => {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    {/* ── Mobile Cards ── */}
+                    <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {loading ? (
+                            [...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: 140, borderRadius: '16px' }} />)
+                        ) : courses.length === 0 ? (
+                            <div style={{ padding: '4rem 1rem', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: '16px' }}>
+                                <Activity size={40} style={{ opacity: 0.15, marginBottom: '1rem' }} />
+                                <h4 style={{ fontWeight: 800, color: 'var(--text-secondary)' }}>No course records found</h4>
+                            </div>
+                        ) : (
+                            courses.map(course => (
+                                <div key={course.id} className="card" style={{ border: '1px solid var(--border-primary)', borderRadius: '16px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                                    {/* Row 1 – Student + Action */}
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+                                            <div style={{ width: 40, height: 40, background: 'var(--primary-100)', color: 'var(--brand-700)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, flexShrink: 0 }}>
+                                                {course.studentName.charAt(0)}
+                                            </div>
+                                            <div style={{ minWidth: 0 }}>
+                                                <div style={{ fontWeight: 800, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.studentName}</div>
+                                                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>{course.enrollmentNo}</div>
+                                            </div>
+                                        </div>
+                                        <Link to={`/portfolio/${course.studentId}`} className="btn btn-ghost" style={{ color: 'var(--brand-600)', flexShrink: 0 }}><Eye size={18} /></Link>
+                                    </div>
+
+                                    {/* Row 2 – Course name + badges */}
+                                    <div>
+                                        <div style={{ fontWeight: 800, fontSize: '0.9rem', marginBottom: '0.35rem' }}>{course.courseName}</div>
+                                        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                                            <span style={{ fontSize: '0.65rem', background: 'var(--brand-50)', color: 'var(--brand-700)', padding: '2px 7px', borderRadius: '4px', fontWeight: 900 }}>{course.category}</span>
+                                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>{course.department}</span>
+                                            {course.skillsToBeLearnt && (
+                                                <span style={{ fontSize: '0.68rem', color: 'var(--brand-600)', fontWeight: 700, fontStyle: 'italic' }}>· Targeting: {course.skillsToBeLearnt}</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Row 3 – Meta info */}
+                                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                                        <span><strong style={{ color: 'var(--text-primary)' }}>Platform:</strong> {course.platform || 'N/A'}</span>
+                                        <span><strong style={{ color: 'var(--text-primary)' }}>Due:</strong> {course.expectedCompletionDate ? new Date(course.expectedCompletionDate).toLocaleDateString() : 'N/A'}</span>
+                                    </div>
+
+                                    {/* Row 4 – Progress + Status */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                        <div style={{ flex: 1, height: '6px', background: 'var(--slate-100)', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{ width: `${course.progress}%`, height: '100%', background: 'var(--brand-600)' }} />
+                                        </div>
+                                        <span style={{ fontSize: '0.8rem', fontWeight: 900, minWidth: 36 }}>{course.progress}%</span>
+                                        <span className={`badge ${course.status === 'Completed' ? 'badge-success' : 'badge-warning'}`} style={{ fontWeight: 800, flexShrink: 0 }}>{course.status}</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </>
             ) : (

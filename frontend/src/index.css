@@ -332,6 +332,26 @@ h6 {
   }
 }
 
+/* mobile-only: visible only on phones/tablets, hidden on desktop */
+.mobile-only {
+  display: flex !important;
+}
+
+/* desktop-only: hidden on phones, visible on desktop */
+.desktop-only {
+  display: none !important;
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+
+  .desktop-only {
+    display: block !important;
+  }
+}
+
 /* Navigation Dropdown Styles */
 .desktop-nav-link:hover, .desktop-nav-dropdown-trigger:hover {
   background-color: var(--primary-100) !important;
