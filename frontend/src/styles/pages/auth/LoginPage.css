@@ -30,7 +30,7 @@
     justify-content: center;
     gap: 1.25rem;
     margin-bottom: 2.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     animation: fadeIn 0.8s ease-out;
 }
 
@@ -262,48 +262,57 @@
 }
 
 @media (max-width: 640px) {
+    /* FORCE single horizontal row EXACTLY like desktop */
     .auth-header {
-        flex-direction: column;
-        flex-wrap: nowrap;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1.5rem;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: center !important;
+        gap: 0.6rem !important;
+        margin-bottom: 1.5rem !important;
+        width: 100% !important;
     }
 
     .auth-logo-group {
-        gap: 0.75rem;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        flex-shrink: 0 !important;
     }
 
     .auth-logo {
-        width: 55px;
-        height: 55px;
-        font-size: 1.1rem;
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 0.75rem !important;
     }
 
     .auth-divider {
-        height: 40px;
-        width: 1.5px;
-        display: block;
+        height: 24px !important;
+        width: 1px !important;
     }
 
     .auth-title-column {
-        text-align: left;
-        min-width: unset;
+        min-width: unset !important;
+        flex-shrink: 1 !important;
     }
 
     .auth-university-name {
-        font-size: 1.05rem;
+        font-size: 0.7rem !important;
+        line-height: 1.1 !important;
+        white-space: nowrap !important;
     }
 
     .auth-location {
-        font-size: 0.75rem;
+        font-size: 0.6rem !important;
+        margin-top: 1px !important;
     }
 
     .auth-naac-badge {
-        font-size: 0.65rem;
-        padding: 0.3rem 0.8rem;
-        margin-left: 0;
-        align-self: center;
+        font-size: 0.55rem !important;
+        padding: 0.25rem 0.5rem !important;
+        border-radius: 3px !important;
+        flex-shrink: 0 !important;
+        margin-left: 0.25rem !important;
     }
 
     .login-card {
@@ -323,7 +332,6 @@
         align-items: center !important;
     }
 
-    /* Prevent captcha box from being too wide on mobile */
     .captcha-box {
         padding: 0 0.75rem;
         min-width: 70px;
