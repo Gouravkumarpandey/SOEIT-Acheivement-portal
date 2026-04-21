@@ -278,3 +278,12 @@
         margin-left: 0.25rem !important;
     }
 }
+
+/* Prefilled field styles */
+.prefilled-field {
+    background-color: #f8fafc !important;
+    cursor: not-allowed !important;
+    opacity: 0.8;
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
