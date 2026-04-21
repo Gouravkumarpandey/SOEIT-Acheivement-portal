@@ -212,11 +212,10 @@ const PublicPortfolioPage = () => {
                         <div style={{ flex: 1 }}>
                             <h1 style={{ marginBottom: '0.375rem' }}>{student.name}</h1>
                             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '0.75rem' }}>
-                                {student.department} Engineering • {student.enrollment_no ? `Enrollment: ${student.enrollment_no}` : ''} {student.semester ? `• Sem ${student.semester}` : ''}
+                                {student.department} Engineering {student.semester ? `• • Sem ${student.semester}` : ''}
                             </p>
-                            {student.bio && <p style={{ color: 'var(--text-muted)', maxWidth: 500, lineHeight: 1.7, marginBottom: '1rem', fontSize: '0.9rem' }}>{student.bio}</p>}
-                            
-                            {/* Badges Display */}
+
+                            {/* Weekly Badges Display */}
                             {badges && badges.length > 0 && (
                                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                     <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)', marginRight: '0.5rem' }}>Weekly Badges:</span>
@@ -245,18 +244,18 @@ const PublicPortfolioPage = () => {
                                             >
                                                 <FileText size={14} color="#3b82f6" /> Resume <ChevronDown size={14} style={{ transform: resumeMenuOpen ? 'rotate(180deg)' : 'none', transition: '0.2s' }} />
                                             </button>
-                                            
+
                                             {resumeMenuOpen && (
                                                 <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: '#fff', border: '1px solid var(--border-primary)', borderRadius: '10px', boxShadow: 'var(--shadow-lg)', padding: '0.35rem', zIndex: 1000, minWidth: '100px' }}>
-                                                    <button 
-                                                        className="btn btn-ghost btn-sm" 
+                                                    <button
+                                                        className="btn btn-ghost btn-sm"
                                                         style={{ width: '100%', justifyContent: 'flex-start', padding: '0.4rem 0.75rem', fontSize: '0.78rem', borderRadius: '6px', gap: '0.5rem' }}
                                                         onClick={() => { generateResumePdf(data); setResumeMenuOpen(false); }}
                                                     >
                                                         <FileIcon size={12} color="#ef4444" /> PDF
                                                     </button>
-                                                    <button 
-                                                        className="btn btn-ghost btn-sm" 
+                                                    <button
+                                                        className="btn btn-ghost btn-sm"
                                                         style={{ width: '100%', justifyContent: 'flex-start', padding: '0.4rem 0.75rem', fontSize: '0.78rem', borderRadius: '6px', marginTop: '2px', gap: '0.5rem' }}
                                                         onClick={() => { generateResumeDocx(data); setResumeMenuOpen(false); }}
                                                     >
