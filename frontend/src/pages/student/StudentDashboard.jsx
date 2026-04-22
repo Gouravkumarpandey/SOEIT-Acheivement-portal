@@ -206,11 +206,11 @@ const StudentDashboard = () => {
                 <div className="banner-motif-1" style={{ position: 'absolute', top: '-30%', right: '-3%', width: '280px', height: '280px', background: 'rgba(0, 33, 71, 0.04)', borderRadius: '50%' }}></div>
                 <div className="banner-motif-2" style={{ position: 'absolute', bottom: '-40%', right: '15%', width: '200px', height: '200px', background: 'rgba(0, 33, 71, 0.03)', borderRadius: '50%' }}></div>
                 <div className="banner-inner-content">
-                    <div className="banner-icon-container" style={{ borderRadius: '20px', background: 'linear-gradient(135deg, var(--brand-600), var(--brand-800))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(0, 33, 71, 0.25)', flexShrink: 0 }}>
-                        <GraduationCap size={40} />
+                    <div className="banner-icon-container" style={{ borderRadius: '18px', background: 'linear-gradient(135deg, var(--brand-600), var(--brand-800))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(0, 33, 71, 0.25)', flexShrink: 0 }}>
+                        <GraduationCap size={32} />
                     </div>
                     <div className="banner-text-content">
-                        <h3 className="welcome-headline" style={{ fontSize: '1.75rem', fontWeight: 900, marginBottom: '0.5rem', letterSpacing: '-0.03em', color: 'var(--brand-700)' }}>Welcome back, {user?.name}</h3>
+                        <h3 className="welcome-headline" style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.4rem', letterSpacing: '-0.03em', color: 'var(--brand-700)' }}>Welcome back, {user?.name}</h3>
                         <div className="banner-meta-row" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
                             <div className="banner-meta-item" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success-500)' }}></div>
@@ -235,7 +235,7 @@ const StudentDashboard = () => {
                             </div>
                             <TrendingUp size={16} className="trending-icon" style={{ color: color, opacity: 0.5 }} />
                         </div>
-                        <div className="stat-card-value" style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: '0.25rem', letterSpacing: '-0.02em' }}>{value}</div>
+                        <div className="stat-card-value" style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, marginBottom: '0.25rem', letterSpacing: '-0.02em' }}>{value}</div>
                         <div className="stat-card-label" style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
                         <div className="stat-card-delta" style={{ fontSize: '0.7rem', fontWeight: 700, color: color, marginTop: '1rem', background: bg, padding: '0.25rem 0.5rem', borderRadius: '4px', width: 'fit-content' }}>
                             {delta}

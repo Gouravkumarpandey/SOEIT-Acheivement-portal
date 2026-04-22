@@ -283,7 +283,7 @@ const Topbar = ({ onMenuClick, title }) => {
             backdropFilter: 'blur(12px)', 
             borderBottom: '1px solid var(--border-primary)', 
             padding: '0 2rem', 
-            height: '80px', 
+            height: '70px', 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between', 
@@ -323,9 +323,9 @@ const Topbar = ({ onMenuClick, title }) => {
                     <button 
                         className="notification-btn btn-ghost" 
                         onClick={() => setShowNotifications(!showNotifications)}
-                        style={{ width: 44, height: 44, padding: 0, borderRadius: '12px', position: 'relative', background: 'var(--slate-50)', color: 'var(--slate-600)', border: '1px solid var(--border-primary)' }}
+                        style={{ width: 40, height: 40, padding: 0, borderRadius: '10px', position: 'relative', background: 'var(--slate-50)', color: 'var(--slate-600)', border: '1px solid var(--border-primary)' }}
                     >
-                        <Bell size={20} strokeWidth={2.5} />
+                        <Bell size={18} strokeWidth={2.5} />
                         {unreadCount > 0 && (
                             <span className="notification-dot" style={{ position: 'absolute', top: '10px', right: '10px', width: '10px', height: '10px', background: 'var(--error-500)', borderRadius: '50%', border: '2px solid white', boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.1)' }}></span>
                         )}
@@ -380,9 +380,9 @@ const Topbar = ({ onMenuClick, title }) => {
                             transition: 'all 0.2s ease'
                         }}>
                         {user?.profileImage ? (
-                            <img className="user-avatar" src={`${import.meta.env.VITE_UPLOADS_URL || ''}${user.profileImage}`} alt={user.name} style={{ width: 36, height: 36, borderRadius: '10px', objectFit: 'cover', border: '2px solid var(--slate-100)' }} />
+                            <img className="user-avatar" src={`${import.meta.env.VITE_UPLOADS_URL || ''}${user.profileImage}`} alt={user.name} style={{ width: 32, height: 32, borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--slate-100)' }} />
                         ) : (
-                            <div className="user-avatar-initials" style={{ width: 36, height: 36, borderRadius: '10px', background: 'linear-gradient(135deg, var(--brand-600), var(--brand-800))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.75rem', border: '2px solid var(--slate-100)' }}>{getInitials(user?.name)}</div>
+                            <div className="user-avatar-initials" style={{ width: 32, height: 32, borderRadius: '8px', background: 'linear-gradient(135deg, var(--brand-600), var(--brand-800))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.7rem', border: '1px solid var(--slate-100)' }}>{getInitials(user?.name)}</div>
                         )}
                         <div className="user-info-text display-desktop" style={{ display: 'flex', flexDirection: 'column' }}>
                             <span className="user-name" style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>{user?.name?.split(' ')[0]}</span>
@@ -396,7 +396,7 @@ const Topbar = ({ onMenuClick, title }) => {
                             position: 'absolute',
                             top: 'calc(100% + 8px)',
                             right: 0,
-                            width: '240px',
+                            width: '280px',
                             background: 'white',
                             borderRadius: '16px',
                             border: '1px solid var(--border-primary)',
@@ -405,9 +405,9 @@ const Topbar = ({ onMenuClick, title }) => {
                             zIndex: 1000,
                             animation: 'slideUp 0.2s ease-out'
                         }}>
-                             <div style={{ padding: '0.75rem 0.875rem', borderBottom: '1px solid var(--border-primary)', marginBottom: '0.5rem' }}>
+                             <div style={{ padding: '0.6rem 0.875rem', borderBottom: '1px solid var(--border-primary)', marginBottom: '0.25rem' }}>
                                 <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>{user?.name}</div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{user?.email}</div>
+                                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, wordBreak: 'break-all' }}>{user?.email}</div>
                             </div>
                             
                             <NavLink to="/profile" onClick={() => setShowUserMenu(false)} className="dropdown-item" style={{ 
