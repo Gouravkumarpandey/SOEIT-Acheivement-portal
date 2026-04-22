@@ -25,17 +25,17 @@ const UniversityHeader = () => (
 const ResetPasswordPage = () => {
     const { token } = useParams();
     const navigate = useNavigate();
-    
+
     const [form, setForm] = useState({ password: '', confirmPassword: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    
+
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [errors, setErrors] = useState({});
 
     const validateList = {
-        length: form.password.length >= 8,
+        length: form.password.length >= 6 && form.password.length <= 10,
         upper: /[A-Z]/.test(form.password),
         lower: /[a-z]/.test(form.password),
         number: /\d/.test(form.password),
@@ -97,7 +97,7 @@ const ResetPasswordPage = () => {
                                 <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Create New Password</h2>
                                 <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>Please enter your new strong password below.</p>
                             </div>
-                            
+
                             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                 <div className="form-group" style={{ marginBottom: 0 }}>
                                     <label className="form-label" style={{ fontWeight: 600, color: '#303657', marginBottom: '0.4rem', display: 'block', fontSize: '0.85rem' }}>New Password</label>
@@ -118,13 +118,13 @@ const ResetPasswordPage = () => {
                                         </button>
                                     </div>
                                     {errors.password && <div className="input-error" style={{ color: '#dc2626', fontSize: '0.75rem', marginTop: '0.25rem' }}>{errors.password}</div>}
-                                    
+
                                     {/* Password Strength Requirement Checklist */}
                                     <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', padding: '0.75rem', background: 'var(--slate-50)', borderRadius: '8px', border: '1px solid var(--border-primary)' }}>
                                         <div style={{ fontWeight: 600, color: '#303657', marginBottom: '0.5rem' }}>Password must contain:</div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                                             <div style={{ color: validateList.length ? '#16a34a' : '#64748b', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                {validateList.length ? '✓' : '•'} At least 8 characters
+                                                {validateList.length ? '✓' : '•'} 6 to 12 characters
                                             </div>
                                             <div style={{ color: validateList.upper && validateList.lower ? '#16a34a' : '#64748b', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                                                 {validateList.upper && validateList.lower ? '✓' : '•'} Upper & lowercase letters

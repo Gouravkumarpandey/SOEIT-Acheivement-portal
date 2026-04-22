@@ -2,7 +2,10 @@ const User = require('../../modules/user/user.model');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const FileModel = require('../../modules/file/file.model');
-const { clearCache } = require('../../utils/cache');
+const { clearCache, cache } = require('../../utils/cache');
+const { generateOTP } = require('../../utils/otp');
+const sendEmail = require('../../utils/sendEmail');
+const getEmailTemplate = require('../../utils/emailTemplates');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
@@ -16,42 +19,158 @@ const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
 };
 
 const validatePassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,12}$/;
     return regex.test(password);
 };
 
-// @desc    Register student
+// @desc    Register student (Step 1: Send OTP)
 // @route   POST /api/auth/register
 exports.register = async (req, res, next) => {
     try {
-        const { name, email, password, department, studentId, enrollmentNo, batch, semester, section } = req.body;
+        const { name, email, password, department, enrollmentNo, batch, semester, section } = req.body;
 
         if (!validatePassword(password)) {
-            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character' });
+            return res.status(400).json({ success: false, message: 'Password must be 6-10 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)' });
         }
 
         // Check duplicates
-        const orConditions = [{ email: email?.toLowerCase() }];
+        const emailLower = email?.toLowerCase();
+        const orConditions = [{ email: emailLower }];
         if (enrollmentNo && enrollmentNo.trim()) orConditions.push({ enrollmentNo: enrollmentNo.trim() });
 
         const existingUser = await User.findOne({ $or: orConditions });
         if (existingUser) return res.status(400).json({ success: false, message: 'Email or Enrollment No. already registered' });
 
-        const semesterNum = semester ? parseInt(semester, 10) : undefined;
+        // Generate OTP
+        const otp = generateOTP();
+        const otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-        const user = await User.create({
-            name, email, password, department,
-            studentId: studentId?.trim() || undefined,
+        // Store registration data in cache
+        const registrationData = {
+            name, email: emailLower, password, department,
             enrollmentNo: enrollmentNo?.trim() || undefined,
             batch: batch?.trim() || undefined,
-            semester: !isNaN(semesterNum) ? semesterNum : undefined,
+            semester: semester ? parseInt(semester, 10) : undefined,
             section: section?.trim() || undefined,
             role: req.body.role || 'student',
+            otp,
+            otpExpiry
+        };
+
+        cache.set(`signup_${emailLower}`, registrationData, 600); // 10 mins
+
+        // Send OTP Email
+        const html = getEmailTemplate({
+            title: 'Verify Your Email',
+            content: `
+                <h1 class="h1">Hello ${name},</h1>
+                <p class="p">Thank you for registering on the SOEIT Achievement Portal.</p>
+                <p class="p">Please use the following 6-digit OTP to verify your email address:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1e293b; background: #f1f5f9; padding: 10px 20px; border-radius: 8px; border: 1px solid #e2e8f0;">${otp}</span>
+                </div>
+                <p class="p" style="color: #64748b; font-size: 14px;">This OTP is valid for 10 minutes. Do not share this code with anyone.</p>
+            `,
+            footerText: 'If you did not initiate this registration, please ignore this email.'
         });
+
+        await sendEmail({
+            to: emailLower,
+            subject: 'SOEIT Portal - Email Verification OTP',
+            html
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'OTP sent to your email. Please verify to complete registration.',
+            email: emailLower
+        });
+    } catch (error) {
+        console.error('[Register Error]', error.message);
+        next(error);
+    }
+};
+
+// @desc    Verify OTP and complete registration
+// @route   POST /api/auth/verify-otp
+exports.verifyOTP = async (req, res, next) => {
+    try {
+        const { email, otp } = req.body;
+        if (!email || !otp) return res.status(400).json({ success: false, message: 'Email and OTP are required' });
+
+        const emailLower = email.toLowerCase();
+        const registrationData = cache.get(`signup_${emailLower}`);
+
+        if (!registrationData) {
+            return res.status(400).json({ success: false, message: 'OTP expired or invalid registration session. Please sign up again.' });
+        }
+
+        if (registrationData.otp !== otp) {
+            return res.status(400).json({ success: false, message: 'Invalid OTP' });
+        }
+
+        if (Date.now() > registrationData.otpExpiry) {
+            cache.del(`signup_${emailLower}`);
+            return res.status(400).json({ success: false, message: 'OTP has expired' });
+        }
+
+        // OTP Valid - Create User
+        const { otp: _, otpExpiry: __, ...userData } = registrationData;
+
+        const user = await User.create(userData);
+
+        // Remove from cache
+        cache.del(`signup_${emailLower}`);
 
         sendTokenResponse(user, 201, res, 'Registration successful! Welcome to SOEIT Portal.');
     } catch (error) {
-        console.error('[Register Error]', error.message);
+        console.error('[Verify OTP Error]', error.message);
+        next(error);
+    }
+};
+
+// @desc    Resend OTP
+// @route   POST /api/auth/resend-otp
+exports.resendOTP = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+
+        const emailLower = email.toLowerCase();
+        const registrationData = cache.get(`signup_${emailLower}`);
+
+        if (!registrationData) {
+            return res.status(400).json({ success: false, message: 'Registration session not found. Please sign up again.' });
+        }
+
+        // Generate new OTP
+        const otp = generateOTP();
+        registrationData.otp = otp;
+        registrationData.otpExpiry = Date.now() + 10 * 60 * 1000;
+
+        cache.set(`signup_${emailLower}`, registrationData, 600);
+
+        // Send Email
+        const html = getEmailTemplate({
+            title: 'Resent Verification OTP',
+            content: `
+                <h1 class="h1">Hello ${registrationData.name},</h1>
+                <p class="p">Here is your new 6-digit OTP to verify your email address:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1e293b; background: #f1f5f9; padding: 10px 20px; border-radius: 8px; border: 1px solid #e2e8f0;">${otp}</span>
+                </div>
+            `,
+            footerText: 'This OTP is valid for 10 minutes.'
+        });
+
+        await sendEmail({
+            to: emailLower,
+            subject: 'SOEIT Portal - Resent Verification OTP',
+            html
+        });
+
+        res.status(200).json({ success: true, message: 'A new OTP has been sent to your email.' });
+    } catch (error) {
         next(error);
     }
 };
@@ -132,7 +251,7 @@ exports.changePassword = async (req, res, next) => {
         const { currentPassword, newPassword } = req.body;
 
         if (!validatePassword(newPassword)) {
-            return res.status(400).json({ success: false, message: 'New password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character' });
+            return res.status(400).json({ success: false, message: 'New password must be 6-10 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)' });
         }
 
         const user = await User.findById(req.user.id);
@@ -217,7 +336,7 @@ exports.resetPassword = async (req, res, next) => {
         if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
 
         if (!validatePassword(req.body.password)) {
-            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character' });
+            return res.status(400).json({ success: false, message: 'Password must be 6-10 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)' });
         }
 
         const bcrypt = require('bcryptjs');

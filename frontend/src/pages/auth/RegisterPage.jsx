@@ -30,7 +30,7 @@ import { AJU25_EEE } from '../../data/aju25/aju25_eee';
 import { AJU25_ME } from '../../data/aju25/aju25_me';
 
 const AJU_STUDENTS = [
-    ...AJU23_IBM, ...AJU23_C, ...AJU23_D, ...AJU23_EEE, ...AJU23_ME, 
+    ...AJU23_IBM, ...AJU23_C, ...AJU23_D, ...AJU23_EEE, ...AJU23_ME,
     ...AJU24_AIML, ...AJU24_D, ...AJU24_E, ...AJU24_IBM, ...AJU24_EEE, ...AJU24_ME,
     ...AJU22_C, ...AJU22_D, ...AJU22_E, ...AJU22_F, ...AJU22_EEE, ...AJU22_ME,
     ...AJU25_AIML, ...AJU25_D, ...AJU25_E, ...AJU25_F, ...AJU25_IBM, ...AJU25_EEE, ...AJU25_ME
@@ -60,7 +60,7 @@ const DEPARTMENTS = {
 };
 
 // Define Field component OUTSIDE the main component to prevent focus loss during state updates
-const Field = ({ name, label, type = 'text', placeholder, required, form, setForm, errors, children, disabled = false }) => (
+const Field = ({ name, label, type = 'text', placeholder, required, form, setForm, errors, children, disabled = false, onChange }) => (
     <div className="form-group" style={{ marginBottom: '1.25rem' }}>
         {label && (
             <label className="form-label">
@@ -74,7 +74,7 @@ const Field = ({ name, label, type = 'text', placeholder, required, form, setFor
                     className={`form-control ${errors[name] ? 'error' : ''} ${disabled ? 'prefilled-field' : ''}`}
                     placeholder={placeholder}
                     value={form[name] || ''}
-                    onChange={e => setForm(p => ({ ...p, [name]: e.target.value }))}
+                    onChange={onChange || (e => setForm(p => ({ ...p, [name]: e.target.value })))}
                     disabled={disabled}
                 />
             </div>
@@ -104,6 +104,11 @@ const RegisterPage = () => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [isPreFilled, setIsPreFilled] = useState(false);
+    const [showOTPModal, setShowOTPModal] = useState(false);
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [otpLoading, setOtpLoading] = useState(false);
+    const [resendLoading, setResendLoading] = useState(false);
+    const [timer, setTimer] = useState(0);
 
     // Auto-fill logic for restricted batches (AJU/23 & AJU/24)
     useEffect(() => {
@@ -126,10 +131,10 @@ const RegisterPage = () => {
                     delete newErrors.enrollmentNo;
                     return newErrors;
                 });
-            } else if ((form.enrollmentNo.toUpperCase().startsWith('AJU/23') || 
-                        form.enrollmentNo.toUpperCase().startsWith('AJU/24') ||
-                        form.enrollmentNo.toUpperCase().startsWith('AJU/22') ||
-                        form.enrollmentNo.toUpperCase().startsWith('AJU/25')) && form.enrollmentNo.length >= 10) {
+            } else if ((form.enrollmentNo.toUpperCase().startsWith('AJU/23') ||
+                form.enrollmentNo.toUpperCase().startsWith('AJU/24') ||
+                form.enrollmentNo.toUpperCase().startsWith('AJU/22') ||
+                form.enrollmentNo.toUpperCase().startsWith('AJU/25')) && form.enrollmentNo.length >= 10) {
                 // Restricted batches missing from list
                 setIsPreFilled(false);
                 setErrors(prev => ({ ...prev, enrollmentNo: 'Enrollment No. not recognized for this batch' }));
@@ -170,10 +175,10 @@ const RegisterPage = () => {
         if (!form.name.trim()) e.name = 'Name is required';
         if (!form.email) e.email = 'Email is required';
         else if (!/\S+@arkajainuniversity\.ac\.in$/.test(form.email)) e.email = 'Please use official university email';
-        
+
         if (!form.password) e.password = 'Password is required';
-        else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(form.password)) {
-            e.password = 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)';
+        else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,10}$/.test(form.password)) {
+            e.password = 'Password must be 6-10 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)';
         }
         if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
 
@@ -192,12 +197,12 @@ const RegisterPage = () => {
                 e.enrollmentNo = 'Student Enrollment No. must start with AJU/';
             } else {
                 const searchEnrollment = form.enrollmentNo.toUpperCase();
-                const isRestrictedBatch = searchEnrollment.startsWith('AJU/23') || 
-                                        searchEnrollment.startsWith('AJU/24') ||
-                                        searchEnrollment.startsWith('AJU/22') ||
-                                        searchEnrollment.startsWith('AJU/25');
+                const isRestrictedBatch = searchEnrollment.startsWith('AJU/23') ||
+                    searchEnrollment.startsWith('AJU/24') ||
+                    searchEnrollment.startsWith('AJU/22') ||
+                    searchEnrollment.startsWith('AJU/25');
                 const student = AJU_STUDENTS.find(s => s.enrollmentNo === searchEnrollment);
-                
+
                 if (isRestrictedBatch && !student) {
                     e.enrollmentNo = 'Enrollment No. not valid for your batch';
                 }
@@ -216,14 +221,78 @@ const RegisterPage = () => {
         try {
             const { confirmPassword, ...data } = form;
             await register(data);
-            toast.success('Registration successful! Welcome aboard 🎉');
-            navigate('/dashboard', { replace: true });
+            toast.success('OTP sent to your email!');
+            setShowOTPModal(true);
+            setTimer(60); // 1 minute resend timer
         } catch (err) {
             toast.error(err.response?.data?.message || 'Registration failed');
         } finally {
             setLoading(false);
         }
     };
+
+    const handleOtpChange = (index, value) => {
+        if (isNaN(value)) return;
+        const newOtp = [...otp];
+        newOtp[index] = value.substring(value.length - 1);
+        setOtp(newOtp);
+
+        // Move to next input
+        if (value && index < 5) {
+            document.getElementById(`otp-${index + 1}`).focus();
+        }
+    };
+
+    const handleKeyDown = (index, e) => {
+        if (e.key === 'Backspace' && !otp[index] && index > 0) {
+            document.getElementById(`otp-${index - 1}`).focus();
+        }
+    };
+
+    const { verifyOTP, resendOTP } = useAuth();
+
+    const handleVerifyOTP = async (e) => {
+        e.preventDefault();
+        const otpString = otp.join('');
+        if (otpString.length !== 6) {
+            toast.error('Please enter 6-digit OTP');
+            return;
+        }
+
+        setOtpLoading(true);
+        try {
+            await verifyOTP({ email: form.email, otp: otpString });
+            toast.success('Email verified! Welcome to SOEIT 🎉');
+            navigate('/dashboard', { replace: true });
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Verification failed');
+        } finally {
+            setOtpLoading(false);
+        }
+    };
+
+    const handleResendOTP = async () => {
+        if (timer > 0) return;
+        setResendLoading(true);
+        try {
+            await resendOTP(form.email);
+            toast.success('New OTP sent!');
+            setTimer(60);
+            setOtp(['', '', '', '', '', '']);
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Resend failed');
+        } finally {
+            setResendLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        let interval;
+        if (timer > 0) {
+            interval = setInterval(() => setTimer(t => t - 1), 1000);
+        }
+        return () => clearInterval(interval);
+    }, [timer]);
 
     return (
         <div className="register-page">
@@ -266,7 +335,25 @@ const RegisterPage = () => {
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-row">
-                            <Field name="enrollmentNo" label="Enrollment No." placeholder={form.role === 'student' ? "AJU/221403" : "ARKA/AJU/FACULTY"} required form={form} setForm={setForm} errors={errors} />
+                            <Field 
+                                name="enrollmentNo" 
+                                label="Enrollment No." 
+                                placeholder={form.role === 'student' ? "AJU/221403" : "ARKA/AJU/FACULTY"} 
+                                required 
+                                form={form} 
+                                setForm={setForm} 
+                                errors={errors} 
+                                onChange={e => {
+                                    let val = e.target.value.toUpperCase();
+                                    // Auto-format AJU/ for students
+                                    if (form.role === 'student') {
+                                        if (val.startsWith('AJU') && val.length > 3 && val[3] !== '/') {
+                                            val = 'AJU/' + val.substring(3);
+                                        }
+                                    }
+                                    setForm(p => ({ ...p, enrollmentNo: val }));
+                                }}
+                            />
                             <Field name="name" label="Full Name" placeholder="Full name" required form={form} setForm={setForm} errors={errors} disabled={isPreFilled} />
                         </div>
 
@@ -333,14 +420,14 @@ const RegisterPage = () => {
                             </>
                         )}
                         {form.role === 'faculty' && (
-                            <Field 
-                                name="department" 
-                                label="Department" 
-                                placeholder="Enter your department" 
-                                required 
-                                form={form} 
-                                setForm={setForm} 
-                                errors={errors} 
+                            <Field
+                                name="department"
+                                label="Department"
+                                placeholder="Enter your department"
+                                required
+                                form={form}
+                                setForm={setForm}
+                                errors={errors}
                             />
                         )}
 
@@ -351,7 +438,7 @@ const RegisterPage = () => {
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         className={`form-control ${errors.password ? 'error' : ''}`}
-                                        placeholder="Min 8 chars"
+                                        placeholder="6-10 chars"
                                         value={form.password}
                                         onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                                     />
@@ -391,6 +478,61 @@ const RegisterPage = () => {
                     </p>
                 </div>
             </div>
+
+            {/* OTP Modal */}
+            {showOTPModal && (
+                <div className="otp-overlay">
+                    <div className="otp-modal">
+                        <button className="otp-close" onClick={() => setShowOTPModal(false)}>×</button>
+
+                        <div className="otp-header">
+                            <div className="otp-icon-circle">
+                                <Eye size={32} />
+                            </div>
+                            <h2>Verify your email</h2>
+                            <p>We've sent a 6-digit code to <br /><strong>{form.email}</strong></p>
+                        </div>
+
+                        <form onSubmit={handleVerifyOTP}>
+                            <div className="otp-input-container">
+                                {otp.map((digit, idx) => (
+                                    <input
+                                        key={idx}
+                                        id={`otp-${idx}`}
+                                        type="text"
+                                        maxLength={1}
+                                        value={digit}
+                                        onChange={e => handleOtpChange(idx, e.target.value)}
+                                        onKeyDown={e => handleKeyDown(idx, e)}
+                                        className="otp-input"
+                                        autoFocus={idx === 0}
+                                    />
+                                ))}
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="btn-arka-jain w-full"
+                                disabled={otpLoading}
+                                style={{ marginTop: '2rem', padding: '1rem' }}
+                            >
+                                {otpLoading ? 'Verifying...' : 'VERIFY OTP'}
+                            </button>
+                        </form>
+
+                        <div className="otp-footer">
+                            <p>Didn't receive code?</p>
+                            <button
+                                onClick={handleResendOTP}
+                                disabled={timer > 0 || resendLoading}
+                                className="resend-btn"
+                            >
+                                {resendLoading ? 'Sending...' : timer > 0 ? `Resend in ${timer}s` : 'Resend Code'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
