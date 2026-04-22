@@ -32,19 +32,19 @@ export const generateResumePdf = (data) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     const contactInfo = [];
-    if (student.phone) contactInfo.push({ text: `+91-${student.phone.replace('+91-', '')}` });
+    if (student.phone) contactInfo.push({ text: `+91-${student.phone.replace('', '')}` });
     if (student.email) contactInfo.push({ text: student.email });
     if (student.linkedIn) contactInfo.push({ text: 'LinkedIn', url: student.linkedIn.startsWith('http') ? student.linkedIn : `https://${student.linkedIn}` });
     if (student.github) contactInfo.push({ text: 'GitHub', url: student.github.startsWith('http') ? student.github : `https://${student.github}` });
     if (student.portfolio) contactInfo.push({ text: 'Portfolio', url: student.portfolio.startsWith('http') ? student.portfolio : `https://${student.portfolio}` });
-    
+
     // Draw contact info centered
     let totalContactWidth = 0;
     contactInfo.forEach((info, index) => {
         totalContactWidth += doc.getTextWidth(info.text);
         if (index < contactInfo.length - 1) totalContactWidth += doc.getTextWidth('  |  ');
     });
-    
+
     let currentX = (pageWidth - totalContactWidth) / 2;
     contactInfo.forEach((info, index) => {
         if (info.url) {
@@ -59,7 +59,7 @@ export const generateResumePdf = (data) => {
             doc.text(info.text, currentX, cursorY);
         }
         currentX += doc.getTextWidth(info.text);
-        
+
         if (index < contactInfo.length - 1) {
             doc.text('  |  ', currentX, cursorY);
             currentX += doc.getTextWidth('  |  ');
@@ -136,7 +136,7 @@ export const generateResumePdf = (data) => {
         const dashIdx = batch.indexOf('-');
         if (dashIdx !== -1) {
             const mon = batch.substring(0, dashIdx); // e.g. 'Aug'
-            const yr  = batch.substring(dashIdx + 1); // e.g. '2022'
+            const yr = batch.substring(dashIdx + 1); // e.g. '2022'
             const endYr = String(parseInt(yr) + 4);
             return `${mon} ${yr} - May ${endYr}`;
         }
@@ -188,11 +188,11 @@ export const generateResumePdf = (data) => {
         internships.forEach(exp => {
             const startStr = exp.start_date ? format(new Date(exp.start_date), 'MMM yyyy') : '';
             const endStr = exp.status === 'Ongoing' ? 'Present' : (exp.end_date ? format(new Date(exp.end_date), 'MMM yyyy') : '');
-            
+
             drawRow(exp.company_name, `${startStr} - ${endStr}`, true, false);
             drawRow(exp.role, exp.location || '', false, true);
             if (exp.description) {
-                exp.description.split('\n').forEach(line => drawBullet(line));
+                exp.description.split('\n').filter(d => d.trim()).forEach(line => drawBullet(line.trim().replace(/^[-*•]\s*/, '')));
             }
             cursorY += 8;
         });
@@ -204,7 +204,7 @@ export const generateResumePdf = (data) => {
         projects.forEach(proj => {
             drawRow(`${proj.title} | ${proj.techStack || ''}`, proj.githubLink ? 'GitHub Link' : '', true, false, proj.githubLink);
             if (proj.description) {
-                proj.description.split('\n').forEach(line => drawBullet(line));
+                proj.description.split('\n').filter(d => d.trim()).forEach(line => drawBullet(line.trim().replace(/^[-*•]\s*/, '')));
             }
             cursorY += 8;
         });
@@ -222,10 +222,10 @@ export const generateResumePdf = (data) => {
             doc.text(`${ach.title}`, margin, cursorY);
             const titleW = doc.getTextWidth(`${ach.title} `);
             doc.setFont('helvetica', 'normal');
-            
+
             const achText = `— ${ach.description || 'Verified Accomplishment'}${dateStr}.`;
             const splitAch = doc.splitTextToSize(achText, contentWidth - titleW);
-            
+
             doc.text(splitAch[0], margin + titleW, cursorY);
             if (splitAch.length > 1) {
                 cursorY += 14;

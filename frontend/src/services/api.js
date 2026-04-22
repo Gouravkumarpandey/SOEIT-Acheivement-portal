@@ -150,6 +150,7 @@ export const projectAPI = {
     add: (data) => API.post('/projects', data),
     getMy: () => API.get('/projects/my'),
     getAll: (params) => API.get('/projects', { params }),
+    update: (id, data) => API.put(`/projects/${id}`, data),
     delete: (id) => API.delete(`/projects/${id}`),
 };
 

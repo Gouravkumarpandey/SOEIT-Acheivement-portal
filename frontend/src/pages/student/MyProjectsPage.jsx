@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { projectAPI } from '../../services/api';
-import { Plus, Trash2, Github, ExternalLink, Code2, Layers, X } from 'lucide-react';
+import { Plus, Trash2, Github, ExternalLink, Code2, Layers, X, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const MyProjectsPage = () => {
@@ -16,6 +16,20 @@ const MyProjectsPage = () => {
         techStack: '',
         status: 'Completed'
     });
+    const [submitting, setSubmitting] = useState(false);
+
+    const handleEdit = (project) => {
+        setEditingId(project.id);
+        setFormData({
+            title: project.title,
+            description: project.description,
+            githubLink: project.githubLink || '',
+            liveLink: project.liveLink || '',
+            techStack: project.techStack || '',
+            status: project.status || ''
+        });
+        setShowModal(true);
+    };
 
     const loadProjects = async () => {
         try {
@@ -34,10 +48,11 @@ const MyProjectsPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitting(true);
         try {
             if (editingId) {
-                // await projectAPI.update(editingId, formData);
-                // toast.success('Project updated');
+                await projectAPI.update(editingId, formData);
+                toast.success('Project updated');
             } else {
                 await projectAPI.add(formData);
                 toast.success('Project added successfully');
@@ -47,6 +62,8 @@ const MyProjectsPage = () => {
             loadProjects();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Operation failed');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -105,9 +122,14 @@ const MyProjectsPage = () => {
                                     <div style={{ width: 48, height: 48, background: 'var(--primary-50)', color: 'var(--brand-700)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <Layers size={24} />
                                     </div>
-                                    <button className="btn btn-ghost btn-sm text-danger" onClick={() => handleDelete(project.id)} style={{ padding: '0.5rem' }}>
-                                        <Trash2 size={16} />
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                        <button className="btn btn-ghost btn-sm" onClick={() => handleEdit(project)} style={{ padding: '0.5rem', color: 'var(--primary-600)' }}>
+                                            <Pencil size={16} />
+                                        </button>
+                                        <button className="btn btn-ghost btn-sm text-danger" onClick={() => handleDelete(project.id)} style={{ padding: '0.5rem' }}>
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div style={{ marginBottom: '1rem' }}>
@@ -117,9 +139,27 @@ const MyProjectsPage = () => {
                                             {project.status.toUpperCase()}
                                         </span>
                                     </div>
-                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '0.5rem', lineBreak: 'anywhere' }}>
-                                        {project.description}
-                                    </p>
+                                    <div style={{ 
+                                        marginTop: '1rem',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '0.5rem'
+                                    }}>
+                                        {project.description?.split('\n').filter(line => line.trim()).map((line, i) => (
+                                            <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                                                <div style={{ marginTop: '0.5rem', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--brand-400)', flexShrink: 0 }} />
+                                                <p style={{ 
+                                                    fontSize: '0.875rem', 
+                                                    color: 'var(--text-secondary)', 
+                                                    margin: 0,
+                                                    lineHeight: '1.5',
+                                                    wordBreak: 'break-word'
+                                                }}>
+                                                    {line.trim().replace(/^[-*•]\s*/, '')}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div style={{ marginBottom: '1.25rem' }}>
@@ -155,8 +195,8 @@ const MyProjectsPage = () => {
                     <div className="modal animate-scale-in">
                         <div className="modal-header">
                             <div>
-                                <h3 style={{ margin: 0 }}>Add New Project</h3>
-                                <p style={{ margin: 0 }}>Showcase your technical work and achievements.</p>
+                                <h3 style={{ margin: 0 }}>{editingId ? 'Edit Project' : 'Add New Project'}</h3>
+                                <p style={{ margin: 0 }}>{editingId ? 'Update your project details.' : 'Showcase your technical work and achievements.'}</p>
                             </div>
                             <button className="btn btn-ghost" onClick={() => setShowModal(false)} style={{ color: '#ef4444' }}>
                                 <X size={24} />
@@ -233,8 +273,10 @@ const MyProjectsPage = () => {
                                 </div>
 
                                 <div className="modal-actions-responsive">
-                                    <button type="button" className="btn btn-secondary cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
-                                    <button type="submit" className="btn btn-primary submit-btn">Add Project</button>
+                                    <button type="button" className="btn btn-secondary cancel-btn" onClick={() => setShowModal(false)} disabled={submitting}>Cancel</button>
+                                    <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
+                                        {submitting ? 'Processing...' : editingId ? 'Update Project' : 'Add Project'}
+                                    </button>
                                 </div>
                             </form>
                         </div>
