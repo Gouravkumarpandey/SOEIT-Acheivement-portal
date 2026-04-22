@@ -388,5 +388,205 @@ export const AJU23_IBM = [
         semester: "6",
         email: "btech231824@arkajainuniversity.ac.in",
         department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231834",
+        name: "MISHA KUMARI",
+        rollNo: "BTCS-DS/045",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "btech231834@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231845",
+        name: "SIMEE PANDEY",
+        rollNo: "BTCS-DS/046",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "btech231845@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231846",
+        name: "RAJA SARDAR",
+        rollNo: "BTCS-DS/047",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "raja231846@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231930",
+        name: "SHIVANKAR",
+        rollNo: "BTCS-DS/048",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "shivankar231930@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/230609",
+        name: "YASHFEEN FARAH DIBA",
+        rollNo: "BTCS-DS/049",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "yashfeen230609@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231362",
+        name: "AMIT KUMAR",
+        rollNo: "BTCS-DS/050",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "btech231362@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231425",
+        name: "SOHAIL KHAN",
+        rollNo: "BTCS-DS/051",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "sohail231425@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231932",
+        name: "PRIYANSHU KUMAR",
+        rollNo: "BTCS-DS/052",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "priyanshu231932@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231288",
+        name: "ABHISHEK KUMAR",
+        rollNo: "BTCS-DS/053",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "abhishek231288@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/230329",
+        name: "ROHIT SINGH",
+        rollNo: "BTCS-DS/054",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "btech230329@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231977",
+        name: "SURBHI SINGH",
+        rollNo: "BTCS-DS/055",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "surbhi231977@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/232002",
+        name: "RISHI RAJ HANS",
+        rollNo: "BTCS-DS/056",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "rishi232002@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/230876",
+        name: "SAHIL MOURYA",
+        rollNo: "BTCS-DS/057",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "sahil230876@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/230105",
+        name: "BISHU BHARTI",
+        rollNo: "BTCS-DS/058",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "bishu230105@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/230727",
+        name: "ABHISHEK GHOSH",
+        rollNo: "BTCS-DS/059",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "abhishek230727@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/232076",
+        name: "AYUSHI SINGH",
+        rollNo: "BTCS-DS/060",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "ayushi232076@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/230108",
+        name: "SATAPRAKASH JENA",
+        rollNo: "BTCS-DS/061",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "sataprakash230108@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/230375",
+        name: "SAKINA KHATOON",
+        rollNo: "BTCS-DS/062",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "sakina230375@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/231374",
+        name: "SUNDARAM TIWARY",
+        rollNo: "BTCS-DS/063",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "sundaram231374@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
+    },
+    {
+        enrollmentNo: "AJU/230402",
+        name: "RAM GOPE",
+        rollNo: "BTCS-DS/064",
+        section: "E",
+        batch: "2023-27",
+        semester: "6",
+        email: "ram230402@arkajainuniversity.ac.in",
+        department: "AIDS (IBM)"
     }
 ];
