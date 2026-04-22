@@ -342,14 +342,14 @@ const RegisterPage = () => {
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-row">
-                            <Field 
-                                name="enrollmentNo" 
-                                label="Enrollment No." 
-                                placeholder={form.role === 'student' ? "AJU/221403" : "ARKA/AJU/FACULTY"} 
-                                required 
-                                form={form} 
-                                setForm={setForm} 
-                                errors={errors} 
+                            <Field
+                                name="enrollmentNo"
+                                label="Enrollment No."
+                                placeholder={form.role === 'student' ? "AJU/221403" : "ARKA/AJU/FACULTY"}
+                                required
+                                form={form}
+                                setForm={setForm}
+                                errors={errors}
                                 onChange={e => {
                                     let val = e.target.value.toUpperCase();
                                     // Auto-format AJU/ for students
