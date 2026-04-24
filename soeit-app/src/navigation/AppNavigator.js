@@ -111,6 +111,7 @@ const CustomDrawerContent = (props) => {
     <>
       <DrawerSectionHeader title="SYSTEM ADMIN" />
       <CustomDrawerItem label="Main Dashboard" icon="stats-chart-outline" screenName="AdminHome" active={activeRouteName === 'AdminHome'} />
+      <CustomDrawerItem label="Campus Events" icon="calendar-outline" screenName="Broadcasts" active={activeRouteName === 'Broadcasts'} />
       <CustomDrawerItem label="Verification" icon="shield-checkmark-outline" screenName="Verify" active={activeRouteName === 'Verify'} />
       
       <DrawerSectionHeader title="USER MANAGEMENT" />
@@ -118,7 +119,6 @@ const CustomDrawerContent = (props) => {
       <CustomDrawerItem label="Faculty Registry" icon="school-outline" screenName="FacultyManagement" active={activeRouteName === 'FacultyManagement'} />
 
       <DrawerSectionHeader title="INSTITUTION" />
-      <CustomDrawerItem label="Public Notices" icon="megaphone-outline" screenName="Notices" active={activeRouteName === 'Notices'} />
       <CustomDrawerItem label="System Reports" icon="analytics-outline" screenName="Reports" active={activeRouteName === 'Reports'} />
     </>
   );
@@ -258,10 +258,11 @@ const AdminDrawer = () => (
       }}
     />
     <Drawer.Screen
-      name="Notices"
+      name="Broadcasts"
       component={EventsPage}
       options={{
-        drawerIcon: (props) => <DrawerIcon name="megaphone-outline" {...props} />,
+        title: 'Campus Events',
+        drawerIcon: (props) => <DrawerIcon name="calendar-outline" {...props} />,
       }}
     />
     <Drawer.Screen

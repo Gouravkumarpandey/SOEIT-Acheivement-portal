@@ -34,7 +34,7 @@ api.interceptors.request.use(
 
       // MOCK DATA LOGIC: If using demo token, intercept certain GET requests to prevent 401s
       const isDemoToken = token && typeof token === 'string' && token.startsWith('demo-token-');
-      
+
       if (isDemoToken && config.method === 'get') {
         const url = config.url || '';
         // console.log(`[API] Intercepting Demo Request: ${url}`);
@@ -50,7 +50,7 @@ api.interceptors.request.use(
           const stats = { totalStudents: 120, totalFaculties: 15, totalAchievements: 450, pendingCount: 25, approvedCount: 400, rejectedCount: 25 };
           return { ...config, adapter: () => Promise.resolve(mockRes(stats)) };
         }
-        
+
         if (url.includes('/admin/students')) {
           const demoStudents = [
             { id: '1', name: 'Ritesh Kumar', email: 'ritesh@demo.edu', enrollmentNo: 'AJU/221403', semester: 6, section: 'A', achievementCounts: { approved: 5, pending: 2, points: 150 } },
@@ -59,7 +59,7 @@ api.interceptors.request.use(
           ];
           return { ...config, adapter: () => Promise.resolve({ data: { success: true, data: demoStudents, total: 3 }, status: 200, statusText: 'OK', headers: {}, config }) };
         }
-        
+
         if (url.includes('/admin/achievements') || url.includes('/achievements/pending')) {
           const demoPending = [
             { id: 'ach1', title: 'Google Hash Code Finalist', category: 'Coding', level: 'International', date: '2026-03-15', status: 'pending', user: { name: 'Ritesh Kumar', enrollmentNo: 'AJU/221403' } },
@@ -118,15 +118,15 @@ api.interceptors.response.use(
     // If 401 Unauthorized, only log out if NOT in demo mode
     const authHeader = error.config?.headers?.Authorization || '';
     const isDemo = authHeader.includes('demo-token-');
-    
+
     if (error.response?.status === 401 && !isDemo) {
       if (typeof localStorage !== 'undefined') {
         localStorage.removeItem('soeit_token');
         localStorage.removeItem('soeit_user');
       }
       if (Platform.OS !== 'web') {
-        await SecureStore.deleteItemAsync('soeit_token').catch(() => {});
-        await SecureStore.deleteItemAsync('soeit_user').catch(() => {});
+        await SecureStore.deleteItemAsync('soeit_token').catch(() => { });
+        await SecureStore.deleteItemAsync('soeit_user').catch(() => { });
       }
     }
     return Promise.reject(error);
