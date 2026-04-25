@@ -76,3 +76,20 @@ exports.clearAll = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Update user push token
+// @route   PUT /api/notifications/push-token
+// @access  Private
+exports.updatePushToken = async (req, res, next) => {
+    try {
+        const { pushToken } = req.body;
+        if (!req.user || !req.user.id) throw new Error('User not identified');
+
+        const User = require('../user/user.model');
+        await User.findByIdAndUpdate(req.user.id, { pushToken }, { new: true });
+
+        res.status(200).json({ success: true, message: 'Push token updated' });
+    } catch (error) {
+        next(error);
+    }
+};

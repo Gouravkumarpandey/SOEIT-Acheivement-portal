@@ -54,6 +54,7 @@ const rowToUser = (row) => {
         lastLogin: row.last_login ? new Date(row.last_login) : undefined,
         createdAt: row.created_at ? new Date(row.created_at) : undefined,
         updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
+        pushToken: row.push_token || '',
 
         // Methods (mimic Mongoose)
         matchPassword: async function (entered) {
@@ -86,7 +87,7 @@ const rowToUser = (row) => {
                     edu_12th_school=?, edu_12th_year=?, edu_12th_percent=?,
                     university_name=?, university_cgpa=?, skills=?,
                     reset_password_token=?, reset_password_expire=?, last_login=?,
-                    updated_at=datetime('now')
+                    updated_at=datetime('now'), push_token=?
                     WHERE id=?`,
                 args: [
                     this.name, this.email, this.password, this.role, this.department,
@@ -102,6 +103,7 @@ const rowToUser = (row) => {
                     this.resetPasswordToken || null,
                     this.resetPasswordExpire ? this.resetPasswordExpire.toISOString() : null,
                     this.lastLogin ? this.lastLogin.toISOString() : null,
+                    this.pushToken || null,
                     this.id,
                 ],
             });
@@ -264,7 +266,7 @@ const User = {
             edu10thSchool: 'edu_10th_school', edu10thYear: 'edu_10th_year', edu10thPercent: 'edu_10th_percent',
             edu12thSchool: 'edu_12th_school', edu12thYear: 'edu_12th_year', edu12thPercent: 'edu_12th_percent',
             universityName: 'university_name', universityCgpa: 'university_cgpa',
-            skills: 'skills',
+            skills: 'skills', pushToken: 'push_token',
         };
 
         const setParts = [];

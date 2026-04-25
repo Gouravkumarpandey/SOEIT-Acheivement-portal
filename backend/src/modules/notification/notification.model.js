@@ -1,4 +1,7 @@
 const { getDb } = require('../../config/db');
+const { sendPushNotification } = require('./notification.service');
+// We import User dynamically to avoid circular dependency if any
+const getUserModel = () => require('../user/user.model');
 
 const genId = async () => {
     const { nanoid } = await import('nanoid');
@@ -49,7 +52,18 @@ const Notification = {
             args: [id, data.user, data.type, data.title, data.message, data.link || null],
         });
         const res = await db.execute({ sql: 'SELECT * FROM notifications WHERE id = ?', args: [id] });
-        return rowToNotification(res.rows[0]);
+        const notification = rowToNotification(res.rows[0]);
+
+        // Send push notification
+        if (notification) {
+            const User = getUserModel();
+            const user = await User.findById(data.user);
+            if (user && user.pushToken) {
+                sendPushNotification([user.pushToken], data.title, data.message, { type: data.type, link: data.link });
+            }
+        }
+
+        return notification;
     },
 
     createMany: async (notifications) => {
@@ -66,6 +80,19 @@ const Notification = {
             });
             created.push(id);
         }
+        // Send push notifications for all (grouped by user token)
+        const User = getUserModel();
+        const userTokens = {};
+        for (const data of notifications) {
+            if (!userTokens[data.user]) {
+                const user = await User.findById(data.user);
+                userTokens[data.user] = user ? user.pushToken : null;
+            }
+            if (userTokens[data.user]) {
+                sendPushNotification([userTokens[data.user]], data.title, data.message, { type: data.type, link: data.link });
+            }
+        }
+
         return created;
     },
 

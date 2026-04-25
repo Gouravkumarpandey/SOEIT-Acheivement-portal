@@ -9,6 +9,7 @@ import {
   Platform,
   TextInput,
   Image,
+  Switch,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,6 +18,7 @@ import { COLORS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/common/Button';
 import { SPACING, getResponsiveFontSize } from '../../utils/responsive';
+import { registerForPushNotificationsAsync, updatePushTokenOnServer } from '../../utils/notifications';
 
 const ProfileItem = ({
   icon,
@@ -101,6 +103,48 @@ const ProfileScreen = ({ navigation }) => {
     newPassword: '',
     confirmPassword: '',
   });
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  useEffect(() => {
+    // Check if user has push token on mount
+    if (user?.pushToken) {
+      setNotificationsEnabled(true);
+    }
+  }, [user]);
+
+  const toggleNotifications = async (value) => {
+    if (value) {
+      setLoading(true);
+      try {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          await updatePushTokenOnServer(token);
+          setNotificationsEnabled(true);
+          // Update local user state
+          updateUser({ ...user, pushToken: token });
+          Alert.alert('Success', 'Push notifications enabled!');
+        } else {
+          setNotificationsEnabled(false);
+          Alert.alert('Error', 'Failed to get push token. Please check your settings.');
+        }
+      } catch (e) {
+        console.error(e);
+        setNotificationsEnabled(false);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Logic to disable notifications (optional: could remove token from server)
+      setNotificationsEnabled(false);
+      try {
+        await updatePushTokenOnServer(null);
+        updateUser({ ...user, pushToken: null });
+        Alert.alert('Disabled', 'Push notifications disabled');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -454,6 +498,34 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           )}
 
+          {/* Notification Settings */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle} allowFontScaling maxFontSizeMultiplier={1.2}>
+              Settings
+            </Text>
+            <View style={styles.card}>
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <View style={[styles.itemIcon, { backgroundColor: COLORS.primary + '15' }]}>
+                    <Ionicons name="notifications-outline" size={22} color={COLORS.primary} />
+                  </View>
+                  <View>
+                    <Text style={styles.itemLabel}>Push Notifications</Text>
+                    <Text style={styles.settingDescription}>Receive alerts for notices and updates</Text>
+                  </View>
+                </View>
+                <Switch
+                  trackColor={{ false: '#767577', true: COLORS.primary + '80' }}
+                  thumbColor={notificationsEnabled ? COLORS.primary : '#f4f3f4'}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={toggleNotifications}
+                  value={notificationsEnabled}
+                  disabled={loading}
+                />
+              </View>
+            </View>
+          </View>
+
         </>
       )}
 
@@ -797,6 +869,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SPACING.lg,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  settingInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  settingDescription: {
+    fontSize: getResponsiveFontSize(10),
+    color: COLORS.textMuted,
+    marginTop: 2,
   },
   itemContent: {
     flex: 1,

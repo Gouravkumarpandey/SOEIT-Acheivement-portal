@@ -9,5 +9,6 @@ router.get('/', getNotifications);
 router.put('/read-all', markAllAsRead);
 router.delete('/clear-all', clearAll);
 router.put('/:id/read', markAsRead);
+router.put('/push-token', require('./notification.controller').updatePushToken);
 
 module.exports = router;
