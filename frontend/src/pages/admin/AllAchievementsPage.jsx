@@ -70,7 +70,7 @@ const AllAchievementsPage = () => {
                 const excelData = achievements.map(a => ({
                     'Achievement Title': a.title,
                     'Student Name': a.student?.name,
-                    'ID/Enrollment': a.student?.idNumber || 'N/A',
+                    'ID/Enrollment': a.student?.enrollmentNo || a.student?.studentId || 'N/A',
                     'Department': a.student?.department,
                     'Category': a.category,
                     'Level': a.level,
@@ -226,7 +226,7 @@ const AllAchievementsPage = () => {
                                                     </div>
                                                     <div>
                                                         <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{a.student?.name}</div>
-                                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}># {a.student?.idNumber || 'N/A'}</div>
+                                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}># {a.student?.enrollmentNo || a.student?.studentId || 'N/A'}</div>
                                                     </div>
                                                 </div>
                                             </td>

@@ -71,6 +71,7 @@ exports.getPendingAchievements = async (req, res, next) => {
                 u.email       AS student_email,
                 u.department  AS student_department,
                 u.student_id  AS student_student_id,
+                u.enrollment_no AS student_enrollment_no,
                 u.profile_image AS student_profile_image
             FROM achievements a
             LEFT JOIN users u ON a.student_id = u.id
@@ -87,7 +88,7 @@ exports.getPendingAchievements = async (req, res, next) => {
 
         // Count
         const countRes = await db.execute({
-            sql: sql.replace('a.*, u.name AS student_name, u.email AS student_email, u.department AS student_department, u.student_id AS student_student_id, u.profile_image AS student_profile_image', 'COUNT(*) AS cnt'),
+            sql: sql.replace(/SELECT[\s\S]*?FROM achievements/, 'SELECT COUNT(*) AS cnt FROM achievements'),
             args,
         });
         const total = Number(countRes.rows[0]?.cnt || 0);
@@ -111,6 +112,7 @@ exports.getPendingAchievements = async (req, res, next) => {
                 name: row.student_name, email: row.student_email,
                 department: row.student_department,
                 studentId: row.student_student_id,
+                enrollmentNo: row.student_enrollment_no,
                 profileImage: row.student_profile_image || '',
             },
         }));
@@ -249,6 +251,7 @@ exports.getAllAchievements = async (req, res, next) => {
                 u.email       AS student_email,
                 u.department  AS student_department,
                 u.student_id  AS student_student_id,
+                u.enrollment_no AS student_enrollment_no,
                 u.profile_image AS student_profile_image
             FROM achievements a
             LEFT JOIN users u ON a.student_id = u.id
@@ -288,6 +291,7 @@ exports.getAllAchievements = async (req, res, next) => {
                 name: row.student_name, email: row.student_email,
                 department: row.student_department,
                 studentId: row.student_student_id,
+                enrollmentNo: row.student_enrollment_no,
                 profileImage: row.student_profile_image || '',
             },
         }));
