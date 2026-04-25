@@ -90,6 +90,14 @@ const Notification = {
         const db = getDb();
         const res = await db.execute({ sql: 'SELECT * FROM notifications WHERE id = ?', args: [id] });
         return res.rows.length ? rowToNotification(res.rows[0]) : null;
+    },
+
+    deleteAllByUser: async (userId) => {
+        const db = getDb();
+        await db.execute({
+            sql: 'DELETE FROM notifications WHERE user_id = ?',
+            args: [userId]
+        });
     }
 };
 

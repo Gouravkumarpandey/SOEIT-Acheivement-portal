@@ -158,6 +158,7 @@ export const notificationAPI = {
     getAll: () => API.get('/notifications'),
     markAsRead: (id) => API.put(`/notifications/${id}/read`),
     markAllAsRead: () => API.put('/notifications/read-all'),
+    clearAll: () => API.delete('/notifications/clear-all'),
 };
 
 export const badgeAPI = {

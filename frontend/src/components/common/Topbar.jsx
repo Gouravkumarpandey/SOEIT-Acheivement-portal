@@ -264,10 +264,26 @@ const Topbar = ({ onMenuClick, title }) => {
 
     const markAllRead = async () => {
         try {
+            // Immediately update UI — remove blue dots but keep notifications visible
+            setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
             await notificationAPI.markAllAsRead();
-            setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+            // Re-fetch to stay in sync with server
+            fetchNotifications();
         } catch (err) {
             console.error('Failed to mark all as read:', err);
+            // Re-fetch to restore correct state on error
+            fetchNotifications();
+        }
+    };
+
+    const clearAll = async () => {
+        if (!window.confirm('Are you sure you want to clear all notifications?')) return;
+        try {
+            setNotifications([]);
+            await notificationAPI.clearAll();
+        } catch (err) {
+            console.error('Failed to clear notifications:', err);
+            fetchNotifications();
         }
     };
 
@@ -340,9 +356,14 @@ const Topbar = ({ onMenuClick, title }) => {
                         }}>
                             <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--slate-50)' }}>
                                 <span style={{ fontWeight: 800, fontSize: '0.9rem' }}>Notifications</span>
-                                {unreadCount > 0 && (
-                                    <button onClick={markAllRead} style={{ fontSize: '0.7rem', color: 'var(--brand-600)', fontWeight: 700 }}>Mark all read</button>
-                                )}
+                                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                    {unreadCount > 0 && (
+                                        <button onClick={markAllRead} style={{ fontSize: '0.7rem', color: 'var(--brand-600)', fontWeight: 700 }}>Mark all read</button>
+                                    )}
+                                    {notifications.length > 0 && (
+                                        <button onClick={clearAll} style={{ fontSize: '0.7rem', color: 'var(--error-600)', fontWeight: 700 }}>Clear all</button>
+                                    )}
+                                </div>
                             </div>
                             <div style={{ maxHeight: '360px', overflowY: 'auto' }}>
                                 {notifications.length > 0 ? (

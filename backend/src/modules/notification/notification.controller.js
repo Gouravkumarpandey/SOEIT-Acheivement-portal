@@ -63,3 +63,16 @@ exports.markAsRead = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Clear all notifications
+// @route   DELETE /api/notifications/clear-all
+// @access  Private
+exports.clearAll = async (req, res, next) => {
+    try {
+        if (!req.user || !req.user.id) throw new Error('User not identified');
+        await Notification.deleteAllByUser(req.user.id);
+        res.status(200).json({ success: true, message: 'All notifications cleared' });
+    } catch (error) {
+        next(error);
+    }
+};
