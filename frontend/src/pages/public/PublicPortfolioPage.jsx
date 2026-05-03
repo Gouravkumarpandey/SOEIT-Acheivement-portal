@@ -220,18 +220,6 @@ const PublicPortfolioPage = () => {
                                 {student.department} Engineering {student.semester ? `• • Sem ${student.semester}` : ''}
                             </p>
 
-                            {/* Weekly Badges Display */}
-                            {badges && badges.length > 0 && (
-                                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-primary)', marginRight: '0.5rem' }}>Weekly Badges:</span>
-                                    {badges.map(b => (
-                                        <div key={b.id} title={`${b.badge_type} - ${b.points_earned} pts (${b.week_start})`} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: b.badge_type === 'Platinum' ? 'linear-gradient(135deg, #e2e8f0, #94a3b8)' : b.badge_type === 'Gold' ? 'linear-gradient(135deg, #fef08a, #f59e0b)' : b.badge_type === 'Silver' ? 'linear-gradient(135deg, #f1f5f9, #cbd5e1)' : 'linear-gradient(135deg, #fed7aa, #f97316)', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800, color: '#1e293b', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', border: '1px solid rgba(255,255,255,0.4)' }}>
-                                            <Award size={12} /> {b.badge_type}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
                             {/* Academic History in Public Portfolio was removed as per request, it will only show on generated resume */}
 
                             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
