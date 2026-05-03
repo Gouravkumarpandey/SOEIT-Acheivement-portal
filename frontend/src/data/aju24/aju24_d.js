@@ -221,7 +221,7 @@ export const AJU24_D = [
     },
     {
         enrollmentNo: "AJU/240486",
-        name: "MANSI RAI",
+        name: "MANSI RAY",
         rollNo: "BTCS/028",
         section: "D",
         batch: "2024-28",
