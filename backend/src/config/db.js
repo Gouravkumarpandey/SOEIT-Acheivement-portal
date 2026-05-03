@@ -343,6 +343,71 @@ const seedHackathons = async (client) => {
   }
 };
 
+const awardBadgesForExistingData = async (client) => {
+  try {
+    const { startOfWeek, endOfWeek, format } = require('date-fns');
+    
+    const now = new Date();
+    const weekStart = format(startOfWeek(now), 'yyyy-MM-dd');
+    const weekEnd = format(endOfWeek(now), 'yyyy-MM-dd');
+
+    // Get all approved achievements for this week
+    const achievementsRes = await client.execute(`
+      SELECT a.student_id, SUM(a.points) as weekly_points, u.name, u.email
+      FROM achievements a
+      JOIN users u ON a.student_id = u.id
+      WHERE a.status = 'approved' AND a.date >= ? AND a.date <= ?
+      GROUP BY a.student_id
+    `, [weekStart, weekEnd]);
+
+    if (!achievementsRes?.rows || achievementsRes.rows.length === 0) {
+      console.log('📊 No approved achievements found for current week');
+      return;
+    }
+
+    const BADGE_TIERS = [
+      { type: 'Platinum', minPoints: 500 },
+      { type: 'Gold', minPoints: 300 },
+      { type: 'Silver', minPoints: 150 },
+      { type: 'Bronze', minPoints: 50 }
+    ];
+
+    let badgesAwarded = 0;
+
+    for (const row of achievementsRes.rows) {
+      const studentId = row.student_id || row[0];
+      const points = Number(row.weekly_points || row[1] || 0);
+      const studentName = row.name || row[2];
+      const studentEmail = row.email || row[3];
+
+      // Check if badge already exists for this week
+      const existingRes = await client.execute(
+        'SELECT id FROM badges WHERE student_id = ? AND week_start = ?',
+        [studentId, weekStart]
+      );
+
+      if (existingRes?.rows?.length > 0) continue;
+
+      const tier = BADGE_TIERS.find(t => points >= t.minPoints);
+      if (!tier) continue;
+
+      const badgeId = 'badge_' + Math.random().toString(36).substring(2, 10);
+      await client.execute(
+        `INSERT INTO badges (id, student_id, badge_type, week_start, points_earned, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [badgeId, studentId, tier.type, weekStart, points, new Date().toISOString()]
+      );
+
+      badgesAwarded++;
+      console.log(`🏆 Badge awarded: ${studentName} - ${tier.type} (${points} pts)`);
+    }
+
+    console.log(`✅ ${badgesAwarded} badges awarded for existing data`);
+  } catch (err) {
+    console.log('⚠️ Badge awarding skipped:', err.message);
+  }
+};
+
 const connectDB = async () => {
   const url = process.env.TURSO_URL;
   if (!url) {
@@ -359,6 +424,9 @@ const connectDB = async () => {
 
     await initSchema(client);
     console.log('📐 Schema initialized');
+
+    // Award badges based on existing data
+    await awardBadgesForExistingData(client);
 
     db = client;
     return db;
