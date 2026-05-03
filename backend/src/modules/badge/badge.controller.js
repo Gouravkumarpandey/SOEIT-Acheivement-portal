@@ -168,8 +168,8 @@ exports.getWeeklyLeaderboard = async (req, res) => {
         const weekStartStr = weekStart.toISOString().split('T')[0];
         const weekEndStr = weekEnd.toISOString().split('T')[0];
         
-        // ✅ FIXED: Simplified query for LibSQL/Turso compatibility
-        const leaderboardRes = await db.execute(`
+        // ✅ Try to get this week's leaderboard first
+        let leaderboardRes = await db.execute(`
             SELECT 
                 u.id,
                 u.name,
@@ -190,7 +190,33 @@ exports.getWeeklyLeaderboard = async (req, res) => {
             LIMIT 10
         `, [weekStartStr, weekEndStr]);
         
-        const leaderboard = (leaderboardRes?.rows || []).map((row, idx) => ({
+        let leaderboard = leaderboardRes?.rows || [];
+        let displayWeek = weekStartStr;
+        
+        // If no data this week, get all-time top 10
+        if (leaderboard.length === 0) {
+            leaderboardRes = await db.execute(`
+                SELECT 
+                    u.id,
+                    u.name,
+                    u.profile_image,
+                    u.department,
+                    SUM(a.points) as points_earned,
+                    COUNT(a.id) as achievement_count
+                FROM achievements a
+                JOIN users u ON a.student_id = u.id
+                WHERE a.status = 'approved'
+                AND a.points > 0
+                GROUP BY u.id, u.name, u.profile_image, u.department
+                HAVING SUM(a.points) >= 50
+                ORDER BY SUM(a.points) DESC, u.name ASC
+                LIMIT 10
+            `);
+            leaderboard = leaderboardRes?.rows || [];
+            displayWeek = 'all-time';
+        }
+        
+        const formattedLeaderboard = leaderboard.map((row, idx) => ({
             id: row.id || row[0],
             student_id: row.id || row[0],
             name: row.name || row[1],
@@ -206,10 +232,14 @@ exports.getWeeklyLeaderboard = async (req, res) => {
                 if (pts >= 50) return 'Bronze';
                 return 'None';
             })(),
-            week_start: weekStartStr,
+            week_start: displayWeek,
         }));
         
-        res.status(200).json({ success: true, data: leaderboard });
+        res.status(200).json({ 
+            success: true, 
+            data: formattedLeaderboard,
+            displayPeriod: displayWeek === 'all-time' ? 'All-Time Top Performers' : `Week of ${displayWeek}`
+        });
     } catch (error) {
         console.error('Leaderboard fetch error:', error);
         res.status(500).json({ success: false, message: error.message });
