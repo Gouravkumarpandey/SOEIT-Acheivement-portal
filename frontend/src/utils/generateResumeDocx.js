@@ -284,9 +284,12 @@ export const generateResumeDocx = async (data) => {
 
     // Achievements Section (Bulleted like Ritesh image)
     const legitAchievements = achievements?.filter(a => a.category !== 'Internship' && a.category !== 'Project');
-    if (legitAchievements && legitAchievements.length > 0) {
+    const top4Achievements = legitAchievements
+        ?.sort((a, b) => (b.points || 0) - (a.points || 0))
+        .slice(0, 4);
+    if (top4Achievements && top4Achievements.length > 0) {
         sections.push(createSectionHeader("Achievements"));
-        legitAchievements.forEach(ach => {
+        top4Achievements.forEach(ach => {
             const dateStr = ach.date ? ` (${format(new Date(ach.date), 'yyyy')})` : '';
             sections.push(new Paragraph({
                 children: [
