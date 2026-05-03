@@ -22,14 +22,24 @@ exports.awardWeeklyBadges = async (req, res) => {
     try {
         const db = getDb();
         
-        // Get ALL approved achievements grouped by week
+        // ✅ FIXED: Group by WEEK properly using date arithmetic
+        // For each achievement, calculate week start, then sum by student + week
         const pointsRes = await db.execute(`
-            SELECT a.student_id, DATE(a.date) as ach_date, SUM(a.points) as daily_points, u.name, u.email
+            SELECT 
+                a.student_id,
+                DATE(DATE_ADD(CURDATE(), INTERVAL -DAYOFWEEK(a.verified_at)+1 DAY)) as week_start,
+                SUM(a.points) as total_weekly_points,
+                u.name,
+                u.email,
+                MAX(a.verified_at) as latest_verified
             FROM achievements a
             JOIN users u ON a.student_id = u.id
             WHERE a.status = 'approved'
-            GROUP BY a.student_id, DATE(a.date)
-            ORDER BY a.date DESC
+            AND a.points > 0
+            AND a.verified_at IS NOT NULL
+            GROUP BY a.student_id, DATE(DATE_ADD(CURDATE(), INTERVAL -DAYOFWEEK(a.verified_at)+1 DAY))
+            HAVING SUM(a.points) >= 50
+            ORDER BY latest_verified DESC
         `);
 
         if (!pointsRes?.rows || pointsRes.rows.length === 0) {
@@ -47,53 +57,38 @@ exports.awardWeeklyBadges = async (req, res) => {
             { type: 'Bronze', minPoints: 50 }
         ];
 
-        // Group by student and week
-        const weeklyData = {};
-        
+        const awards = [];
+
+        // Award badges - one per student per week
         for (const row of pointsRes.rows) {
             const studentId = row.student_id || row[0];
-            const achievementDate = row.ach_date || row[1];
-            const points = Number(row.daily_points || row[2] || 0);
+            const weekStartRaw = row.week_start || row[1];
+            const weekStart = weekStartRaw ? new Date(weekStartRaw).toISOString().split('T')[0] : format(startOfWeek(new Date()), 'yyyy-MM-dd');
+            const totalPoints = Number(row.total_weekly_points || row[2] || 0);
             const studentName = row.name || row[3];
             const studentEmail = row.email || row[4];
 
-            const weekStart = format(startOfWeek(new Date(achievementDate)), 'yyyy-MM-dd');
-            const key = `${studentId}_${weekStart}`;
-
-            if (!weeklyData[key]) {
-                weeklyData[key] = {
-                    studentId,
-                    weekStart,
-                    studentName,
-                    studentEmail,
-                    totalPoints: 0
-                };
-            }
-            weeklyData[key].totalPoints += points;
-        }
-
-        const awards = [];
-
-        // Award badges for each week
-        for (const key in weeklyData) {
-            const data = weeklyData[key];
-            const { studentId, weekStart, studentName, totalPoints } = data;
-
-            // Check if badge already exists
+            // Check if badge already exists for this week
             const existingRes = await db.execute(
                 'SELECT id FROM badges WHERE student_id = ? AND week_start = ?',
                 [studentId, weekStart]
             );
 
-            if (existingRes?.rows?.length > 0) continue;
+            if (existingRes?.rows?.length > 0) {
+                console.log(`⏭️ Badge already exists for ${studentName} in week ${weekStart}`);
+                continue;
+            }
 
             const tier = BADGE_TIERS.find(t => totalPoints >= t.minPoints);
-            if (!tier) continue;
+            if (!tier) {
+                console.log(`⚠️ No tier found for ${studentName} with ${totalPoints} points`);
+                continue;
+            }
 
             const badgeId = Math.random().toString(36).substring(2, 15);
             await db.execute({
-                sql: `INSERT INTO badges (id, student_id, badge_type, week_start, points_earned)
-                      VALUES (?, ?, ?, ?, ?)`,
+                sql: `INSERT INTO badges (id, student_id, badge_type, week_start, points_earned, created_at)
+                      VALUES (?, ?, ?, ?, ?, NOW())`,
                 args: [badgeId, studentId, tier.type, weekStart, totalPoints]
             });
 
@@ -104,6 +99,8 @@ exports.awardWeeklyBadges = async (req, res) => {
                 week: weekStart,
                 studentName 
             });
+
+            console.log(`✅ Badge awarded: ${studentName} - ${tier.type} (${totalPoints} pts) for week ${weekStart}`);
         }
 
         res.status(200).json({
