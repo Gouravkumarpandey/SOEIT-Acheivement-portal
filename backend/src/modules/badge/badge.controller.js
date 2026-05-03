@@ -153,39 +153,48 @@ exports.getWeeklyLeaderboard = async (req, res) => {
     try {
         const db = getDb();
         
-        // ✅ Get all students with badges, sorted by points (recent first)
+        // ✅ FIXED: Always fetch from ACHIEVEMENTS table (real source of truth)
+        // Don't rely on stale badges table - calculate fresh totals
         const leaderboardRes = await db.execute(`
             SELECT 
-                b.student_id,
+                u.id,
                 u.name,
                 u.profile_image,
                 u.department,
-                b.points_earned,
-                b.badge_type,
-                b.week_start,
-                COUNT(DISTINCT b.id) as badge_count
-            FROM badges b
-            JOIN users u ON b.student_id = u.id
-            GROUP BY b.student_id
-            ORDER BY MAX(b.points_earned) DESC, MAX(b.created_at) DESC
+                SUM(a.points) as points_earned,
+                COUNT(a.id) as achievement_count
+            FROM achievements a
+            JOIN users u ON a.student_id = u.id
+            WHERE a.status = 'approved'
+            AND a.points > 0
+            GROUP BY u.id, u.name, u.profile_image, u.department
+            HAVING SUM(a.points) >= 50
+            ORDER BY SUM(a.points) DESC, u.name ASC
             LIMIT 20
         `);
         
         const leaderboard = (leaderboardRes?.rows || []).map((row) => ({
-            id: row.student_id || row[0],
-            student_id: row.student_id || row[0],
+            id: row.id || row[0],
+            student_id: row.id || row[0],
             name: row.name || row[1],
             profile_image: row.profile_image || row[2],
             department: row.department || row[3],
             points_earned: Number(row.points_earned || row[4]) || 0,
-            badge_type: row.badge_type || row[5],
-            week_start: row.week_start || row[6],
+            achievement_count: Number(row.achievement_count || row[5]) || 0,
+            badge_type: (() => {
+                const pts = Number(row.points_earned || row[4]) || 0;
+                if (pts >= 500) return 'Platinum';
+                if (pts >= 300) return 'Gold';
+                if (pts >= 150) return 'Silver';
+                if (pts >= 50) return 'Bronze';
+                return 'None';
+            })(),
         }));
         
         res.status(200).json({ 
             success: true, 
             data: leaderboard,
-            message: `Showing ${leaderboard.length} students with earned badges`
+            message: `Showing ${leaderboard.length} top performers (all-time)`
         });
     } catch (error) {
         console.error('Leaderboard fetch error:', error);
