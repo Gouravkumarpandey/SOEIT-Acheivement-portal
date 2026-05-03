@@ -345,23 +345,20 @@ const seedHackathons = async (client) => {
 
 const awardBadgesForExistingData = async (client) => {
   try {
-    const { startOfWeek, endOfWeek, format } = require('date-fns');
+    const { startOfWeek, format } = require('date-fns');
     
-    const now = new Date();
-    const weekStart = format(startOfWeek(now), 'yyyy-MM-dd');
-    const weekEnd = format(endOfWeek(now), 'yyyy-MM-dd');
-
-    // Get all approved achievements for this week
+    // Get all approved achievements (all time)
     const achievementsRes = await client.execute(`
-      SELECT a.student_id, SUM(a.points) as weekly_points, u.name, u.email
+      SELECT a.student_id, a.date, SUM(a.points) as weekly_points, u.name, u.email
       FROM achievements a
       JOIN users u ON a.student_id = u.id
-      WHERE a.status = 'approved' AND a.date >= ? AND a.date <= ?
-      GROUP BY a.student_id
-    `, [weekStart, weekEnd]);
+      WHERE a.status = 'approved'
+      GROUP BY a.student_id, DATE(a.date)
+      ORDER BY a.date DESC
+    `);
 
     if (!achievementsRes?.rows || achievementsRes.rows.length === 0) {
-      console.log('📊 No approved achievements found for current week');
+      console.log('📊 No approved achievements found in database');
       return;
     }
 
@@ -372,15 +369,41 @@ const awardBadgesForExistingData = async (client) => {
       { type: 'Bronze', minPoints: 50 }
     ];
 
-    let badgesAwarded = 0;
-
+    // Group achievements by student and week
+    const weeklyData = {};
+    
     for (const row of achievementsRes.rows) {
       const studentId = row.student_id || row[0];
-      const points = Number(row.weekly_points || row[1] || 0);
-      const studentName = row.name || row[2];
-      const studentEmail = row.email || row[3];
+      const achievementDate = row.date || row[1];
+      const points = Number(row.weekly_points || row[2] || 0);
+      const studentName = row.name || row[3];
+      const studentEmail = row.email || row[4];
 
-      // Check if badge already exists for this week
+      // Get week start date
+      const weekStart = format(startOfWeek(new Date(achievementDate)), 'yyyy-MM-dd');
+      const key = `${studentId}_${weekStart}`;
+
+      if (!weeklyData[key]) {
+        weeklyData[key] = {
+          studentId,
+          weekStart,
+          studentName,
+          studentEmail,
+          totalPoints: 0
+        };
+      }
+      weeklyData[key].totalPoints += points;
+    }
+
+    let badgesAwarded = 0;
+    const processedWeeks = new Set();
+
+    // Award badges for each week
+    for (const key in weeklyData) {
+      const data = weeklyData[key];
+      const { studentId, weekStart, studentName, totalPoints } = data;
+
+      // Check if badge already exists
       const existingRes = await client.execute(
         'SELECT id FROM badges WHERE student_id = ? AND week_start = ?',
         [studentId, weekStart]
@@ -388,23 +411,27 @@ const awardBadgesForExistingData = async (client) => {
 
       if (existingRes?.rows?.length > 0) continue;
 
-      const tier = BADGE_TIERS.find(t => points >= t.minPoints);
+      const tier = BADGE_TIERS.find(t => totalPoints >= t.minPoints);
       if (!tier) continue;
 
       const badgeId = 'badge_' + Math.random().toString(36).substring(2, 10);
       await client.execute(
         `INSERT INTO badges (id, student_id, badge_type, week_start, points_earned, created_at)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        [badgeId, studentId, tier.type, weekStart, points, new Date().toISOString()]
+        [badgeId, studentId, tier.type, weekStart, totalPoints, new Date().toISOString()]
       );
 
       badgesAwarded++;
-      console.log(`🏆 Badge awarded: ${studentName} - ${tier.type} (${points} pts)`);
+      const weekKey = `${studentName} (${weekStart})`;
+      if (!processedWeeks.has(weekKey)) {
+        console.log(`🏆 Badge: ${studentName} - ${tier.type} Badge (${totalPoints} pts) - Week of ${weekStart}`);
+        processedWeeks.add(weekKey);
+      }
     }
 
-    console.log(`✅ ${badgesAwarded} badges awarded for existing data`);
+    console.log(`✅ ${badgesAwarded} badges awarded from all historical data`);
   } catch (err) {
-    console.log('⚠️ Badge awarding skipped:', err.message);
+    console.error('❌ Badge awarding error:', err.message);
   }
 };
 
