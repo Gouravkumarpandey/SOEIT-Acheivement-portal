@@ -132,26 +132,48 @@ exports.getWeeklyLeaderboard = async (req, res) => {
         const db = getDb();
         const now = new Date();
         const weekStart = format(startOfWeek(now), 'yyyy-MM-dd');
+        const weekEnd = format(endOfWeek(now), 'yyyy-MM-dd');
         
-        // Try to get badges for current week first
-        let leaderboard = await Badge.getWeeklyTop(weekStart);
+        // ✅ FIXED: Fetch directly from achievements and calculate total points properly
+        // This ensures we get the actual sum of all approved achievements in the current week
+        // Uses achievement date (a.date) or verified date (a.verified_at) whichever is available
+        const leaderboardRes = await db.execute(`
+            SELECT 
+                u.id,
+                u.id as student_id,
+                u.name,
+                u.profile_image,
+                u.department,
+                SUM(a.points) as points_earned,
+                COUNT(a.id) as achievement_count,
+                CASE 
+                    WHEN SUM(a.points) >= 500 THEN 'Platinum'
+                    WHEN SUM(a.points) >= 300 THEN 'Gold'
+                    WHEN SUM(a.points) >= 150 THEN 'Silver'
+                    WHEN SUM(a.points) >= 50 THEN 'Bronze'
+                    ELSE 'None'
+                END as badge_type,
+                ? as week_start
+            FROM achievements a
+            JOIN users u ON a.student_id = u.id
+            WHERE a.status = 'approved'
+            AND a.points > 0
+            AND (
+                (a.verified_at IS NOT NULL AND DATE(a.verified_at) >= DATE(?) AND DATE(a.verified_at) <= DATE(?))
+                OR 
+                (a.verified_at IS NULL AND DATE(a.date) >= DATE(?) AND DATE(a.date) <= DATE(?))
+            )
+            GROUP BY u.id, u.name, u.profile_image, u.department
+            HAVING SUM(a.points) >= 50
+            ORDER BY points_earned DESC, u.name ASC
+            LIMIT 10
+        `, [weekStart, weekStart, weekEnd, weekStart, weekEnd]);
         
-        // If no badges for current week, get the most recent week with badges
-        if (!leaderboard || leaderboard.length === 0) {
-            const recentRes = await db.execute(`
-                SELECT DISTINCT week_start FROM badges 
-                ORDER BY week_start DESC 
-                LIMIT 1
-            `);
-            
-            if (recentRes?.rows?.length > 0) {
-                const recentWeek = recentRes.rows[0].week_start || recentRes.rows[0][0];
-                leaderboard = await Badge.getWeeklyTop(recentWeek);
-            }
-        }
+        const leaderboard = leaderboardRes?.rows || [];
         
         res.status(200).json({ success: true, data: leaderboard });
     } catch (error) {
+        console.error('Leaderboard fetch error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };

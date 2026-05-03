@@ -440,3 +440,69 @@ exports.deleteUsers = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    DEBUG: Get achievement points debug for a student
+// @route   GET /api/admin/debug/student/:studentId/points
+exports.getStudentPointsDebug = async (req, res, next) => {
+    try {
+        const { studentId } = req.params;
+        const db = getDb();
+
+        // Get student info
+        const studentRes = await db.execute(
+            'SELECT id, name, email, department FROM users WHERE id = ?',
+            [studentId]
+        );
+        
+        if (!studentRes?.rows?.length) {
+            return res.status(404).json({ success: false, message: 'Student not found' });
+        }
+
+        const student = studentRes.rows[0];
+
+        // Get all achievements for the student
+        const achievementsRes = await db.execute(`
+            SELECT id, title, category, level, date, status, points, verified_at, verified_by
+            FROM achievements
+            WHERE student_id = ?
+            ORDER BY date DESC
+        `, [studentId]);
+
+        const achievements = achievementsRes?.rows || [];
+
+        // Calculate totals
+        const totals = {
+            all: achievements.length,
+            approved: achievements.filter(a => a.status === 'approved').length,
+            pending: achievements.filter(a => a.status === 'pending').length,
+            rejected: achievements.filter(a => a.status === 'rejected').length,
+            totalPoints: achievements.filter(a => a.status === 'approved').reduce((sum, a) => sum + (Number(a.points) || 0), 0),
+            approvedPoints: achievements.filter(a => a.status === 'approved').reduce((sum, a) => sum + (Number(a.points) || 0), 0),
+        };
+
+        res.status(200).json({
+            success: true,
+            student: {
+                id: student.id,
+                name: student.name,
+                email: student.email,
+                department: student.department,
+            },
+            totals,
+            achievements: achievements.map(a => ({
+                id: a.id,
+                title: a.title,
+                category: a.category,
+                level: a.level,
+                date: a.date,
+                status: a.status,
+                points: Number(a.points) || 0,
+                verifiedAt: a.verified_at,
+                verifiedBy: a.verified_by,
+            })),
+        });
+    } catch (error) {
+        console.error('Points debug error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
