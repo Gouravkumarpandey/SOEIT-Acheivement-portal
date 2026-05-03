@@ -526,7 +526,7 @@ exports.checkBadgeEligibility = async (req, res, next) => {
     try {
         const db = getDb();
         
-        // Get students with approved achievements and their weekly totals
+        // Get students with approved achievements
         const weeklyRes = await db.execute(`
             SELECT 
                 u.id as student_id,
@@ -535,22 +535,13 @@ exports.checkBadgeEligibility = async (req, res, next) => {
                 u.department,
                 a.verified_at,
                 SUM(a.points) as total_points,
-                COUNT(a.id) as achievement_count,
-                WEEK(a.verified_at) as week_num,
-                YEAR(a.verified_at) as year_num,
-                CASE 
-                    WHEN SUM(a.points) >= 500 THEN 'Platinum'
-                    WHEN SUM(a.points) >= 300 THEN 'Gold'
-                    WHEN SUM(a.points) >= 150 THEN 'Silver'
-                    WHEN SUM(a.points) >= 50 THEN 'Bronze'
-                    ELSE 'None'
-                END as eligible_badge
+                COUNT(a.id) as achievement_count
             FROM achievements a
             JOIN users u ON a.student_id = u.id
             WHERE a.status = 'approved'
             AND a.points > 0
             AND a.verified_at IS NOT NULL
-            GROUP BY u.id, u.name, u.email, u.department, WEEK(a.verified_at), YEAR(a.verified_at)
+            GROUP BY u.id, u.name, u.email, u.department
             HAVING SUM(a.points) >= 50
             ORDER BY SUM(a.points) DESC
             LIMIT 100
@@ -563,27 +554,38 @@ exports.checkBadgeEligibility = async (req, res, next) => {
             SELECT DISTINCT student_id FROM badges
         `);
 
-        const studentsWithBadges = (badgesRes?.rows || []).map(b => b.student_id);
+        const studentsWithBadges = new Set((badgesRes?.rows || []).map(b => b.student_id || b[0]));
 
         // Compare
-        const missingBadges = eligibleStudents.filter(s => !studentsWithBadges.includes(s.student_id));
+        const studentsWithData = eligibleStudents.map(s => {
+            const sid = s.student_id || s[0];
+            return {
+                studentId: sid,
+                name: s.name || s[1],
+                email: s.email || s[2],
+                department: s.department || s[3],
+                totalPoints: Number(s.total_points || s[4]) || 0,
+                achievementCount: Number(s.achievement_count || s[6]) || 0,
+                eligibleBadge: (() => {
+                    const pts = Number(s.total_points || s[4]) || 0;
+                    if (pts >= 500) return 'Platinum';
+                    if (pts >= 300) return 'Gold';
+                    if (pts >= 150) return 'Silver';
+                    if (pts >= 50) return 'Bronze';
+                    return 'None';
+                })(),
+                hasBadge: studentsWithBadges.has(sid),
+            };
+        });
+
+        const missingBadges = studentsWithData.filter(s => !s.hasBadge);
 
         res.status(200).json({
             success: true,
             totalEligible: eligibleStudents.length,
-            totalWithBadges: studentsWithBadges.length,
+            totalWithBadges: studentsWithBadges.size,
             missingBadges: missingBadges.length,
-            eligibleStudents: eligibleStudents.map(s => ({
-                studentId: s.student_id,
-                name: s.name,
-                email: s.email,
-                department: s.department,
-                weekStart: `Week ${s.week_num}-${s.year_num}`,
-                totalPoints: Number(s.total_points),
-                achievementCount: s.achievement_count,
-                eligibleBadge: s.eligible_badge,
-                hasBadge: studentsWithBadges.includes(s.student_id),
-            })),
+            eligibleStudents: studentsWithData,
         });
     } catch (error) {
         console.error('Badge eligibility error:', error);

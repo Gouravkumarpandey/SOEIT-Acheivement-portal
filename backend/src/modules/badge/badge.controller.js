@@ -22,24 +22,21 @@ exports.awardWeeklyBadges = async (req, res) => {
     try {
         const db = getDb();
         
-        // ✅ FIXED: Group by WEEK properly using date arithmetic
-        // For each achievement, calculate week start, then sum by student + week
+        // ✅ FIXED: Get all approved achievements and group by week in JavaScript
+        // (LibSQL/Turso may not support complex date functions)
         const pointsRes = await db.execute(`
             SELECT 
                 a.student_id,
-                DATE(DATE_ADD(CURDATE(), INTERVAL -DAYOFWEEK(a.verified_at)+1 DAY)) as week_start,
-                SUM(a.points) as total_weekly_points,
+                a.verified_at,
+                a.points,
                 u.name,
-                u.email,
-                MAX(a.verified_at) as latest_verified
+                u.email
             FROM achievements a
             JOIN users u ON a.student_id = u.id
             WHERE a.status = 'approved'
             AND a.points > 0
             AND a.verified_at IS NOT NULL
-            GROUP BY a.student_id, DATE(DATE_ADD(CURDATE(), INTERVAL -DAYOFWEEK(a.verified_at)+1 DAY))
-            HAVING SUM(a.points) >= 50
-            ORDER BY latest_verified DESC
+            ORDER BY a.verified_at DESC
         `);
 
         if (!pointsRes?.rows || pointsRes.rows.length === 0) {
@@ -57,16 +54,44 @@ exports.awardWeeklyBadges = async (req, res) => {
             { type: 'Bronze', minPoints: 50 }
         ];
 
+        // Group by student and week in JavaScript
+        const weeklyData = {};
+        
+        for (const row of pointsRes.rows) {
+            const studentId = row.student_id || row[0];
+            const verifiedAt = new Date(row.verified_at || row[1]);
+            const points = Number(row.points || row[2] || 0);
+            const studentName = row.name || row[3];
+            const studentEmail = row.email || row[4];
+
+            // Calculate week start (Monday of that week)
+            const weekStart = new Date(verifiedAt);
+            const day = weekStart.getDay();
+            const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+            weekStart.setDate(diff);
+            weekStart.setHours(0, 0, 0, 0);
+            
+            const weekStartStr = weekStart.toISOString().split('T')[0];
+            const key = `${studentId}_${weekStartStr}`;
+
+            if (!weeklyData[key]) {
+                weeklyData[key] = {
+                    studentId,
+                    weekStart: weekStartStr,
+                    studentName,
+                    studentEmail,
+                    totalPoints: 0
+                };
+            }
+            weeklyData[key].totalPoints += points;
+        }
+
         const awards = [];
 
         // Award badges - one per student per week
-        for (const row of pointsRes.rows) {
-            const studentId = row.student_id || row[0];
-            const weekStartRaw = row.week_start || row[1];
-            const weekStart = weekStartRaw ? new Date(weekStartRaw).toISOString().split('T')[0] : format(startOfWeek(new Date()), 'yyyy-MM-dd');
-            const totalPoints = Number(row.total_weekly_points || row[2] || 0);
-            const studentName = row.name || row[3];
-            const studentEmail = row.email || row[4];
+        for (const key in weeklyData) {
+            const data = weeklyData[key];
+            const { studentId, weekStart, studentName, totalPoints } = data;
 
             // Check if badge already exists for this week
             const existingRes = await db.execute(
@@ -88,7 +113,7 @@ exports.awardWeeklyBadges = async (req, res) => {
             const badgeId = Math.random().toString(36).substring(2, 15);
             await db.execute({
                 sql: `INSERT INTO badges (id, student_id, badge_type, week_start, points_earned, created_at)
-                      VALUES (?, ?, ?, ?, ?, NOW())`,
+                      VALUES (?, ?, ?, ?, ?, datetime('now'))`,
                 args: [badgeId, studentId, tier.type, weekStart, totalPoints]
             });
 
@@ -128,45 +153,61 @@ exports.getWeeklyLeaderboard = async (req, res) => {
     try {
         const db = getDb();
         const now = new Date();
-        const weekStart = format(startOfWeek(now), 'yyyy-MM-dd');
-        const weekEnd = format(endOfWeek(now), 'yyyy-MM-dd');
         
-        // ✅ FIXED: Fetch directly from achievements and calculate total points properly
-        // This ensures we get the actual sum of all approved achievements in the current week
-        // Uses achievement date (a.date) or verified date (a.verified_at) whichever is available
+        // Get week start and end
+        const weekStart = new Date(now);
+        const day = weekStart.getDay();
+        const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+        weekStart.setDate(diff);
+        weekStart.setHours(0, 0, 0, 0);
+        
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        weekEnd.setHours(23, 59, 59, 999);
+        
+        const weekStartStr = weekStart.toISOString().split('T')[0];
+        const weekEndStr = weekEnd.toISOString().split('T')[0];
+        
+        // ✅ FIXED: Simplified query for LibSQL/Turso compatibility
         const leaderboardRes = await db.execute(`
             SELECT 
                 u.id,
-                u.id as student_id,
                 u.name,
                 u.profile_image,
                 u.department,
                 SUM(a.points) as points_earned,
-                COUNT(a.id) as achievement_count,
-                CASE 
-                    WHEN SUM(a.points) >= 500 THEN 'Platinum'
-                    WHEN SUM(a.points) >= 300 THEN 'Gold'
-                    WHEN SUM(a.points) >= 150 THEN 'Silver'
-                    WHEN SUM(a.points) >= 50 THEN 'Bronze'
-                    ELSE 'None'
-                END as badge_type,
-                ? as week_start
+                COUNT(a.id) as achievement_count
             FROM achievements a
             JOIN users u ON a.student_id = u.id
             WHERE a.status = 'approved'
             AND a.points > 0
-            AND (
-                (a.verified_at IS NOT NULL AND DATE(a.verified_at) >= DATE(?) AND DATE(a.verified_at) <= DATE(?))
-                OR 
-                (a.verified_at IS NULL AND DATE(a.date) >= DATE(?) AND DATE(a.date) <= DATE(?))
-            )
+            AND a.verified_at IS NOT NULL
+            AND DATE(a.verified_at) >= ?
+            AND DATE(a.verified_at) <= ?
             GROUP BY u.id, u.name, u.profile_image, u.department
             HAVING SUM(a.points) >= 50
-            ORDER BY points_earned DESC, u.name ASC
+            ORDER BY SUM(a.points) DESC, u.name ASC
             LIMIT 10
-        `, [weekStart, weekStart, weekEnd, weekStart, weekEnd]);
+        `, [weekStartStr, weekEndStr]);
         
-        const leaderboard = leaderboardRes?.rows || [];
+        const leaderboard = (leaderboardRes?.rows || []).map((row, idx) => ({
+            id: row.id || row[0],
+            student_id: row.id || row[0],
+            name: row.name || row[1],
+            profile_image: row.profile_image || row[2],
+            department: row.department || row[3],
+            points_earned: Number(row.points_earned || row[4]) || 0,
+            achievement_count: Number(row.achievement_count || row[5]) || 0,
+            badge_type: (() => {
+                const pts = Number(row.points_earned || row[4]) || 0;
+                if (pts >= 500) return 'Platinum';
+                if (pts >= 300) return 'Gold';
+                if (pts >= 150) return 'Silver';
+                if (pts >= 50) return 'Bronze';
+                return 'None';
+            })(),
+            week_start: weekStartStr,
+        }));
         
         res.status(200).json({ success: true, data: leaderboard });
     } catch (error) {
