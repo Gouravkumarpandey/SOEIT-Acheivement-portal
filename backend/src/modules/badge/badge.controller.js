@@ -152,93 +152,40 @@ exports.getStudentBadges = async (req, res) => {
 exports.getWeeklyLeaderboard = async (req, res) => {
     try {
         const db = getDb();
-        const now = new Date();
         
-        // Get week start and end
-        const weekStart = new Date(now);
-        const day = weekStart.getDay();
-        const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
-        weekStart.setDate(diff);
-        weekStart.setHours(0, 0, 0, 0);
-        
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
-        weekEnd.setHours(23, 59, 59, 999);
-        
-        const weekStartStr = weekStart.toISOString().split('T')[0];
-        const weekEndStr = weekEnd.toISOString().split('T')[0];
-        
-        // ✅ Try to get this week's leaderboard first
-        let leaderboardRes = await db.execute(`
+        // ✅ Get all students with badges, sorted by points (recent first)
+        const leaderboardRes = await db.execute(`
             SELECT 
-                u.id,
+                b.student_id,
                 u.name,
                 u.profile_image,
                 u.department,
-                SUM(a.points) as points_earned,
-                COUNT(a.id) as achievement_count
-            FROM achievements a
-            JOIN users u ON a.student_id = u.id
-            WHERE a.status = 'approved'
-            AND a.points > 0
-            AND a.verified_at IS NOT NULL
-            AND DATE(a.verified_at) >= ?
-            AND DATE(a.verified_at) <= ?
-            GROUP BY u.id, u.name, u.profile_image, u.department
-            HAVING SUM(a.points) >= 50
-            ORDER BY SUM(a.points) DESC, u.name ASC
-            LIMIT 10
-        `, [weekStartStr, weekEndStr]);
+                b.points_earned,
+                b.badge_type,
+                b.week_start,
+                COUNT(DISTINCT b.id) as badge_count
+            FROM badges b
+            JOIN users u ON b.student_id = u.id
+            GROUP BY b.student_id
+            ORDER BY MAX(b.points_earned) DESC, MAX(b.created_at) DESC
+            LIMIT 20
+        `);
         
-        let leaderboard = leaderboardRes?.rows || [];
-        let displayWeek = weekStartStr;
-        
-        // If no data this week, get all-time top 10
-        if (leaderboard.length === 0) {
-            leaderboardRes = await db.execute(`
-                SELECT 
-                    u.id,
-                    u.name,
-                    u.profile_image,
-                    u.department,
-                    SUM(a.points) as points_earned,
-                    COUNT(a.id) as achievement_count
-                FROM achievements a
-                JOIN users u ON a.student_id = u.id
-                WHERE a.status = 'approved'
-                AND a.points > 0
-                GROUP BY u.id, u.name, u.profile_image, u.department
-                HAVING SUM(a.points) >= 50
-                ORDER BY SUM(a.points) DESC, u.name ASC
-                LIMIT 10
-            `);
-            leaderboard = leaderboardRes?.rows || [];
-            displayWeek = 'all-time';
-        }
-        
-        const formattedLeaderboard = leaderboard.map((row, idx) => ({
-            id: row.id || row[0],
-            student_id: row.id || row[0],
+        const leaderboard = (leaderboardRes?.rows || []).map((row) => ({
+            id: row.student_id || row[0],
+            student_id: row.student_id || row[0],
             name: row.name || row[1],
             profile_image: row.profile_image || row[2],
             department: row.department || row[3],
             points_earned: Number(row.points_earned || row[4]) || 0,
-            achievement_count: Number(row.achievement_count || row[5]) || 0,
-            badge_type: (() => {
-                const pts = Number(row.points_earned || row[4]) || 0;
-                if (pts >= 500) return 'Platinum';
-                if (pts >= 300) return 'Gold';
-                if (pts >= 150) return 'Silver';
-                if (pts >= 50) return 'Bronze';
-                return 'None';
-            })(),
-            week_start: displayWeek,
+            badge_type: row.badge_type || row[5],
+            week_start: row.week_start || row[6],
         }));
         
         res.status(200).json({ 
             success: true, 
-            data: formattedLeaderboard,
-            displayPeriod: displayWeek === 'all-time' ? 'All-Time Top Performers' : `Week of ${displayWeek}`
+            data: leaderboard,
+            message: `Showing ${leaderboard.length} students with earned badges`
         });
     } catch (error) {
         console.error('Leaderboard fetch error:', error);
