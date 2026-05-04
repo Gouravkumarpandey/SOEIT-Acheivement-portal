@@ -99,7 +99,7 @@ const Footer = () => {
                         {/* Badges moved here under Reach Us */}
                         <div className="footer-badges-column">
                             <button onClick={() => setShowAppModal(true)} className="app-badge-box" style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}>
-                                <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" />
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store" style={{ height: '40px' }} />
                             </button>
                             <button onClick={() => setShowAppModal(true)} className="app-badge-box" style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}>
                                 <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Google Play" style={{ width: '135px' }} />
