@@ -485,44 +485,18 @@ const FacultyDashboard = () => {
 
             {/* Institutional Broadcasting Modal */}
             {showNoticeModal && (
-                <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.75rem' }}>
-                    <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '600px', padding: 0, overflow: 'hidden', boxShadow: 'var(--shadow-xl)', borderRadius: '16px', border: 'none', maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ padding: '1.25rem 1.5rem', background: 'var(--brand-700)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '16px 16px 0 0', minHeight: '60px' }}>
-                            <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em', textAlign: 'center' }}>Send New Notice</h3>
-                            <button 
-                                onClick={() => setShowNoticeModal(false)} 
-                                style={{ 
-                                    position: 'absolute',
-                                    right: '1rem',
-                                    padding: 0, 
-                                    color: '#ffffff', 
-                                    background: 'rgba(239, 68, 68, 0.15)', 
-                                    borderRadius: '10px', 
-                                    width: '32px', 
-                                    height: '32px', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center', 
-                                    border: '1px solid rgba(239, 68, 68, 0.2)', 
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = '#ef4444';
-                                    e.currentTarget.style.borderColor = '#ef4444';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
-                                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)';
-                                }}
-                            >
+                <div className="modal-overlay animate-fade-in">
+                    <div className="modal-content-card animate-slide-up">
+                        <div className="modal-header-premium">
+                            <h3>Send New Notice</h3>
+                            <button onClick={() => setShowNoticeModal(false)} className="modal-close-btn">
                                 <X size={18} />
                             </button>
                         </div>
-                        <div className="card-body" style={{ padding: '1.25rem 1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
+                        <div className="modal-body-premium">
                             <form onSubmit={handlePostNotice} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Notice Title</label>
+                                    <label className="form-label">Notice Title</label>
                                     <input className="form-control" placeholder="Enter title here..." required value={noticeData.title} onChange={e => setNoticeData({ ...noticeData, title: e.target.value })} />
                                 </div>
                                 
@@ -592,20 +566,17 @@ const FacultyDashboard = () => {
 
             {/* Scholar Insight Suite */}
             {selectedStudent && (
-                <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1001, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-                    <div className="card animate-scale-in" style={{ width: '100%', maxWidth: '480px', padding: 0, overflow: 'hidden', position: 'relative' }}>
+                <div className="modal-overlay animate-fade-in" style={{ zIndex: 1001 }}>
+                    <div className="modal-content-card animate-scale-in" style={{ maxWidth: '480px' }}>
                         <button
                             onClick={() => setSelectedStudent(null)}
-                            className="btn btn-ghost"
+                            className="modal-close-btn"
                             style={{
-                                position: 'absolute',
                                 top: '1.25rem',
                                 right: '1.25rem',
                                 zIndex: 10,
-                                padding: '0.5rem',
-                                borderRadius: '50%',
                                 background: 'rgba(255,255,255,0.1)',
-                                color: '#ff6b6b', // Vibrant Red for clear termination
+                                color: '#ff6b6b',
                                 border: '1px solid rgba(255,107,107,0.2)'
                             }}
                         >
@@ -619,7 +590,7 @@ const FacultyDashboard = () => {
                             <h3 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em' }}>{selectedStudent.name}</h3>
                             <p style={{ margin: '0.6rem 0 0 0', fontSize: '0.95rem', opacity: 0.95, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{selectedStudent.enrollmentNo || 'ID: ' + selectedStudent._id.slice(-6).toUpperCase()}</p>
                         </div>
-                        <div className="card-body" style={{ padding: '2rem' }}>
+                        <div className="modal-body-premium">
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
                                 <div style={{ padding: '1.25rem 1rem', background: 'var(--slate-50)', borderRadius: '16px', textAlign: 'center', border: '1px solid var(--border-primary)' }}>
                                     <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.35rem', letterSpacing: '0.05em' }}>Semester</div>
