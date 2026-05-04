@@ -95,12 +95,14 @@ const initSchema = async (client) => {
             FOREIGN KEY (created_by) REFERENCES users(id)
         )`,
     `CREATE TABLE IF NOT EXISTS notices (
-            id          TEXT PRIMARY KEY,
-            title       TEXT NOT NULL,
-            content     TEXT NOT NULL,
-            priority    TEXT DEFAULT 'Medium',
-            created_by  TEXT NOT NULL,
-            created_at  TEXT DEFAULT (datetime('now')),
+            id              TEXT PRIMARY KEY,
+            title           TEXT NOT NULL,
+            content         TEXT NOT NULL,
+            priority        TEXT DEFAULT 'Medium',
+            target_semester TEXT DEFAULT 'all',
+            target_branch   TEXT DEFAULT 'all',
+            created_by      TEXT NOT NULL,
+            created_at      TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (created_by) REFERENCES users(id)
         )`,
     `CREATE TABLE IF NOT EXISTS courses (

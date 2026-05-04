@@ -18,7 +18,7 @@ const FacultyDashboard = () => {
     const [section, setSection] = useState('all');
     const [search, setSearch] = useState('');
     const [showNoticeModal, setShowNoticeModal] = useState(false);
-    const [noticeData, setNoticeData] = useState({ title: '', content: '', priority: 'Medium' });
+    const [noticeData, setNoticeData] = useState({ title: '', content: '', priority: 'Medium', targetSemester: 'all', targetBranch: 'all' });
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [leaderboard, setLeaderboard] = useState([]);
     const [isCalculatingBadges, setIsCalculatingBadges] = useState(false);
@@ -154,7 +154,7 @@ const FacultyDashboard = () => {
             await noticeAPI.create(noticeData);
             toast.success('Notice sent successfully!');
             setShowNoticeModal(false);
-            setNoticeData({ title: '', content: '', priority: 'Medium' });
+            setNoticeData({ title: '', content: '', priority: 'Medium', targetSemester: 'all', targetBranch: 'all' });
         } catch {
             toast.error('Failed to send notice');
         }
@@ -490,7 +490,7 @@ const FacultyDashboard = () => {
                         <div className="card-header" style={{ padding: '1.75rem', background: 'var(--brand-700)', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none' }}>
                             <div>
                                 <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em' }}>Send New Notice</h3>
-                                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.9, color: '#ffffff', fontWeight: 500 }}>Send a notice to all students.</p>
+                                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.9, color: '#ffffff', fontWeight: 500 }}>Send a notice to selected semester and branch students.</p>
                             </div>
                             <button onClick={() => setShowNoticeModal(false)} className="btn btn-ghost" style={{ padding: '0.5rem', color: '#ffffff', background: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}><X size={24} /></button>
                         </div>
@@ -499,6 +499,42 @@ const FacultyDashboard = () => {
                                 <div className="form-group">
                                     <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Notice Title</label>
                                     <input className="form-control" placeholder="Enter title here..." required value={noticeData.title} onChange={e => setNoticeData({ ...noticeData, title: e.target.value })} />
+                                </div>
+                                
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                    <div className="form-group">
+                                        <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Semester</label>
+                                        <select 
+                                            className="form-control" 
+                                            value={noticeData.targetSemester} 
+                                            onChange={e => setNoticeData({ ...noticeData, targetSemester: e.target.value })}
+                                            style={{ fontWeight: 700 }}
+                                        >
+                                            <option value="all">All Semesters</option>
+                                            {semesters.map(sem => (
+                                                <option key={sem.id} value={sem.id}>{sem.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Branch</label>
+                                        <select 
+                                            className="form-control" 
+                                            value={noticeData.targetBranch} 
+                                            onChange={e => setNoticeData({ ...noticeData, targetBranch: e.target.value })}
+                                            style={{ fontWeight: 700 }}
+                                        >
+                                            <option value="all">All Branches</option>
+                                            <option value="CSE">Computer Science & Engineering</option>
+                                            <option value="ECE">Electronics & Communication</option>
+                                            <option value="ME">Mechanical Engineering</option>
+                                            <option value="EEE">Electrical Engineering</option>
+                                            <option value="AIML">AI & Machine Learning</option>
+                                            <option value="D">Data Science</option>
+                                            <option value="IBM">IBM</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Priority</label>
@@ -519,7 +555,7 @@ const FacultyDashboard = () => {
                                 <div style={{ padding: '1rem', background: 'var(--error-50)', borderRadius: '12px', border: '1px solid var(--error-100)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Clock size={20} className="text-danger" />
                                     <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--error-800)', fontWeight: 700 }}>
-                                        Note: This will send an email to all active students.
+                                        Note: This will send an email to {noticeData.targetSemester === 'all' ? 'all' : `Semester ${noticeData.targetSemester}`} {noticeData.targetBranch === 'all' ? 'students across all branches' : `students from ${noticeData.targetBranch}`}.
                                     </p>
                                 </div>
                                 <button type="submit" className="btn btn-primary" style={{ padding: '1.25rem', fontWeight: 800 }}>Send Notice</button>
