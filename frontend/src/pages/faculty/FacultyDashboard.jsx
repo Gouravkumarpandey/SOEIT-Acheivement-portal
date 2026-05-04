@@ -485,23 +485,48 @@ const FacultyDashboard = () => {
 
             {/* Institutional Broadcasting Modal */}
             {showNoticeModal && (
-                <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-                    <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '600px', padding: 0, overflow: 'hidden', boxShadow: 'var(--shadow-xl)', borderRadius: '20px', border: 'none' }}>
-                        <div className="card-header" style={{ padding: '1.75rem', background: 'var(--brand-700)', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none' }}>
-                            <div>
-                                <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em' }}>Send New Notice</h3>
-                                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.9, color: '#ffffff', fontWeight: 500 }}>Send a notice to selected semester and branch students.</p>
-                            </div>
-                            <button onClick={() => setShowNoticeModal(false)} className="btn btn-ghost" style={{ padding: '0.5rem', color: '#ffffff', background: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}><X size={24} /></button>
+                <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.75rem' }}>
+                    <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '600px', padding: 0, overflow: 'hidden', boxShadow: 'var(--shadow-xl)', borderRadius: '16px', border: 'none', maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ padding: '1.25rem 1.5rem', background: 'var(--brand-700)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '16px 16px 0 0', minHeight: '60px' }}>
+                            <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em', textAlign: 'center' }}>Send New Notice</h3>
+                            <button 
+                                onClick={() => setShowNoticeModal(false)} 
+                                style={{ 
+                                    position: 'absolute',
+                                    right: '1rem',
+                                    padding: 0, 
+                                    color: '#ffffff', 
+                                    background: 'rgba(239, 68, 68, 0.15)', 
+                                    borderRadius: '10px', 
+                                    width: '32px', 
+                                    height: '32px', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    border: '1px solid rgba(239, 68, 68, 0.2)', 
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#ef4444';
+                                    e.currentTarget.style.borderColor = '#ef4444';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+                                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                                }}
+                            >
+                                <X size={18} />
+                            </button>
                         </div>
-                        <div className="card-body" style={{ padding: '2rem' }}>
+                        <div className="card-body" style={{ padding: '1.25rem 1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
                             <form onSubmit={handlePostNotice} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 <div className="form-group">
                                     <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Notice Title</label>
                                     <input className="form-control" placeholder="Enter title here..." required value={noticeData.title} onChange={e => setNoticeData({ ...noticeData, title: e.target.value })} />
                                 </div>
                                 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                                     <div className="form-group">
                                         <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Semester</label>
                                         <select 
@@ -538,7 +563,7 @@ const FacultyDashboard = () => {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Priority</label>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '0.75rem' }}>
                                         {['Low', 'Medium', 'High', 'Urgent'].map(p => (
                                             <button key={p} type="button" onClick={() => setNoticeData({ ...noticeData, priority: p })}
                                                 className={`btn btn-sm ${noticeData.priority === p ? (p === 'Urgent' ? 'btn-danger' : 'btn-primary') : 'btn-ghost'}`}
