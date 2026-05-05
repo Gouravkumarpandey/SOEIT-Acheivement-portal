@@ -118,6 +118,8 @@ The portal is built on a **full-stack modern architecture** (REVN Stack + React 
 
 ---
 
+
+
 ### 📱 Mobile App (React Native + Expo)
 - 🔐 **Secure Access** — JWT-based login with SecureStore encryption.
 - 📤 **Instant Upload** — Native camera/gallery integration for certificates.
