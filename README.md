@@ -135,7 +135,6 @@ The portal is built on a **full-stack modern architecture** (REVN Stack + React 
 - 🛡️ **Hybrid Authentication** — Integrated Google OAuth via Passport.js for faster student login.
 - 🖼️ **Dynamic Hero Section** — Auto-rotating university campus imagery with premium transitions.
 - 🏥 **DB Performance** — Optimized SQL indexes for sub-100ms lookups across 10k+ records.
-
 ---
 
 ## 📂 Project Structure
