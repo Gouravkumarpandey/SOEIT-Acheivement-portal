@@ -133,6 +133,7 @@ The portal is built on a **full-stack modern architecture** (REVN Stack + React 
 - 📊 **Enhanced Analytics** — New faculty dashboard with real-time participation graphs.
 - 📧 **Brevo Email Integration** — High-reliability transactional emails with custom brand templates.
 - 🛡️ **Hybrid Authentication** — Integrated Google OAuth via Passport.js for faster student login.
+- 🖼️ **Dynamic Hero Section** — Auto-rotating university campus imagery with premium transitions.
 - 🏥 **DB Performance** — Optimized SQL indexes for sub-100ms lookups across 10k+ records.
 
 ---
