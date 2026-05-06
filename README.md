@@ -129,6 +129,7 @@ The portal is built on a **full-stack modern architecture** (REVN Stack + React 
 
 ## 🆕 Recent Updates (April 2026)
 
+
 - 🏅 **Weekly Badge Engine** — Automated badge assignment (Platinum to Bronze) via `node-cron`.
 - 📊 **Enhanced Analytics** — New faculty dashboard with real-time participation graphs.
 - 📧 **Brevo Email Integration** — High-reliability transactional emails with custom brand templates.
