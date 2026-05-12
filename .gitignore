@@ -26,6 +26,8 @@ yarn-error.log*
 # Uploads & Data
 backend/uploads/*
 !backend/uploads/.gitkeep
+backend/*.db
+backend/*.db-*
 
 # IDE & OS
 .vscode/

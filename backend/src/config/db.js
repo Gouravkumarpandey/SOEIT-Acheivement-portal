@@ -330,19 +330,42 @@ const seedHackathons = async (client) => {
   }
 };
 
-const connectDB = async () => {
-  const url = process.env.TURSO_URL;
-  if (!url) {
-    console.error('❌ TURSO_URL is not set in environment variables');
-    process.exit(1);
+const resolveDbConfig = () => {
+  const env = process.env.NODE_ENV || 'development';
+  const tursoUrl = process.env.TURSO_URL;
+  const tursoToken = process.env.TURSO_AUTH_TOKEN;
+
+  if (tursoUrl) {
+    return {
+      clientConfig: {
+        url: tursoUrl,
+        authToken: tursoToken || undefined,
+      },
+      label: tursoUrl.startsWith('file:') ? 'Local LibSQL file' : 'Turso (LibSQL)',
+    };
   }
 
+  if (env === 'production') {
+    throw new Error('TURSO_URL is required in production environment');
+  }
+
+  const localDbPath = process.env.LOCAL_DB_PATH || 'file:./soeit-dev.db';
+  console.warn(`⚠️ TURSO_URL missing. Falling back to local database at ${localDbPath}`);
+
+  return {
+    clientConfig: { url: localDbPath },
+    label: 'Local LibSQL file',
+  };
+};
+
+const connectDB = async () => {
   try {
-    const client = createClient({ url });
+    const { clientConfig, label } = resolveDbConfig();
+    const client = createClient(clientConfig);
 
     // Verify connection (essential check)
     await client.execute('SELECT 1');
-    console.log('✅ Turso (LibSQL) Connected');
+    console.log(`✅ ${label} Connected`);
 
     await initSchema(client);
     console.log('📐 Schema initialized');
