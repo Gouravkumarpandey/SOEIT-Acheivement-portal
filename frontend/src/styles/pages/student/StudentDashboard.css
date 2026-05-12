@@ -203,4 +203,23 @@
     .banner-motif-2 {
         display: none;
     }
+
+    .leaderboard-card-res {
+        padding: 1.25rem !important;
+    }
+    
+    .leaderboard-header-res {
+        align-items: flex-start !important;
+        flex-direction: column;
+    }
+    
+    .leaderboard-grid-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .leaderboard-empty-res {
+        padding: 2rem 1rem !important;
+    }
 }

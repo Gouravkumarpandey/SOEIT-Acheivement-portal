@@ -13,6 +13,8 @@ const rowToNotice = (row) => {
         title: row.title,
         content: row.content,
         priority: row.priority || 'Medium',
+        targetSemester: row.target_semester || 'all',
+        targetBranch: row.target_branch || 'all',
         createdBy: row.creator_id ? {
             _id: row.creator_id,
             id: row.creator_id,
@@ -52,9 +54,9 @@ const Notice = {
         const db = getDb();
         const id = await genId();
         await db.execute({
-            sql: `INSERT INTO notices (id, title, content, priority, created_by)
-                  VALUES (?,?,?,?,?)`,
-            args: [id, data.title, data.content, data.priority || 'Medium', data.createdBy],
+            sql: `INSERT INTO notices (id, title, content, priority, created_by, target_semester, target_branch)
+                  VALUES (?,?,?,?,?,?,?)`,
+            args: [id, data.title, data.content, data.priority || 'Medium', data.createdBy, data.targetSemester || 'all', data.targetBranch || 'all'],
         });
         const res = await db.execute({ sql: `${BASE_SELECT} WHERE n.id = ?`, args: [id] });
         return rowToNotice(res.rows[0]);

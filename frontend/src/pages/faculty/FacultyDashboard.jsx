@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminAPI, noticeAPI } from '../../services/api';
+import { adminAPI, noticeAPI, badgeAPI } from '../../services/api';
 import {
     Users, Trophy, Clock, CheckCircle, GraduationCap,
     Search, Filter, ChevronRight, Eye, Download, UsersRound, XCircle, X
@@ -18,8 +18,10 @@ const FacultyDashboard = () => {
     const [section, setSection] = useState('all');
     const [search, setSearch] = useState('');
     const [showNoticeModal, setShowNoticeModal] = useState(false);
-    const [noticeData, setNoticeData] = useState({ title: '', content: '', priority: 'Medium' });
+    const [noticeData, setNoticeData] = useState({ title: '', content: '', priority: 'Medium', targetSemester: 'all', targetBranch: 'all' });
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [leaderboard, setLeaderboard] = useState([]);
+    const [isCalculatingBadges, setIsCalculatingBadges] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,7 +33,16 @@ const FacultyDashboard = () => {
                 toast.error('Failed to load dashboard data');
             }
         };
+        const loadLeaderboard = async () => {
+            try {
+                const res = await badgeAPI.getLeaderboard();
+                setLeaderboard(res.data.data);
+            } catch (err) {
+                console.error('Failed to load leaderboard', err);
+            }
+        };
         loadStats();
+        loadLeaderboard();
     }, []);
 
     useEffect(() => {
@@ -143,9 +154,25 @@ const FacultyDashboard = () => {
             await noticeAPI.create(noticeData);
             toast.success('Notice sent successfully!');
             setShowNoticeModal(false);
-            setNoticeData({ title: '', content: '', priority: 'Medium' });
+            setNoticeData({ title: '', content: '', priority: 'Medium', targetSemester: 'all', targetBranch: 'all' });
         } catch {
             toast.error('Failed to send notice');
+        }
+    };
+
+    const handleCalculateBadges = async () => {
+        setIsCalculatingBadges(true);
+        const toastId = toast.loading('Calculating weekly badges based on verified points...');
+        try {
+            const res = await badgeAPI.calculateWeeklyBadges();
+            toast.success(res.data?.message || 'Badges calculated successfully!', { id: toastId });
+            // Reload leaderboard
+            const lbRes = await badgeAPI.getLeaderboard();
+            setLeaderboard(lbRes.data.data);
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to calculate badges', { id: toastId });
+        } finally {
+            setIsCalculatingBadges(false);
         }
     };
 
@@ -210,6 +237,55 @@ const FacultyDashboard = () => {
                         <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{label}</div>
                     </div>
                 ))}
+            </div>
+
+            {/* Weekly Leaderboard & Badges */}
+            <div className="card" style={{ padding: '1.5rem', marginBottom: '2.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <div>
+                        <h4 style={{ margin: 0, fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Top Scholars of the Week</h4>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Students awarded weekly badges based on verified (real) points.</p>
+                    </div>
+                    <button 
+                        className="btn btn-secondary btn-sm" 
+                        onClick={handleCalculateBadges} 
+                        disabled={isCalculatingBadges}
+                        style={{ fontWeight: 800 }}
+                    >
+                        {isCalculatingBadges ? <div className="spinner-sm" style={{ borderTopColor: 'var(--brand-600)' }}></div> : <Trophy size={16} />} 
+                        {isCalculatingBadges ? 'Calculating...' : 'Calculate Weekly Badges'}
+                    </button>
+                </div>
+
+                {leaderboard.length === 0 ? (
+                    <div style={{ padding: '2rem', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: '12px' }}>
+                        <Trophy size={32} style={{ color: 'var(--text-muted)', opacity: 0.3, marginBottom: '1rem' }} />
+                        <p style={{ color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>No badges awarded yet for this week.</p>
+                    </div>
+                ) : (
+                    <div className="grid-res grid-res-3">
+                        {leaderboard.map((user, idx) => (
+                            <div key={user.id} style={{ padding: '1rem', border: '1px solid var(--border-primary)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 900, color: idx === 0 ? '#f59e0b' : idx === 1 ? '#94a3b8' : idx === 2 ? '#d97706' : 'var(--text-muted)', width: '30px', textAlign: 'center' }}>
+                                    #{idx + 1}
+                                </div>
+                                <div className="avatar avatar-md" style={{ background: 'var(--primary-100)', color: 'var(--brand-700)', fontWeight: 800 }}>
+                                    {user.name?.charAt(0) || 'U'}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <h5 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800 }}>{user.name}</h5>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.department}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div className="badge" style={{ background: user.badge_type === 'Platinum' ? 'linear-gradient(135deg, #e2e8f0, #94a3b8)' : user.badge_type === 'Gold' ? 'linear-gradient(135deg, #fef08a, #f59e0b)' : user.badge_type === 'Silver' ? 'linear-gradient(135deg, #f1f5f9, #cbd5e1)' : 'linear-gradient(135deg, #fed7aa, #f97316)', color: '#1e293b', border: 'none', padding: '0.2rem 0.6rem' }}>
+                                        {user.badge_type}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--text-primary)' }}>{user.points_earned} pts</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Academic Controls */}
@@ -409,24 +485,59 @@ const FacultyDashboard = () => {
 
             {/* Institutional Broadcasting Modal */}
             {showNoticeModal && (
-                <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-                    <div className="card animate-slide-up" style={{ width: '100%', maxWidth: '600px', padding: 0, overflow: 'hidden', boxShadow: 'var(--shadow-xl)', borderRadius: '20px', border: 'none' }}>
-                        <div className="card-header" style={{ padding: '1.75rem', background: 'var(--brand-700)', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none' }}>
-                            <div>
-                                <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em' }}>Send New Notice</h3>
-                                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.9, color: '#ffffff', fontWeight: 500 }}>Send a notice to all students.</p>
-                            </div>
-                            <button onClick={() => setShowNoticeModal(false)} className="btn btn-ghost" style={{ padding: '0.5rem', color: '#ffffff', background: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}><X size={24} /></button>
+                <div className="modal-overlay animate-fade-in">
+                    <div className="modal-content-card animate-slide-up">
+                        <div className="modal-header-premium">
+                            <h3>Send New Notice</h3>
+                            <button onClick={() => setShowNoticeModal(false)} className="modal-close-btn">
+                                <X size={18} />
+                            </button>
                         </div>
-                        <div className="card-body" style={{ padding: '2rem' }}>
+                        <div className="modal-body-premium">
                             <form onSubmit={handlePostNotice} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 <div className="form-group">
-                                    <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Notice Title</label>
+                                    <label className="form-label">Notice Title</label>
                                     <input className="form-control" placeholder="Enter title here..." required value={noticeData.title} onChange={e => setNoticeData({ ...noticeData, title: e.target.value })} />
+                                </div>
+                                
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+                                    <div className="form-group">
+                                        <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Semester</label>
+                                        <select 
+                                            className="form-control" 
+                                            value={noticeData.targetSemester} 
+                                            onChange={e => setNoticeData({ ...noticeData, targetSemester: e.target.value })}
+                                            style={{ fontWeight: 700 }}
+                                        >
+                                            <option value="all">All Semesters</option>
+                                            {semesters.map(sem => (
+                                                <option key={sem.id} value={sem.id}>{sem.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Branch</label>
+                                        <select 
+                                            className="form-control" 
+                                            value={noticeData.targetBranch} 
+                                            onChange={e => setNoticeData({ ...noticeData, targetBranch: e.target.value })}
+                                            style={{ fontWeight: 700 }}
+                                        >
+                                            <option value="all">All Branches</option>
+                                            <option value="CSE">Computer Science & Engineering</option>
+                                            <option value="ECE">Electronics & Communication</option>
+                                            <option value="ME">Mechanical Engineering</option>
+                                            <option value="EEE">Electrical Engineering</option>
+                                            <option value="AIML">AI & Machine Learning</option>
+                                            <option value="D">Data Science</option>
+                                            <option value="IBM">IBM</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label" style={{ fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}>Priority</label>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '0.75rem' }}>
                                         {['Low', 'Medium', 'High', 'Urgent'].map(p => (
                                             <button key={p} type="button" onClick={() => setNoticeData({ ...noticeData, priority: p })}
                                                 className={`btn btn-sm ${noticeData.priority === p ? (p === 'Urgent' ? 'btn-danger' : 'btn-primary') : 'btn-ghost'}`}
@@ -443,7 +554,7 @@ const FacultyDashboard = () => {
                                 <div style={{ padding: '1rem', background: 'var(--error-50)', borderRadius: '12px', border: '1px solid var(--error-100)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <Clock size={20} className="text-danger" />
                                     <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--error-800)', fontWeight: 700 }}>
-                                        Note: This will send an email to all active students.
+                                        Note: This will send an email to {noticeData.targetSemester === 'all' ? 'all' : `Semester ${noticeData.targetSemester}`} {noticeData.targetBranch === 'all' ? 'students across all branches' : `students from ${noticeData.targetBranch}`}.
                                     </p>
                                 </div>
                                 <button type="submit" className="btn btn-primary" style={{ padding: '1.25rem', fontWeight: 800 }}>Send Notice</button>
@@ -455,20 +566,17 @@ const FacultyDashboard = () => {
 
             {/* Scholar Insight Suite */}
             {selectedStudent && (
-                <div className="modal-overlay animate-fade-in" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1001, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-                    <div className="card animate-scale-in" style={{ width: '100%', maxWidth: '480px', padding: 0, overflow: 'hidden', position: 'relative' }}>
+                <div className="modal-overlay animate-fade-in" style={{ zIndex: 1001 }}>
+                    <div className="modal-content-card animate-scale-in" style={{ maxWidth: '480px' }}>
                         <button
                             onClick={() => setSelectedStudent(null)}
-                            className="btn btn-ghost"
+                            className="modal-close-btn"
                             style={{
-                                position: 'absolute',
                                 top: '1.25rem',
                                 right: '1.25rem',
                                 zIndex: 10,
-                                padding: '0.5rem',
-                                borderRadius: '50%',
                                 background: 'rgba(255,255,255,0.1)',
-                                color: '#ff6b6b', // Vibrant Red for clear termination
+                                color: '#ff6b6b',
                                 border: '1px solid rgba(255,107,107,0.2)'
                             }}
                         >
@@ -482,7 +590,7 @@ const FacultyDashboard = () => {
                             <h3 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.02em' }}>{selectedStudent.name}</h3>
                             <p style={{ margin: '0.6rem 0 0 0', fontSize: '0.95rem', opacity: 0.95, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{selectedStudent.enrollmentNo || 'ID: ' + selectedStudent._id.slice(-6).toUpperCase()}</p>
                         </div>
-                        <div className="card-body" style={{ padding: '2rem' }}>
+                        <div className="modal-body-premium">
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
                                 <div style={{ padding: '1.25rem 1rem', background: 'var(--slate-50)', borderRadius: '16px', textAlign: 'center', border: '1px solid var(--border-primary)' }}>
                                     <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.35rem', letterSpacing: '0.05em' }}>Semester</div>

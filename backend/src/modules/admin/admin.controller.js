@@ -62,7 +62,7 @@ exports.getDashboardStats = async (req, res, next) => {
 // @route   GET /api/admin/achievements/pending
 exports.getPendingAchievements = async (req, res, next) => {
     try {
-        const { page = 1, limit = 10, category, department, search } = req.query;
+        const { page = 1, limit = 5000, category, department, search } = req.query;
         const db = getDb();
         let sql = `
             SELECT
@@ -71,6 +71,7 @@ exports.getPendingAchievements = async (req, res, next) => {
                 u.email       AS student_email,
                 u.department  AS student_department,
                 u.student_id  AS student_student_id,
+                u.enrollment_no AS student_enrollment_no,
                 u.profile_image AS student_profile_image
             FROM achievements a
             LEFT JOIN users u ON a.student_id = u.id
@@ -87,7 +88,7 @@ exports.getPendingAchievements = async (req, res, next) => {
 
         // Count
         const countRes = await db.execute({
-            sql: sql.replace('a.*, u.name AS student_name, u.email AS student_email, u.department AS student_department, u.student_id AS student_student_id, u.profile_image AS student_profile_image', 'COUNT(*) AS cnt'),
+            sql: sql.replace(/SELECT[\s\S]*?FROM achievements/, 'SELECT COUNT(*) AS cnt FROM achievements'),
             args,
         });
         const total = Number(countRes.rows[0]?.cnt || 0);
@@ -111,6 +112,7 @@ exports.getPendingAchievements = async (req, res, next) => {
                 name: row.student_name, email: row.student_email,
                 department: row.student_department,
                 studentId: row.student_student_id,
+                enrollmentNo: row.student_enrollment_no,
                 profileImage: row.student_profile_image || '',
             },
         }));
@@ -240,7 +242,7 @@ exports.verifyAchievement = async (req, res, next) => {
 // @route   GET /api/admin/achievements
 exports.getAllAchievements = async (req, res, next) => {
     try {
-        const { page = 1, limit = 10, status, category, department, search } = req.query;
+        const { page = 1, limit = 5000, status, category, department, search } = req.query;
         const db = getDb();
         let sql = `
             SELECT
@@ -249,6 +251,7 @@ exports.getAllAchievements = async (req, res, next) => {
                 u.email       AS student_email,
                 u.department  AS student_department,
                 u.student_id  AS student_student_id,
+                u.enrollment_no AS student_enrollment_no,
                 u.profile_image AS student_profile_image
             FROM achievements a
             LEFT JOIN users u ON a.student_id = u.id
@@ -288,6 +291,7 @@ exports.getAllAchievements = async (req, res, next) => {
                 name: row.student_name, email: row.student_email,
                 department: row.student_department,
                 studentId: row.student_student_id,
+                enrollmentNo: row.student_enrollment_no,
                 profileImage: row.student_profile_image || '',
             },
         }));
@@ -302,9 +306,9 @@ exports.getAllAchievements = async (req, res, next) => {
 // @route   GET /api/admin/students
 exports.getStudents = async (req, res, next) => {
     try {
-        const { page = 1, limit = 10, department, search, batch, semester, section } = req.query;
+        const { page = 1, limit = 5000, department, search, batch, semester, section } = req.query;
         const pageNum = Math.max(1, parseInt(page) || 1);
-        const limitNum = Math.max(1, parseInt(limit) || 10);
+        const limitNum = Math.max(1, parseInt(limit) || 5000);
 
         const query = { role: 'student', isActive: true };
         if (department) query.department = department;
@@ -434,5 +438,157 @@ exports.deleteUsers = async (req, res, next) => {
         res.status(200).json({ success: true, message: `${ids.length} scholar records purged from registry` });
     } catch (error) {
         next(error);
+    }
+};
+
+// @desc    DEBUG: Get achievement points debug for a student
+// @route   GET /api/admin/debug/student/:studentId/points
+exports.getStudentPointsDebug = async (req, res, next) => {
+    try {
+        const { studentId } = req.params;
+        const db = getDb();
+
+        // Get student info
+        const studentRes = await db.execute(
+            'SELECT id, name, email, department FROM users WHERE id = ?',
+            [studentId]
+        );
+        
+        if (!studentRes?.rows?.length) {
+            return res.status(404).json({ success: false, message: 'Student not found' });
+        }
+
+        const student = studentRes.rows[0];
+
+        // Get all achievements for the student
+        const achievementsRes = await db.execute(`
+            SELECT id, title, category, level, date, status, points, verified_at, verified_by, created_at
+            FROM achievements
+            WHERE student_id = ?
+            ORDER BY date DESC
+        `, [studentId]);
+
+        const achievements = achievementsRes?.rows || [];
+
+        // Calculate totals
+        const totals = {
+            all: achievements.length,
+            approved: achievements.filter(a => a.status === 'approved').length,
+            pending: achievements.filter(a => a.status === 'pending').length,
+            rejected: achievements.filter(a => a.status === 'rejected').length,
+            totalPoints: achievements.filter(a => a.status === 'approved').reduce((sum, a) => sum + (Number(a.points) || 0), 0),
+            approvedPoints: achievements.filter(a => a.status === 'approved').reduce((sum, a) => sum + (Number(a.points) || 0), 0),
+        };
+
+        // Check if badges exist
+        const badgesRes = await db.execute(
+            'SELECT id, badge_type, week_start, points_earned FROM badges WHERE student_id = ? ORDER BY week_start DESC',
+            [studentId]
+        );
+
+        const badges = badgesRes?.rows || [];
+
+        res.status(200).json({
+            success: true,
+            student: {
+                id: student.id,
+                name: student.name,
+                email: student.email,
+                department: student.department,
+            },
+            totals,
+            badges: badges.map(b => ({
+                badgeType: b.badge_type,
+                weekStart: b.week_start,
+                pointsEarned: Number(b.points_earned) || 0,
+            })),
+            achievements: achievements.map(a => ({
+                id: a.id,
+                title: a.title,
+                category: a.category,
+                level: a.level,
+                date: a.date,
+                status: a.status,
+                points: Number(a.points) || 0,
+                verifiedAt: a.verified_at,
+                createdAt: a.created_at,
+            })),
+        });
+    } catch (error) {
+        console.error('Points debug error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// @desc    DEBUG: Check weekly badge eligibility
+// @route   GET /api/admin/debug/badge-eligibility
+exports.checkBadgeEligibility = async (req, res, next) => {
+    try {
+        const db = getDb();
+        
+        // Get students with approved achievements
+        const weeklyRes = await db.execute(`
+            SELECT 
+                u.id as student_id,
+                u.name,
+                u.email,
+                u.department,
+                a.verified_at,
+                SUM(a.points) as total_points,
+                COUNT(a.id) as achievement_count
+            FROM achievements a
+            JOIN users u ON a.student_id = u.id
+            WHERE a.status = 'approved'
+            AND a.points > 0
+            AND a.verified_at IS NOT NULL
+            GROUP BY u.id, u.name, u.email, u.department
+            HAVING SUM(a.points) >= 50
+            ORDER BY SUM(a.points) DESC
+            LIMIT 100
+        `);
+
+        const eligibleStudents = weeklyRes?.rows || [];
+
+        // Get list of students who already have badges
+        const badgesRes = await db.execute(`
+            SELECT DISTINCT student_id FROM badges
+        `);
+
+        const studentsWithBadges = new Set((badgesRes?.rows || []).map(b => b.student_id || b[0]));
+
+        // Compare
+        const studentsWithData = eligibleStudents.map(s => {
+            const sid = s.student_id || s[0];
+            return {
+                studentId: sid,
+                name: s.name || s[1],
+                email: s.email || s[2],
+                department: s.department || s[3],
+                totalPoints: Number(s.total_points || s[4]) || 0,
+                achievementCount: Number(s.achievement_count || s[6]) || 0,
+                eligibleBadge: (() => {
+                    const pts = Number(s.total_points || s[4]) || 0;
+                    if (pts >= 500) return 'Platinum';
+                    if (pts >= 300) return 'Gold';
+                    if (pts >= 150) return 'Silver';
+                    if (pts >= 50) return 'Bronze';
+                    return 'None';
+                })(),
+                hasBadge: studentsWithBadges.has(sid),
+            };
+        });
+
+        const missingBadges = studentsWithData.filter(s => !s.hasBadge);
+
+        res.status(200).json({
+            success: true,
+            totalEligible: eligibleStudents.length,
+            totalWithBadges: studentsWithBadges.size,
+            missingBadges: missingBadges.length,
+            eligibleStudents: studentsWithData,
+        });
+    } catch (error) {
+        console.error('Badge eligibility error:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };

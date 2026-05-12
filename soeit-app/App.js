@@ -29,6 +29,8 @@ if (typeof window !== 'undefined') {
       msg.includes('props.pointerEvents') || 
       msg.includes('aria-hidden') || 
       msg.includes('retained focus') ||
+      msg.includes('assistive technology') ||
+      msg.includes('inert attribute') ||
       msg.includes('touch start') ||
       msg.includes('Touch End') ||
       msg.includes('Touch Bank') ||

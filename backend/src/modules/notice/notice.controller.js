@@ -10,11 +10,27 @@ const { clearCache } = require('../../utils/cache');
 // @access  Private (Admin/Faculty)
 exports.createNotice = async (req, res, next) => {
     try {
-        const { title, content, priority } = req.body;
+        const { title, content, priority, targetSemester, targetBranch } = req.body;
 
-        const notice = await Notice.create({ title, content, priority, createdBy: req.user.id });
+        const notice = await Notice.create({ 
+            title, 
+            content, 
+            priority, 
+            createdBy: req.user.id,
+            targetSemester: targetSemester || 'all',
+            targetBranch: targetBranch || 'all'
+        });
 
-        const students = await User.find({ role: 'student', isActive: true });
+        // Build filter query for students
+        let query = { role: 'student', isActive: true };
+        if (targetSemester && targetSemester !== 'all') {
+            query.semester = targetSemester;
+        }
+        if (targetBranch && targetBranch !== 'all') {
+            query.department = targetBranch;
+        }
+
+        const students = await User.find(query);
         
         // Create in-app notifications
         const notifications = students.map(s => ({
@@ -33,6 +49,10 @@ exports.createNotice = async (req, res, next) => {
         }
 
         if (studentEmails.length > 0) {
+            const targetInfo = targetSemester === 'all' 
+                ? 'all students' 
+                : `Semester ${targetSemester} ${targetBranch === 'all' ? '' : `(${targetBranch})`} students`;
+
             sendEmail({
                 to: studentEmails.join(','),
                 subject: `OFFICIAL NOTICE: ${title}`,
@@ -41,7 +61,7 @@ exports.createNotice = async (req, res, next) => {
                     title: `Official Notice: ${title}`,
                     content: `
                         <h1 class="h1">Official Academic Notice</h1>
-                        <p class="p">The following departmental notification has been issued to all Students:</p>
+                        <p class="p">The following departmental notification has been issued to ${targetInfo}:</p>
                         
                         <div style="background: #ffffff; padding: 25px; border-radius: 8px; margin: 25px 0; border: 1px solid #e2e8f0; border-top: 5px solid ${priority === 'Urgent' ? '#ef4444' : '#002147'};">
                             <h3 style="margin-top: 0; color: #1e293b; font-size: 18px;">${title}</h3>
@@ -65,7 +85,11 @@ exports.createNotice = async (req, res, next) => {
         // Invalidate cache
         clearCache('/api/notices');
 
-        res.status(201).json({ success: true, message: 'Notice posted and students notified', data: notice });
+        res.status(201).json({ 
+            success: true, 
+            message: `Notice posted and ${students.length} students notified`, 
+            data: notice 
+        });
     } catch (error) {
         next(error);
     }

@@ -14,9 +14,13 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
 const { connectDB, getDb } = require('./src/config/db');
 const compression = require('compression');
 const errorHandler = require('./src/middleware/errorHandler');
+
+// Passport Config
+require('./src/config/passport')(passport);
 
 // Route imports
 const authRoutes = require('./src/modules/auth/auth.routes');
@@ -30,6 +34,7 @@ const internshipRoutes = require('./src/modules/internship/internship.routes');
 const internshipPostingRoutes = require('./src/modules/internship/internship-posting.routes');
 const projectRoutes = require('./src/modules/project/project.routes');
 const notificationRoutes = require('./src/modules/notification/notification.routes');
+const badgeRoutes = require('./src/modules/badge/badge.routes');
 
 // Connect to Turso Database (called in startServer)
 // connectDB();
@@ -47,6 +52,9 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:5173',
+    'http://localhost:8081',   // Expo web dev server
+    'http://localhost:8082',
+    'http://localhost:19006',  // Expo Go web
     'https://soeit-acheivement-portal.vercel.app',
     'https://soeit-acheivement-portal-5ojpz1d9b.vercel.app',
     'https://soeit-achievement-portal.onrender.com',
@@ -84,6 +92,7 @@ app.use(cors({
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use(cookieParser());
+app.use(passport.initialize());
 
 // Logging (development only)
 if (process.env.NODE_ENV === 'development') {
@@ -139,6 +148,7 @@ app.use('/api/internships', internshipRoutes);
 app.use('/api/internship-postings', internshipPostingRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/badges', badgeRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -147,6 +157,8 @@ app.use((req, res) => {
 
 // Error handler (must be last)
 app.use(errorHandler);
+
+const { initCronJobs } = require('./src/utils/cron');
 
 // Start Server
 const startServer = async () => {
@@ -160,6 +172,9 @@ const startServer = async () => {
             console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
             console.log(`📁 Uploads: http://localhost:${PORT}/uploads\n`);
         });
+
+        // Initialize cron jobs
+        initCronJobs();
 
         process.on('unhandledRejection', (err) => {
             console.error('Unhandled Rejection:', err.message);

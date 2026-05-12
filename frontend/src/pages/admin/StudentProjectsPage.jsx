@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { projectAPI } from '../../services/api';
-import { Search, Code2, ExternalLink, Eye, Github } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Search, Code2, ExternalLink, Eye, Github, X, Calendar, User, Layers, CheckCircle, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const StudentProjectsPage = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({ department: '', search: '' });
+    const [selectedProject, setSelectedProject] = useState(null);
 
     const loadAllProjects = async () => {
         setLoading(true);
@@ -140,9 +140,14 @@ const StudentProjectsPage = () => {
                                             </div>
                                         </td>
                                         <td style={{ textAlign: 'right', paddingRight: '2rem' }}>
-                                            <Link to={`/portfolio/${project.studentId}`} className="btn btn-ghost" style={{ padding: '0.5rem', color: 'var(--brand-600)' }} title="View Profile">
+                                            <button
+                                                className="btn btn-ghost"
+                                                style={{ padding: '0.5rem', color: 'var(--brand-600)' }}
+                                                title="View Project Details"
+                                                onClick={() => setSelectedProject(project)}
+                                            >
                                                 <Eye size={20} strokeWidth={2.5} />
-                                            </Link>
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -175,9 +180,13 @@ const StudentProjectsPage = () => {
                                             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>{project.student?.department}</div>
                                         </div>
                                     </div>
-                                    <Link to={`/portfolio/${project.studentId}`} className="btn btn-ghost btn-sm" style={{ padding: '0.4rem', color: 'var(--brand-600)' }}>
+                                    <button
+                                        className="btn btn-ghost btn-sm"
+                                        style={{ padding: '0.4rem', color: 'var(--brand-600)' }}
+                                        onClick={() => setSelectedProject(project)}
+                                    >
                                         <Eye size={18} />
-                                    </Link>
+                                    </button>
                                 </div>
 
                                 <div style={{ marginBottom: '1rem' }}>
@@ -216,6 +225,249 @@ const StudentProjectsPage = () => {
                     )}
                 </div>
             </div>
+
+            {/* ===== Project Detail Modal ===== */}
+            {selectedProject && (
+                <div
+                    className="modal-overlay"
+                    style={{
+                        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(4px)', zIndex: 9999,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: '1rem', animation: 'fadeIn 0.2s ease'
+                    }}
+                    onClick={(e) => e.target === e.currentTarget && setSelectedProject(null)}
+                >
+                    <div
+                        className="animate-scale-in"
+                        style={{
+                            background: 'white', borderRadius: '20px',
+                            width: '100%', maxWidth: '620px',
+                            maxHeight: '90vh', overflow: 'auto',
+                            boxShadow: '0 25px 60px rgba(0,0,0,0.15)',
+                            border: '1px solid var(--border-primary)'
+                        }}
+                    >
+                        {/* Modal Header */}
+                        <div style={{
+                            padding: '1.75rem 2rem 1.25rem',
+                            borderBottom: '1px solid var(--border-primary)',
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
+                        }}>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                                    <div style={{
+                                        width: 44, height: 44,
+                                        background: 'linear-gradient(135deg, var(--primary-100), var(--primary-50))',
+                                        color: 'var(--brand-700)', borderRadius: '12px',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontWeight: 900, fontSize: '1.1rem'
+                                    }}>
+                                        <Layers size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 style={{ margin: 0, fontWeight: 900, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
+                                            Project Details
+                                        </h3>
+                                        <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                            Submitted project record overview
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setSelectedProject(null)}
+                                style={{
+                                    background: 'var(--slate-50)', border: '1px solid var(--border-primary)',
+                                    borderRadius: '10px', padding: '0.5rem', cursor: 'pointer',
+                                    color: 'var(--text-muted)', transition: 'all 0.15s'
+                                }}
+                                onMouseOver={e => e.currentTarget.style.background = '#fee2e2'}
+                                onMouseOut={e => e.currentTarget.style.background = 'var(--slate-50)'}
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div style={{ padding: '1.75rem 2rem' }}>
+                            {/* Project Title & Status */}
+                            <div style={{
+                                background: 'var(--slate-50)', borderRadius: '14px',
+                                padding: '1.25rem 1.5rem', marginBottom: '1.5rem',
+                                border: '1px solid var(--border-primary)'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>
+                                        PROJECT TITLE
+                                    </span>
+                                    <span
+                                        className={`badge ${selectedProject.status === 'Completed' ? 'badge-success' : 'badge-primary'}`}
+                                        style={{ fontWeight: 800, fontSize: '0.7rem', padding: '0.3rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                    >
+                                        {selectedProject.status === 'Completed' ? <CheckCircle size={12} /> : <Clock size={12} />}
+                                        {selectedProject.status?.toUpperCase()}
+                                    </span>
+                                </div>
+                                <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.3rem', color: 'var(--brand-800)', lineHeight: 1.3 }}>
+                                    {selectedProject.title}
+                                </h4>
+                            </div>
+
+                            {/* Student Info */}
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '1rem',
+                                padding: '1rem 1.25rem', marginBottom: '1.5rem',
+                                background: 'var(--primary-50)', borderRadius: '12px',
+                                border: '1px solid var(--primary-100)'
+                            }}>
+                                <div style={{
+                                    width: 48, height: 48,
+                                    background: 'white', color: 'var(--brand-700)',
+                                    borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontWeight: 900, fontSize: '1.1rem', border: '2px solid var(--primary-100)',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                                }}>
+                                    {selectedProject.student?.name?.charAt(0) || 'S'}
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)' }}>
+                                        {selectedProject.student?.name || 'Unknown Student'}
+                                    </div>
+                                    <div style={{ fontSize: '0.78rem', color: 'var(--brand-700)', fontWeight: 700 }}>
+                                        {selectedProject.student?.department || 'N/A'}
+                                        {selectedProject.student?.email && (
+                                            <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}> • {selectedProject.student.email}</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Description */}
+                            {selectedProject.description && (
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <div style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+                                        DESCRIPTION
+                                    </div>
+                                    <div style={{
+                                        background: 'white', borderRadius: '12px',
+                                        border: '1px solid var(--border-primary)',
+                                        padding: '1.25rem 1.5rem'
+                                    }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                            {selectedProject.description.split('\n').filter(line => line.trim()).map((line, i) => (
+                                                <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                                                    <div style={{
+                                                        marginTop: '0.5rem', width: '6px', height: '6px',
+                                                        borderRadius: '50%', background: 'var(--brand-400)', flexShrink: 0
+                                                    }} />
+                                                    <p style={{
+                                                        fontSize: '0.88rem', color: 'var(--text-secondary)',
+                                                        margin: 0, lineHeight: '1.6', wordBreak: 'break-word'
+                                                    }}>
+                                                        {line.trim().replace(/^[-*•]\s*/, '')}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Tech Stack */}
+                            {selectedProject.techStack && (
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <div style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+                                        TECH STACK
+                                    </div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                        {selectedProject.techStack.split(',').map((tech, i) => (
+                                            <span key={i} style={{
+                                                background: 'var(--slate-100)', padding: '0.35rem 0.8rem',
+                                                borderRadius: '8px', fontSize: '0.8rem', fontWeight: 800,
+                                                color: 'var(--text-secondary)', border: '1px solid var(--border-primary)'
+                                            }}>
+                                                {tech.trim()}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Meta Info */}
+                            <div style={{
+                                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem',
+                                marginBottom: '1.5rem'
+                            }}>
+                                <div style={{
+                                    background: 'var(--slate-50)', borderRadius: '10px',
+                                    padding: '1rem 1.25rem', border: '1px solid var(--border-primary)'
+                                }}>
+                                    <div style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                                        STATUS
+                                    </div>
+                                    <div style={{ fontWeight: 900, fontSize: '0.95rem', color: selectedProject.status === 'Completed' ? 'var(--success-600)' : 'var(--brand-600)' }}>
+                                        {selectedProject.status}
+                                    </div>
+                                </div>
+                                <div style={{
+                                    background: 'var(--slate-50)', borderRadius: '10px',
+                                    padding: '1rem 1.25rem', border: '1px solid var(--border-primary)'
+                                }}>
+                                    <div style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                                        SUBMITTED ON
+                                    </div>
+                                    <div style={{ fontWeight: 900, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                                        {selectedProject.createdAt
+                                            ? new Date(selectedProject.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                                            : 'N/A'
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Links */}
+                            {(selectedProject.githubLink || selectedProject.liveLink) && (
+                                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                    {selectedProject.githubLink && (
+                                        <a
+                                            href={selectedProject.githubLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="btn btn-ghost"
+                                            style={{
+                                                flex: 1, minWidth: '160px', gap: '0.6rem',
+                                                padding: '0.85rem 1.25rem', fontWeight: 800,
+                                                background: 'var(--slate-50)', border: '1px solid var(--border-primary)',
+                                                borderRadius: '12px', fontSize: '0.85rem',
+                                                color: 'var(--text-primary)', justifyContent: 'center'
+                                            }}
+                                        >
+                                            <Github size={18} /> View on GitHub
+                                        </a>
+                                    )}
+                                    {selectedProject.liveLink && (
+                                        <a
+                                            href={selectedProject.liveLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="btn btn-primary"
+                                            style={{
+                                                flex: 1, minWidth: '160px', gap: '0.6rem',
+                                                padding: '0.85rem 1.25rem', fontWeight: 800,
+                                                borderRadius: '12px', fontSize: '0.85rem',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            <ExternalLink size={18} /> Live Demo
+                                        </a>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

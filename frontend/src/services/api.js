@@ -56,6 +56,8 @@ API.interceptors.response.use(
 // Auth APIs
 export const authAPI = {
     register: (data) => API.post('/auth/register', data),
+    verifyOTP: (data) => API.post('/auth/verify-otp', data),
+    resendOTP: (data) => API.post('/auth/resend-otp', data),
     login: (data) => API.post('/auth/login', data),
     forgotPassword: (email) => API.post('/auth/forgot-password', { email }),
     resetPassword: (token, password) => API.put(`/auth/reset-password/${token}`, { password }),
@@ -148,6 +150,7 @@ export const projectAPI = {
     add: (data) => API.post('/projects', data),
     getMy: () => API.get('/projects/my'),
     getAll: (params) => API.get('/projects', { params }),
+    update: (id, data) => API.put(`/projects/${id}`, data),
     delete: (id) => API.delete(`/projects/${id}`),
 };
 
@@ -155,6 +158,13 @@ export const notificationAPI = {
     getAll: () => API.get('/notifications'),
     markAsRead: (id) => API.put(`/notifications/${id}/read`),
     markAllAsRead: () => API.put('/notifications/read-all'),
+    clearAll: () => API.delete('/notifications/clear-all'),
+};
+
+export const badgeAPI = {
+    getStudentBadges: (studentId) => API.get(`/badges/student/${studentId}`),
+    getLeaderboard: () => API.get('/badges/leaderboard'),
+    calculateWeeklyBadges: () => API.post('/badges/calculate'),
 };
 
 export default API;

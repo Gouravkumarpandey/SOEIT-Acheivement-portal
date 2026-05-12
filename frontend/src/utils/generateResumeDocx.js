@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, TabStopType, TabStopPosition, UnderlineType } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, TabStopType, TabStopPosition, UnderlineType, ExternalHyperlink } from 'docx';
 import { saveAs } from 'file-saver';
 import { format } from 'date-fns';
 
@@ -6,23 +6,48 @@ export const generateResumeDocx = async (data) => {
     const { student, achievements, courses, internships, projects } = data;
 
     const createContactInfo = () => {
-        const contactInfo = [];
-        if (student.phone) contactInfo.push(`+91-${student.phone.replace('+91-', '')}`);
-        if (student.email) contactInfo.push(student.email);
-        if (student.linkedIn) contactInfo.push(`LinkedIn`);
-        if (student.github) contactInfo.push(`GitHub`);
-        if (student.portfolio) contactInfo.push(`Portfolio`);
+        const formatUrl = (url) => url.startsWith('http') ? url : `https://${url}`;
+
+        const children = [];
+        const addSeparator = () => {
+            if (children.length > 0) {
+                children.push(new TextRun({ text: "  |  ", size: 20, font: "Calibri", color: "000000" }));
+            }
+        };
+
+        if (student.phone) {
+            addSeparator();
+            children.push(new TextRun({ text: `+91-${student.phone.replace('', '')}`, size: 20, font: "Calibri", color: "000000" }));
+        }
+        if (student.email) {
+            addSeparator();
+            children.push(new TextRun({ text: student.email, size: 20, font: "Calibri", color: "000000" }));
+        }
+        if (student.linkedIn) {
+            addSeparator();
+            children.push(new ExternalHyperlink({
+                children: [new TextRun({ text: "LinkedIn", size: 20, font: "Calibri", color: "1155cc", underline: { type: UnderlineType.SINGLE, color: "1155cc" } })],
+                link: formatUrl(student.linkedIn),
+            }));
+        }
+        if (student.github) {
+            addSeparator();
+            children.push(new ExternalHyperlink({
+                children: [new TextRun({ text: "GitHub", size: 20, font: "Calibri", color: "1155cc", underline: { type: UnderlineType.SINGLE, color: "1155cc" } })],
+                link: formatUrl(student.github),
+            }));
+        }
+        if (student.portfolio) {
+            addSeparator();
+            children.push(new ExternalHyperlink({
+                children: [new TextRun({ text: "Portfolio", size: 20, font: "Calibri", color: "1155cc", underline: { type: UnderlineType.SINGLE, color: "1155cc" } })],
+                link: formatUrl(student.portfolio),
+            }));
+        }
 
         return new Paragraph({
             alignment: AlignmentType.CENTER,
-            children: [
-                new TextRun({
-                    text: contactInfo.join('  |  '),
-                    size: 20,
-                    font: "Calibri",
-                    color: "000000"
-                })
-            ],
+            children: children,
             spacing: { after: 150 },
         });
     };
@@ -69,17 +94,24 @@ export const generateResumeDocx = async (data) => {
         });
     };
 
-    const createRow = (leftText, rightText, boldLeft = false, italicLeft = false, boldRight = false, italicRight = false) => {
+    const createRow = (leftText, rightText, boldLeft = false, italicLeft = false, boldRight = false, italicRight = false, rightLink = null) => {
+        const formatUrl = (url) => url.startsWith('http') ? url : `https://${url}`;
+
+        const rightChildren = [];
+        if (rightLink) {
+            rightChildren.push(new ExternalHyperlink({
+                children: [new TextRun({ text: `\t${rightText}`, bold: boldRight, italics: italicRight, size: 21, font: "Calibri", color: "1155cc", underline: { type: UnderlineType.SINGLE, color: "1155cc" } })],
+                link: formatUrl(rightLink),
+            }));
+        } else {
+            rightChildren.push(new TextRun({ text: `\t${rightText}`, bold: boldRight, italics: italicRight, size: 21, font: "Calibri" }));
+        }
+
         return new Paragraph({
-            tabStops: [
-                {
-                    type: TabStopType.RIGHT,
-                    position: 9500, 
-                },
-            ],
+            tabStops: [{ type: TabStopType.RIGHT, position: 9500 }],
             children: [
                 new TextRun({ text: leftText, bold: boldLeft, italics: italicLeft, size: 21, font: "Calibri" }),
-                new TextRun({ text: `\t${rightText}`, bold: boldRight, italics: italicRight, size: 21, font: "Calibri" })
+                ...rightChildren
             ],
             spacing: { before: 40, after: 40 }
         });
@@ -88,10 +120,10 @@ export const generateResumeDocx = async (data) => {
     const createBulletPoint = (text, isSubBullet = false) => {
         return new Paragraph({
             children: [
-                new TextRun({ 
-                    text: isSubBullet ? `◦  ${text}` : `–  ${text}`, 
-                    size: 20, 
-                    font: "Calibri" 
+                new TextRun({
+                    text: isSubBullet ? `◦  ${text}` : `–  ${text}`,
+                    size: 20,
+                    font: "Calibri"
                 })
             ],
             indent: { left: isSubBullet ? 720 : 360 },
@@ -119,20 +151,34 @@ export const generateResumeDocx = async (data) => {
 
     // Education Section
     sections.push(createSectionHeader("Education"));
-    
-    // University
-    const batchRange = student.batch ? (student.batch.includes('-') ? student.batch : `${student.batch}-${parseInt(student.batch)+4}`) : '2022-26';
+
+    // Derive batch range from student.batch
+    // Formats: 'Aug-2022' (new) → 'Aug. 2022 – May 2026'  |  '2022' (legacy) → 'Aug. 2022 – May 2026'
+    const parseBatchRange = (batch) => {
+        if (!batch) return '';
+        const dashIdx = batch.indexOf('-');
+        if (dashIdx !== -1) {
+            const mon = batch.substring(0, dashIdx); // e.g. 'Aug'
+            const yr = batch.substring(dashIdx + 1); // e.g. '2022'
+            const endYr = String(parseInt(yr) + 4);
+            return `${mon}. ${yr} \u2013 May ${endYr}`;
+        }
+        // Legacy: year-only
+        const yr = batch.replace(/[^0-9]/g, '').slice(0, 4);
+        return yr ? `Aug. ${yr} \u2013 May ${String(parseInt(yr) + 4)}` : '';
+    };
+    const batchRange = parseBatchRange(student.batch);
     sections.push(createRow(
-        student.universityName || 'Arka Jain University, Jamshedpur', 
+        student.universityName || 'Arka Jain University, Jamshedpur',
         student.universityCgpa ? `CGPA: ${student.universityCgpa}` : 'Arka Jain University',
         true, false, false, false
     ));
     sections.push(createRow(
-        `Bachelor of Technology in ${student.department || 'Computer Science & Engineering'}`, 
-        `Aug. 2022 – May 2026`, // Placeholder for date range from batch
+        `Bachelor of Technology in ${student.department || 'Computer Science & Engineering'}`,
+        batchRange,
         false, true, false, false
     ));
-    
+
     // 12th
     if (student.edu12thSchool) {
         sections.push(createRow(
@@ -192,22 +238,22 @@ export const generateResumeDocx = async (data) => {
         internships.forEach(exp => {
             const startStr = exp.start_date ? format(new Date(exp.start_date), 'MMM yyyy') : '';
             const endStr = exp.status === 'Ongoing' ? 'Present' : (exp.end_date ? format(new Date(exp.end_date), 'MMM yyyy') : '');
-            
+
             sections.push(createRow(
-                exp.company_name, 
+                exp.company_name,
                 `${startStr} – ${endStr}`,
                 true, false, false, false
             ));
-            
+
             sections.push(createRow(
-                exp.role, 
+                exp.role,
                 exp.location || '',
                 false, true, false, true
             ));
 
             if (exp.description) {
                 exp.description.split('\n').filter(d => d.trim()).forEach(line => {
-                    sections.push(createBulletPoint(line.trim()));
+                    sections.push(createBulletPoint(line.trim().replace(/^[-*•]\s*/, '')));
                 });
             }
         });
@@ -220,16 +266,17 @@ export const generateResumeDocx = async (data) => {
             const leftText = `${proj.title} | ${proj.techStack || ''}`;
             let rightText = '';
             if (proj.githubLink) rightText = 'GitHub Link';
-            
+
             sections.push(createRow(
-                leftText, 
+                leftText,
                 rightText,
-                true, false, false, false
+                true, false, false, false,
+                proj.githubLink || null
             ));
 
             if (proj.description) {
                 proj.description.split('\n').filter(d => d.trim()).forEach(line => {
-                    sections.push(createBulletPoint(line.trim()));
+                    sections.push(createBulletPoint(line.trim().replace(/^[-*•]\s*/, '')));
                 });
             }
         });
@@ -237,9 +284,12 @@ export const generateResumeDocx = async (data) => {
 
     // Achievements Section (Bulleted like Ritesh image)
     const legitAchievements = achievements?.filter(a => a.category !== 'Internship' && a.category !== 'Project');
-    if (legitAchievements && legitAchievements.length > 0) {
+    const top4Achievements = legitAchievements
+        ?.sort((a, b) => (b.points || 0) - (a.points || 0))
+        .slice(0, 4);
+    if (top4Achievements && top4Achievements.length > 0) {
         sections.push(createSectionHeader("Achievements"));
-        legitAchievements.forEach(ach => {
+        top4Achievements.forEach(ach => {
             const dateStr = ach.date ? ` (${format(new Date(ach.date), 'yyyy')})` : '';
             sections.push(new Paragraph({
                 children: [

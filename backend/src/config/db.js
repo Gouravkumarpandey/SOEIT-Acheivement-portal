@@ -43,7 +43,8 @@ const initSchema = async (client) => {
             university_cgpa TEXT,
             skills          TEXT,
             created_at      TEXT DEFAULT (datetime('now')),
-            updated_at      TEXT DEFAULT (datetime('now'))
+            updated_at      TEXT DEFAULT (datetime('now')),
+            push_token      TEXT
         )`,
     `CREATE TABLE IF NOT EXISTS achievements (
             id              TEXT PRIMARY KEY,
@@ -94,12 +95,14 @@ const initSchema = async (client) => {
             FOREIGN KEY (created_by) REFERENCES users(id)
         )`,
     `CREATE TABLE IF NOT EXISTS notices (
-            id          TEXT PRIMARY KEY,
-            title       TEXT NOT NULL,
-            content     TEXT NOT NULL,
-            priority    TEXT DEFAULT 'Medium',
-            created_by  TEXT NOT NULL,
-            created_at  TEXT DEFAULT (datetime('now')),
+            id              TEXT PRIMARY KEY,
+            title           TEXT NOT NULL,
+            content         TEXT NOT NULL,
+            priority        TEXT DEFAULT 'Medium',
+            target_semester TEXT DEFAULT 'all',
+            target_branch   TEXT DEFAULT 'all',
+            created_by      TEXT NOT NULL,
+            created_at      TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (created_by) REFERENCES users(id)
         )`,
     `CREATE TABLE IF NOT EXISTS courses (
@@ -206,6 +209,15 @@ const initSchema = async (client) => {
             created_at  TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (user_id) REFERENCES users(id)
         )`,
+    `CREATE TABLE IF NOT EXISTS badges (
+            id              TEXT PRIMARY KEY,
+            student_id      TEXT NOT NULL,
+            badge_type      TEXT NOT NULL,
+            week_start      TEXT NOT NULL,
+            points_earned   INTEGER DEFAULT 0,
+            created_at      TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (student_id) REFERENCES users(id)
+        )`,
     `CREATE TABLE IF NOT EXISTS course_assignments (
             id              TEXT PRIMARY KEY,
             course_name     TEXT NOT NULL,
@@ -224,6 +236,8 @@ const initSchema = async (client) => {
     `CREATE INDEX IF NOT EXISTS idx_users_dept ON users(department)`,
     `CREATE INDEX IF NOT EXISTS idx_users_active ON users(is_active)`,
     `CREATE INDEX IF NOT EXISTS idx_users_batch ON users(batch)`,
+    `CREATE INDEX IF NOT EXISTS idx_users_auth_email ON users(email)`,
+    `CREATE INDEX IF NOT EXISTS idx_users_auth_enroll ON users(enrollment_no)`,
     `CREATE INDEX IF NOT EXISTS idx_achievements_student_status ON achievements(student_id, status)`,
     `CREATE INDEX IF NOT EXISTS idx_achievements_public_status ON achievements(is_public, status)`,
     `CREATE INDEX IF NOT EXISTS idx_achievements_category_status ON achievements(category, status)`,
@@ -255,7 +269,8 @@ const initSchema = async (client) => {
     `ALTER TABLE users ADD COLUMN edu_12th_percent TEXT`,
     `ALTER TABLE users ADD COLUMN university_name TEXT DEFAULT 'Arka Jain University, Jamshedpur'`,
     `ALTER TABLE users ADD COLUMN university_cgpa TEXT`,
-    `ALTER TABLE users ADD COLUMN skills TEXT`
+    `ALTER TABLE users ADD COLUMN skills TEXT`,
+    `ALTER TABLE users ADD COLUMN push_token TEXT`
   ];
 
   for (const query of migrations) {
@@ -330,6 +345,98 @@ const seedHackathons = async (client) => {
   }
 };
 
+const awardBadgesForExistingData = async (client) => {
+  try {
+    const { startOfWeek, format } = require('date-fns');
+    
+    // Get all approved achievements (all time)
+    const achievementsRes = await client.execute(`
+      SELECT a.student_id, a.date, SUM(a.points) as weekly_points, u.name, u.email
+      FROM achievements a
+      JOIN users u ON a.student_id = u.id
+      WHERE a.status = 'approved'
+      GROUP BY a.student_id, DATE(a.date)
+      ORDER BY a.date DESC
+    `);
+
+    if (!achievementsRes?.rows || achievementsRes.rows.length === 0) {
+      console.log('📊 No approved achievements found in database');
+      return;
+    }
+
+    const BADGE_TIERS = [
+      { type: 'Platinum', minPoints: 500 },
+      { type: 'Gold', minPoints: 300 },
+      { type: 'Silver', minPoints: 150 },
+      { type: 'Bronze', minPoints: 50 }
+    ];
+
+    // Group achievements by student and week
+    const weeklyData = {};
+    
+    for (const row of achievementsRes.rows) {
+      const studentId = row.student_id || row[0];
+      const achievementDate = row.date || row[1];
+      const points = Number(row.weekly_points || row[2] || 0);
+      const studentName = row.name || row[3];
+      const studentEmail = row.email || row[4];
+
+      // Get week start date
+      const weekStart = format(startOfWeek(new Date(achievementDate)), 'yyyy-MM-dd');
+      const key = `${studentId}_${weekStart}`;
+
+      if (!weeklyData[key]) {
+        weeklyData[key] = {
+          studentId,
+          weekStart,
+          studentName,
+          studentEmail,
+          totalPoints: 0
+        };
+      }
+      weeklyData[key].totalPoints += points;
+    }
+
+    let badgesAwarded = 0;
+    const processedWeeks = new Set();
+
+    // Award badges for each week
+    for (const key in weeklyData) {
+      const data = weeklyData[key];
+      const { studentId, weekStart, studentName, totalPoints } = data;
+
+      // Check if badge already exists
+      const existingRes = await client.execute(
+        'SELECT id FROM badges WHERE student_id = ? AND week_start = ?',
+        [studentId, weekStart]
+      );
+
+      if (existingRes?.rows?.length > 0) continue;
+
+      const tier = BADGE_TIERS.find(t => totalPoints >= t.minPoints);
+      if (!tier) continue;
+
+      const badgeId = 'badge_' + Math.random().toString(36).substring(2, 10);
+      await client.execute(
+        `INSERT INTO badges (id, student_id, badge_type, week_start, points_earned, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [badgeId, studentId, tier.type, weekStart, totalPoints, new Date().toISOString()]
+      );
+
+      badgesAwarded++;
+      const weekKey = `${studentName} (${weekStart})`;
+      if (!processedWeeks.has(weekKey)) {
+        console.log(`🏆 Badge: ${studentName} - ${tier.type} Badge (${totalPoints} pts) - Week of ${weekStart}`);
+        processedWeeks.add(weekKey);
+      }
+    }
+
+    console.log(`✅ ${badgesAwarded} badges awarded from all historical data`);
+  } catch (err) {
+    console.error('❌ Badge awarding error:', err.message);
+  }
+};
+
 const resolveDbConfig = () => {
   const env = process.env.NODE_ENV || 'development';
   const tursoUrl = process.env.TURSO_URL;
@@ -369,6 +476,25 @@ const connectDB = async () => {
 
     await initSchema(client);
     console.log('📐 Schema initialized');
+
+    // Award badges based on existing data
+    await awardBadgesForExistingData(client);
+
+    db = client;
+    return db;
+  } catch (error) {
+    console.error('❌ Turso Connection Failed:', error.message);
+    // If we can't connect at startup, we should likely stop the server
+    throw error;
+  }
+};
+    console.log(`✅ ${label} Connected`);
+
+    await initSchema(client);
+    console.log('📐 Schema initialized');
+
+    // Award badges based on existing data
+    await awardBadgesForExistingData(client);
 
     db = client;
     return db;

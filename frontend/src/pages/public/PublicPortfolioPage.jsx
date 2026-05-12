@@ -1,7 +1,7 @@
 import '../../styles/pages/public/PublicPortfolioPage.css';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { achievementAPI, STATIC_BASE_URL } from '../../services/api';
+import { achievementAPI, badgeAPI, STATIC_BASE_URL } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Trophy, Star, Globe, Github, Linkedin, Award, CheckCircle, Calendar, Building, Share2, ArrowLeft, Terminal, Download, Shield, FileText, File as FileIcon, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
@@ -23,12 +23,25 @@ const PublicPortfolioPage = () => {
     const [error, setError] = useState(null);
     const [selectedCat, setSelectedCat] = useState('');
     const [resumeMenuOpen, setResumeMenuOpen] = useState(false);
+    const [badges, setBadges] = useState([]);
 
     useEffect(() => {
+        if (!userId || userId === 'undefined') {
+            setError('Invalid Portfolio Protocol: Student ID missing in request');
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         setError(null);
         achievementAPI.getPortfolio(userId)
-            .then(res => setData(res.data))
+            .then(res => {
+                setData(res.data);
+                // Also fetch badges for this student - non-critical
+                const studentId = res.data.student.id || res.data.student._id || res.data.student.userId || userId;
+                badgeAPI.getStudentBadges(studentId)
+                    .then(bRes => setBadges(bRes.data.data))
+                    .catch(() => setBadges([]));
+            })
             .catch(err => {
                 const msg = err.response?.data?.message || 'Portfolio not found';
                 setError(msg);
@@ -204,35 +217,10 @@ const PublicPortfolioPage = () => {
                         <div style={{ flex: 1 }}>
                             <h1 style={{ marginBottom: '0.375rem' }}>{student.name}</h1>
                             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '0.75rem' }}>
-                                {student.department} Engineering • {student.enrollment_no ? `Enrollment: ${student.enrollment_no}` : ''} {student.semester ? `• Sem ${student.semester}` : ''}
+                                {student.department} Engineering {student.semester ? `• • Sem ${student.semester}` : ''}
                             </p>
-                            {student.bio && <p style={{ color: 'var(--text-muted)', maxWidth: 500, lineHeight: 1.7, marginBottom: '1rem', fontSize: '0.9rem' }}>{student.bio}</p>}
-                            
-                            {/* Academic History in Public Portfolio */}
-                            {(student.edu12thSchool || student.edu10thSchool) && (
-                                <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-                                    {student.edu12thSchool && (
-                                        <div style={{ background: 'white', padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid var(--border-primary)', minWidth: '220px' }}>
-                                            <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--brand-600)', textTransform: 'uppercase', marginBottom: '0.25rem', letterSpacing: '0.05em' }}>Senior Secondary (12th)</div>
-                                            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{student.edu12thSchool}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
-                                                <span>{student.edu12thYear}</span>
-                                                <span style={{ fontWeight: 700, color: 'var(--success-600)' }}>{student.edu12thPercent}</span>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {student.edu10thSchool && (
-                                        <div style={{ background: 'white', padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid var(--border-primary)', minWidth: '220px' }}>
-                                            <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--brand-600)', textTransform: 'uppercase', marginBottom: '0.25rem', letterSpacing: '0.05em' }}>Secondary Education (10th)</div>
-                                            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{student.edu10thSchool}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
-                                                <span>{student.edu10thYear}</span>
-                                                <span style={{ fontWeight: 700, color: 'var(--success-600)' }}>{student.edu10thPercent}</span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+
+                            {/* Academic History in Public Portfolio was removed as per request, it will only show on generated resume */}
 
                             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                 {student.linkedIn && <a href={student.linkedIn.startsWith('http') ? student.linkedIn : `https://${student.linkedIn}`} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm"><Linkedin size={14} /> LinkedIn</a>}
@@ -249,18 +237,18 @@ const PublicPortfolioPage = () => {
                                             >
                                                 <FileText size={14} color="#3b82f6" /> Resume <ChevronDown size={14} style={{ transform: resumeMenuOpen ? 'rotate(180deg)' : 'none', transition: '0.2s' }} />
                                             </button>
-                                            
+
                                             {resumeMenuOpen && (
                                                 <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: '#fff', border: '1px solid var(--border-primary)', borderRadius: '10px', boxShadow: 'var(--shadow-lg)', padding: '0.35rem', zIndex: 1000, minWidth: '100px' }}>
-                                                    <button 
-                                                        className="btn btn-ghost btn-sm" 
+                                                    <button
+                                                        className="btn btn-ghost btn-sm"
                                                         style={{ width: '100%', justifyContent: 'flex-start', padding: '0.4rem 0.75rem', fontSize: '0.78rem', borderRadius: '6px', gap: '0.5rem' }}
                                                         onClick={() => { generateResumePdf(data); setResumeMenuOpen(false); }}
                                                     >
                                                         <FileIcon size={12} color="#ef4444" /> PDF
                                                     </button>
-                                                    <button 
-                                                        className="btn btn-ghost btn-sm" 
+                                                    <button
+                                                        className="btn btn-ghost btn-sm"
                                                         style={{ width: '100%', justifyContent: 'flex-start', padding: '0.4rem 0.75rem', fontSize: '0.78rem', borderRadius: '6px', marginTop: '2px', gap: '0.5rem' }}
                                                         onClick={() => { generateResumeDocx(data); setResumeMenuOpen(false); }}
                                                     >

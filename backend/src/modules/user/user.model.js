@@ -54,6 +54,7 @@ const rowToUser = (row) => {
         lastLogin: row.last_login ? new Date(row.last_login) : undefined,
         createdAt: row.created_at ? new Date(row.created_at) : undefined,
         updatedAt: row.updated_at ? new Date(row.updated_at) : undefined,
+        pushToken: row.push_token || '',
 
         // Methods (mimic Mongoose)
         matchPassword: async function (entered) {
@@ -86,7 +87,7 @@ const rowToUser = (row) => {
                     edu_12th_school=?, edu_12th_year=?, edu_12th_percent=?,
                     university_name=?, university_cgpa=?, skills=?,
                     reset_password_token=?, reset_password_expire=?, last_login=?,
-                    updated_at=datetime('now')
+                    updated_at=datetime('now'), push_token=?
                     WHERE id=?`,
                 args: [
                     this.name, this.email, this.password, this.role, this.department,
@@ -102,6 +103,7 @@ const rowToUser = (row) => {
                     this.resetPasswordToken || null,
                     this.resetPasswordExpire ? this.resetPasswordExpire.toISOString() : null,
                     this.lastLogin ? this.lastLogin.toISOString() : null,
+                    this.pushToken || null,
                     this.id,
                 ],
             });
@@ -146,25 +148,38 @@ const User = {
     },
 
     /** FIND ONE */
-    findOne: async (query) => {
+    findOne: async (query, selectFields = null) => {
         const db = getDb();
-        let sql = 'SELECT * FROM users WHERE 1=1';
+        const selectClause = selectFields ? selectFields : '*';
+        let sql = `SELECT ${selectClause} FROM users WHERE 1=1`;
         const args = [];
 
         if (query.$or) {
             const orParts = [];
             for (const cond of query.$or) {
-                if (cond.email !== undefined) { orParts.push('email = ?'); args.push(cond.email.toLowerCase()); }
-                if (cond.enrollmentNo !== undefined) { orParts.push('enrollment_no = ?'); args.push(cond.enrollmentNo); }
-                if (cond.resetPasswordToken !== undefined) { orParts.push('reset_password_token = ?'); args.push(cond.resetPasswordToken); }
+                if (cond.email !== undefined) { 
+                    orParts.push('email = ?'); 
+                    args.push(cond.email.toLowerCase()); 
+                }
+                if (cond.enrollmentNo !== undefined) { 
+                    orParts.push('enrollment_no = ?'); 
+                    args.push(cond.enrollmentNo); 
+                }
+                if (cond.resetPasswordToken !== undefined) { 
+                    orParts.push('reset_password_token = ?'); 
+                    args.push(cond.resetPasswordToken); 
+                }
             }
             if (orParts.length) sql += ` AND (${orParts.join(' OR ')})`;
         } else {
+            if (query.id !== undefined) { sql += ' AND id = ?'; args.push(query.id); }
             if (query.email !== undefined) { sql += ' AND email = ?'; args.push(query.email.toLowerCase ? query.email.toLowerCase() : query.email); }
             if (query.enrollmentNo !== undefined) { sql += ' AND enrollment_no = ?'; args.push(query.enrollmentNo); }
             if (query.resetPasswordToken !== undefined) { sql += ' AND reset_password_token = ?'; args.push(query.resetPasswordToken); }
             if (query.resetPasswordExpire?.$gt !== undefined) { sql += ' AND reset_password_expire > ?'; args.push(new Date(query.resetPasswordExpire.$gt).toISOString()); }
         }
+
+        sql += ' LIMIT 1'; // Performance hint
 
         const result = await db.execute({ sql, args });
         return result.rows.length ? rowToUser(result.rows[0]) : null;
@@ -211,8 +226,8 @@ const User = {
                 const colMap = { name: 'name', createdAt: 'created_at' };
                 sql += ` ORDER BY ${colMap[field] || field} ${dir === -1 || dir === 'desc' ? 'DESC' : 'ASC'}`;
             }
-            if (_skip) sql += ` OFFSET ${_skip}`;
             if (_limit) sql += ` LIMIT ${_limit}`;
+            if (_skip) sql += ` OFFSET ${_skip}`;
 
             const result = await db.execute({ sql, args });
             return result.rows.map(rowToUser);
@@ -264,7 +279,7 @@ const User = {
             edu10thSchool: 'edu_10th_school', edu10thYear: 'edu_10th_year', edu10thPercent: 'edu_10th_percent',
             edu12thSchool: 'edu_12th_school', edu12thYear: 'edu_12th_year', edu12thPercent: 'edu_12th_percent',
             universityName: 'university_name', universityCgpa: 'university_cgpa',
-            skills: 'skills',
+            skills: 'skills', pushToken: 'push_token',
         };
 
         const setParts = [];

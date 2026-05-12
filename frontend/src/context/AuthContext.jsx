@@ -52,9 +52,21 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         setError(null);
         const { data } = await authAPI.register(userData);
+        return data;
+    };
+
+    const verifyOTP = async (otpData) => {
+        setError(null);
+        const { data } = await authAPI.verifyOTP(otpData);
         sessionStorage.setItem('soeit_token', data.token);
         sessionStorage.setItem('soeit_user', JSON.stringify(data.user));
         setUser(data.user);
+        return data;
+    };
+
+    const resendOTP = async (email) => {
+        setError(null);
+        const { data } = await authAPI.resendOTP({ email });
         return data;
     };
 
@@ -80,7 +92,7 @@ export const AuthProvider = ({ children }) => {
     const isStaff = isAdmin || isFaculty;
 
     return (
-        <AuthContext.Provider value={{ user, loading, error, login, register, logout, updateUser, isAdmin, isFaculty, isStudent, isStaff, loadUser }}>
+        <AuthContext.Provider value={{ user, loading, error, login, register, verifyOTP, resendOTP, logout, updateUser, isAdmin, isFaculty, isStudent, isStaff, loadUser }}>
             {children}
         </AuthContext.Provider>
     );

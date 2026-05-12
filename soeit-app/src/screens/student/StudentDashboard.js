@@ -38,12 +38,8 @@ const StudentDashboard = ({ navigation }) => {
       });
     } catch (error) {
       console.warn('Dashboard stats fetch failed:', error.message);
-      // Fallback to demo stats if in demo mode or error occurs
-      if (stats.total === 0) {
-        setStats({ verified: 12, pending: 3, total: 15 });
-      }
     }
-  }, [stats.total]);
+  }, []);
 
   useEffect(() => {
     fetchStats();
@@ -175,10 +171,10 @@ const StudentDashboard = ({ navigation }) => {
               <Text style={styles.welcomeName}>Welcome back, {user?.name}</Text>
               <View style={styles.infoRow}>
                 <View style={styles.infoBadge}>
-                  <Text style={styles.infoBadgeText}>● {user?.department || 'CSE DEPARTMENT'}</Text>
+                  <Text style={styles.infoBadgeText}>● {user?.department || 'SOEIT'}</Text>
                 </View>
-                <Text style={styles.infoText}>BATCH: 2022-26</Text>
-                <Text style={styles.infoText}>SEMESTER: 8</Text>
+                {user?.batch ? <Text style={styles.infoText}>BATCH: {user.batch}</Text> : null}
+                {user?.semester ? <Text style={styles.infoText}>SEM: {user.semester}</Text> : null}
               </View>
             </View>
           </View>
@@ -196,9 +192,6 @@ const StudentDashboard = ({ navigation }) => {
           </View>
           <Text style={styles.statValue}>{stats.total}</Text>
           <Text style={styles.statLabel}>TOTAL ACHIEVEMENTS</Text>
-          <View style={styles.statPill}>
-             <Text style={styles.statPillText}>Global Rank: 24</Text>
-          </View>
         </LinearGradient>
 
         <View style={styles.statsRow}>
@@ -226,76 +219,7 @@ const StudentDashboard = ({ navigation }) => {
         </View>
       </View>
 
-      {/* AI Career Roadmap Section */}
-      <View style={styles.aiRoadmapSection}>
-        <LinearGradient
-          colors={['#f5f3ff', '#ede9fe']}
-          style={styles.aiRoadmapGradient}
-        >
-          <View style={styles.aiHeader}>
-            <View style={styles.aiIconBox}>
-              <Ionicons name="sparkles" size={20} color="#7c3aed" />
-            </View>
-            <View>
-              <Text style={styles.aiTitle}>AI Career Roadmap</Text>
-              <Text style={styles.aiSub}>Personalized based on your {stats.verified} accomplishments</Text>
-            </View>
-          </View>
-          
-          <View style={styles.roadmapCards}>
-            <View style={styles.roadmapCard}>
-              <Text style={styles.roadmapRole}>Full Stack Developer</Text>
-              <Text style={styles.roadmapMatch}>92% Match</Text>
-              <View style={styles.roadmapProgress}>
-                <View style={[styles.roadmapFill, { width: '92%', backgroundColor: '#7c3aed' }]} />
-              </View>
-            </View>
-            <View style={styles.roadmapCard}>
-              <Text style={styles.roadmapRole}>Data Analyst</Text>
-              <Text style={styles.roadmapMatch}>75% Match</Text>
-              <View style={styles.roadmapProgress}>
-                <View style={[styles.roadmapFill, { width: '75%', backgroundColor: '#a78bfa' }]} />
-              </View>
-            </View>
-          </View>
 
-          <TouchableOpacity style={styles.aiActionBtn} onPress={() => navigation.navigate('Portfolio')}>
-            <Text style={styles.aiActionText}>View Full Analysis</Text>
-            <Ionicons name="chevron-forward" size={16} color="#7c3aed" />
-          </TouchableOpacity>
-        </LinearGradient>
-      </View>
-
-      {/* Campus Events Section */}
-      <View style={styles.eventsSection}>
-        <View style={styles.sectionHeader}>
-          <View>
-            <Text style={styles.sectionTitle}>Campus Events</Text>
-            <Text style={styles.sectionDesc}>
-              View all upcoming workshops, seminars, and fests on campus.
-            </Text>
-          </View>
-        </View>
-
-        {/* Event Category Filters */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filterScroll}
-          contentContainerStyle={styles.filterContainer}
-        >
-          {['All', 'Technical', 'Cultural', 'Sports', 'Workshop', 'Seminar', 'Other'].map((cat, idx) => (
-            <TouchableOpacity
-              key={idx}
-              style={[styles.filterBtn, idx === 0 && styles.filterBtnActive]}
-            >
-              <Text style={[styles.filterText, idx === 0 && styles.filterTextActive]}>
-                {cat}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
 
       <View style={{ height: SPACING.xxxl }} />
     </ScrollView>
@@ -793,128 +717,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginTop: SPACING.sm,
   },
-  eventsSection: {
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.xl,
-  },
-  sectionHeader: {
-    marginBottom: SPACING.lg,
-  },
-  sectionTitle: {
-    fontSize: getResponsiveFontSize(18),
-    fontWeight: '800',
-    color: '#1f2937',
-    marginBottom: SPACING.sm,
-  },
-  sectionDesc: {
-    fontSize: getResponsiveFontSize(13),
-    color: '#6b7280',
-  },
-  filterScroll: {
-    marginHorizontal: -SPACING.lg,
-  },
-  filterContainer: {
-    paddingHorizontal: SPACING.lg,
-    gap: SPACING.md,
-  },
-  filterBtn: {
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-  },
-  filterBtnActive: {
-    backgroundColor: '#1e3a8a',
-    borderColor: '#1e3a8a',
-  },
-  filterText: {
-    fontSize: getResponsiveFontSize(12),
-    fontWeight: '600',
-    color: '#4b5563',
-  },
-  filterTextActive: {
-    color: '#fff',
-  },
-  // AI Roadmap Styles
-  aiRoadmapSection: {
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.xl,
-  },
-  aiRoadmapGradient: {
-    borderRadius: 20,
-    padding: SPACING.xl,
-    borderWidth: 1,
-    borderColor: '#ddd6fe',
-  },
-  aiHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
-    marginBottom: SPACING.xl,
-  },
-  aiIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-  },
-  aiTitle: {
-    fontSize: getResponsiveFontSize(18),
-    fontWeight: '800',
-    color: '#4c1d95',
-  },
-  aiSub: {
-    fontSize: getResponsiveFontSize(11),
-    color: '#7c3aed',
-    fontWeight: '600',
-  },
-  roadmapCards: {
-    gap: SPACING.md,
-  },
-  roadmapCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    borderRadius: 12,
-    padding: SPACING.md,
-  },
-  roadmapRole: {
-    fontSize: getResponsiveFontSize(14),
-    fontWeight: '700',
-    color: '#1f2937',
-  },
-  roadmapMatch: {
-    fontSize: getResponsiveFontSize(12),
-    color: '#7c3aed',
-    fontWeight: '800',
-    marginTop: 2,
-  },
-  roadmapProgress: {
-    height: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    borderRadius: 3,
-    marginTop: SPACING.sm,
-    overflow: 'hidden',
-  },
-  roadmapFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  aiActionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: SPACING.xl,
-    gap: 4,
-  },
-  aiActionText: {
-    fontSize: getResponsiveFontSize(13),
-    fontWeight: '700',
-    color: '#7c3aed',
-  },
+
 });
 
 export default StudentDashboard;

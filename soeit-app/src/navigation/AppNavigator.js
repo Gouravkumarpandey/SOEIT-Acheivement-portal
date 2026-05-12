@@ -8,13 +8,13 @@ import { useAuth } from '../context/AuthContext';
 
 // Auth Screens
 import LoginScreen from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/auth/RegisterScreen';
 
 // Student Screens
 import StudentDashboard from '../screens/student/StudentDashboard';
 import MyAchievements from '../screens/student/MyAchievements';
 import UploadAchievement from '../screens/student/UploadAchievement';
 import InternshipsPage from '../screens/student/InternshipsPage';
+import InternshipOpportunitiesPage from '../screens/student/InternshipOpportunitiesPage';
 import HackathonsPage from '../screens/student/HackathonsPage';
 import StudentCoursesPage from '../screens/student/StudentCoursesPage';
 import StudentProjectsPage from '../screens/student/StudentProjectsPage';
@@ -77,6 +77,7 @@ const CustomDrawerContent = (props) => {
 
       <DrawerSectionHeader title="CAREER & TALENT" />
       <CustomDrawerItem label="My Internships" icon="briefcase-outline" screenName="Internships" active={activeRouteName === 'Internships'} />
+      <CustomDrawerItem label="Internship Opportunities" icon="globe-outline" screenName="InternshipOpportunities" active={activeRouteName === 'InternshipOpportunities'} />
       <CustomDrawerItem label="Live Hackathons" icon="terminal-outline" screenName="Hackathons" active={activeRouteName === 'Hackathons'} />
     </>
   );
@@ -110,6 +111,7 @@ const CustomDrawerContent = (props) => {
     <>
       <DrawerSectionHeader title="SYSTEM ADMIN" />
       <CustomDrawerItem label="Main Dashboard" icon="stats-chart-outline" screenName="AdminHome" active={activeRouteName === 'AdminHome'} />
+      <CustomDrawerItem label="Campus Events" icon="calendar-outline" screenName="Broadcasts" active={activeRouteName === 'Broadcasts'} />
       <CustomDrawerItem label="Verification" icon="shield-checkmark-outline" screenName="Verify" active={activeRouteName === 'Verify'} />
       
       <DrawerSectionHeader title="USER MANAGEMENT" />
@@ -117,7 +119,6 @@ const CustomDrawerContent = (props) => {
       <CustomDrawerItem label="Faculty Registry" icon="school-outline" screenName="FacultyManagement" active={activeRouteName === 'FacultyManagement'} />
 
       <DrawerSectionHeader title="INSTITUTION" />
-      <CustomDrawerItem label="Public Notices" icon="megaphone-outline" screenName="Notices" active={activeRouteName === 'Notices'} />
       <CustomDrawerItem label="System Reports" icon="analytics-outline" screenName="Reports" active={activeRouteName === 'Reports'} />
     </>
   );
@@ -149,18 +150,23 @@ const CustomDrawerContent = (props) => {
       </View>
  
       <DrawerContentScrollView {...props} showsVerticalScrollIndicator={false}>
-        {/* Profile Card */}
-        <View style={styles.profileCard}>
+        {/* Profile Card — tap to go to My Profile */}
+        <TouchableOpacity
+          style={styles.profileCard}
+          onPress={() => { navigation.navigate('Profile'); navigation.closeDrawer(); }}
+          activeOpacity={0.75}
+        >
           <View style={styles.avatarContainer}>
              <View style={styles.avatarCircle}>
                 <Text style={styles.avatarText}>{user?.name?.substring(0, 2).toUpperCase() || 'AJ'}</Text>
              </View>
           </View>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.profileName}>{user?.name || 'Demo User'}</Text>
             <Text style={styles.profileRole}>{user?.role?.toUpperCase() || 'STUDENT'}</Text>
           </View>
-        </View>
+          <Ionicons name="chevron-forward" size={16} color="#94a3b8" />
+        </TouchableOpacity>
 
         {/* Dynamic Items Based on Role */}
         {renderContent()}
@@ -212,7 +218,8 @@ const StudentDrawer = () => (
     <Drawer.Screen name="Upload" component={UploadAchievement} options={{ title: 'Upload New' }} />
     <Drawer.Screen name="Courses" component={StudentCoursesPage} options={{ title: 'Course Registry' }} />
     <Drawer.Screen name="Projects" component={StudentProjectsPage} options={{ title: 'My Projects' }} />
-    <Drawer.Screen name="Internships" component={InternshipsPage} options={{ title: 'Internships' }} />
+    <Drawer.Screen name="Internships" component={InternshipsPage} options={{ title: 'My Internships' }} />
+    <Drawer.Screen name="InternshipOpportunities" component={InternshipOpportunitiesPage} options={{ title: 'Internship Opportunities' }} />
     <Drawer.Screen name="Hackathons" component={HackathonsPage} options={{ title: 'Live Hackathons' }} />
     <Drawer.Screen name="Broadcasts" component={EventsPage} options={{ title: 'Campus Events' }} />
     <Drawer.Screen name="Profile" component={ProfileScreen} options={{ title: 'My Profile' }} />
@@ -251,10 +258,11 @@ const AdminDrawer = () => (
       }}
     />
     <Drawer.Screen
-      name="Notices"
+      name="Broadcasts"
       component={EventsPage}
       options={{
-        drawerIcon: (props) => <DrawerIcon name="megaphone-outline" {...props} />,
+        title: 'Campus Events',
+        drawerIcon: (props) => <DrawerIcon name="calendar-outline" {...props} />,
       }}
     />
     <Drawer.Screen
@@ -333,11 +341,6 @@ const AppNavigator = () => {
             component={LoginScreen} 
             options={{ headerShown: false }} 
           />
-          <Stack.Screen 
-            name="Register" 
-            component={RegisterScreen} 
-            options={{ title: 'Create Account' }}
-          />
         </>
       ) : (
         <>
@@ -350,10 +353,10 @@ const AppNavigator = () => {
               />
               <Stack.Screen name="Upload" component={UploadAchievement} />
               <Stack.Screen name="Internships" component={InternshipsPage} />
+              <Stack.Screen name="InternshipOpportunities" component={InternshipOpportunitiesPage} options={{ title: 'Internship Opportunities' }} />
               <Stack.Screen name="Hackathons" component={HackathonsPage} />
               <Stack.Screen name="Courses" component={StudentCoursesPage} />
               <Stack.Screen name="Projects" component={StudentProjectsPage} />
-              <Stack.Screen name="Portfolio" component={PublicPortfolioScreen} options={{ headerShown: false }} />
             </Stack.Group>
           ) : user?.role === 'faculty' ? (
             <Stack.Group>
@@ -390,6 +393,7 @@ const AppNavigator = () => {
               <Stack.Screen name="BroadcastNotice" component={BroadcastNoticeScreen} options={{ title: 'Create Notice' }} />
             </Stack.Group>
           )}
+          <Stack.Screen name="Portfolio" component={PublicPortfolioScreen} options={{ headerShown: false }} />
         </>
       )}
     </Stack.Navigator>

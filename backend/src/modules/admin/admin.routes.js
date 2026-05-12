@@ -10,6 +10,8 @@ const {
     getReports,
     manageUser,
     deleteUsers,
+    getStudentPointsDebug,
+    checkBadgeEligibility,
 } = require('./admin.controller');
 const { protect, authorize } = require('../../middleware/auth');
 const { cacheMiddleware } = require('../../utils/cache');
@@ -25,5 +27,7 @@ router.get('/students', getStudents);
 router.get('/reports', getReports);
 router.put('/users/:id', authorize('admin'), manageUser);
 router.delete('/users', deleteUsers);
+router.get('/debug/student/:studentId/points', authorize('admin'), getStudentPointsDebug);
+router.get('/debug/badge-eligibility', authorize('admin'), checkBadgeEligibility);
 
 module.exports = router;

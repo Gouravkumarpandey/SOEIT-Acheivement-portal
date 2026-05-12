@@ -164,8 +164,30 @@ const MyInternshipsPage = () => {
                                     </div>
 
                                     {internship.description && (
-                                        <div style={{ padding: '1rem', background: 'var(--primary-50)', borderRadius: '14px', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6, border: '1px solid var(--primary-100)' }}>
-                                            {internship.description}
+                                        <div style={{ 
+                                            padding: '1.25rem', 
+                                            background: 'var(--primary-50)', 
+                                            borderRadius: '16px', 
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '0.625rem',
+                                            border: '1px solid var(--primary-100)'
+                                        }}>
+                                            {internship.description.split('\n').filter(line => line.trim()).map((line, i) => (
+                                                <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                                                    <div style={{ marginTop: '0.55rem', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--brand-500)', flexShrink: 0 }} />
+                                                    <p style={{ 
+                                                        fontSize: '0.9rem', 
+                                                        color: 'var(--text-secondary)', 
+                                                        margin: 0,
+                                                        lineHeight: '1.5',
+                                                        wordBreak: 'break-word',
+                                                        fontWeight: 500
+                                                    }}>
+                                                        {line.trim().replace(/^[-*•]\s*/, '')}
+                                                    </p>
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
                                 </div>
