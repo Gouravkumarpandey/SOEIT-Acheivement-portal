@@ -1,5 +1,6 @@
 const User = require('../../modules/user/user.model');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const FileModel = require('../../modules/file/file.model');
 const { clearCache, cache } = require('../../utils/cache');
@@ -286,48 +287,46 @@ exports.changePassword = async (req, res, next) => {
 // @route   POST /api/auth/forgot-password
 exports.forgotPassword = async (req, res, next) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
-        if (!user) return res.status(404).json({ success: false, message: 'No user found with that email' });
+        const emailLower = req.body.email?.toLowerCase();
+        // High-speed lookup: Fetch only minimal fields
+        const user = await User.findOne({ email: emailLower }, 'id, name, email');
 
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'No user found with that email' });
+        }
+
+        // Generate token and URL immediately
         const resetToken = user.getResetPasswordToken();
-        await user.save();
-
         const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
 
-        try {
-            const sendEmail = require('../../utils/sendEmail');
-            const getEmailTemplate = require('../../utils/emailTemplates');
+        // Fire and forget: Database update and Email dispatch in background for O(1) perceived response
+        setImmediate(() => {
+            user.save().then(() => {
+                const html = getEmailTemplate({
+                    title: 'Password Reset Request',
+                    content: `
+                        <h1 class="h1">Hello ${user.name},</h1>
+                        <p class="p">You are receiving this email because you requested the reset of a password for your account on the SOEIT Achievement Portal.</p>
+                        <p class="p">Please click on the button below to complete the process. This link is valid for 10 minutes.</p>
+                        <p class="p" style="margin-top: 15px; color: #ef4444; font-size: 13px;">If you did not request this, please ignore this email and your password will remain unchanged.</p>
+                    `,
+                    actionUrl: resetUrl,
+                    actionText: 'Reset Password',
+                    footerText: 'For security reasons, this link will expire shortly. Never share your password reset link with anyone.'
+                });
 
-            const html = getEmailTemplate({
-                title: 'Password Reset Request',
-                content: `
-                    <h1 class="h1">Hello ${user.name},</h1>
-                    <p class="p">You are receiving this email because you  has requested the reset of a password for your account on the SOEIT Achievement Portal.</p>
-                    <p class="p">Please click on the button below to complete the process. This link is valid for 10 minutes.</p>
-                    <p class="p" style="margin-top: 15px; color: #ef4444; font-size: 13px;">If you did not request this, please ignore this email and your password will remain unchanged.</p>
-                `,
-                actionUrl: resetUrl,
-                actionText: 'Reset Password',
-                footerText: 'For security reasons, this link will expire shortly. Never share your password reset link with anyone.'
-            });
+                sendEmail({
+                    to: user.email,
+                    subject: 'SOEIT Portal - Password Reset Instructions',
+                    html
+                }).catch(err => console.error('[Background Reset Email Error]', err.message));
+            }).catch(err => console.error('[Background Reset Save Error]', err.message));
+        });
 
-            // Send in background
-            sendEmail({
-                to: user.email,
-                subject: 'SOEIT Portal - Password Reset Instructions',
-                html
-            }).catch(err => console.error('[Background Reset Email Error]', err.message));
-
-            res.status(200).json({
-                success: true,
-                message: 'Password reset instructions sent to your email.'
-            });
-        } catch (emailError) {
-            user.resetPasswordToken = undefined;
-            user.resetPasswordExpire = undefined;
-            await user.save();
-            return res.status(500).json({ success: false, message: 'Email could not be sent' });
-        }
+        res.status(200).json({
+            success: true,
+            message: 'Password reset instructions sent to your email.'
+        });
     } catch (error) {
         next(error);
     }
