@@ -81,11 +81,12 @@ exports.register = async (req, res, next) => {
             footerText: 'If you did not initiate this registration, please ignore this email.'
         });
 
-        await sendEmail({
+        // Dispatch OTP Email in background for O(1) perceived response
+        sendEmail({
             to: emailLower,
             subject: 'SOEIT Portal - Email Verification OTP',
             html
-        });
+        }).catch(err => console.error('[Background Email Error]', err.message));
 
         res.status(200).json({
             success: true,
@@ -170,11 +171,12 @@ exports.resendOTP = async (req, res, next) => {
             footerText: 'This OTP is valid for 10 minutes.'
         });
 
-        await sendEmail({
+        // Send Email in background
+        sendEmail({
             to: emailLower,
             subject: 'SOEIT Portal - Resent Verification OTP',
             html
-        });
+        }).catch(err => console.error('[Background Resend Email Error]', err.message));
 
         res.status(200).json({ success: true, message: 'A new OTP has been sent to your email.' });
     } catch (error) {
@@ -270,11 +272,8 @@ exports.changePassword = async (req, res, next) => {
         const isMatch = await user.matchPassword(currentPassword);
         if (!isMatch) return res.status(400).json({ success: false, message: 'Current password is incorrect' });
 
-        user.password = newPassword;
-        // Re-hash and save
-        const bcrypt = require('bcryptjs');
-        const salt = await bcrypt.genSalt(8);
-        user.password = await bcrypt.hash(newPassword, salt);
+        // Optimized: Combined salt and hash
+        user.password = await bcrypt.hash(newPassword, 8);
         await user.save();
 
         sendTokenResponse(user, 200, res, 'Password changed successfully');
@@ -312,11 +311,12 @@ exports.forgotPassword = async (req, res, next) => {
                 footerText: 'For security reasons, this link will expire shortly. Never share your password reset link with anyone.'
             });
 
-            await sendEmail({
+            // Send in background
+            sendEmail({
                 to: user.email,
                 subject: 'SOEIT Portal - Password Reset Instructions',
                 html
-            });
+            }).catch(err => console.error('[Background Reset Email Error]', err.message));
 
             res.status(200).json({
                 success: true,
@@ -350,9 +350,8 @@ exports.resetPassword = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Password must be 6-10 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character' });
         }
 
-        const bcrypt = require('bcryptjs');
-        const salt = await bcrypt.genSalt(8);
-        user.password = await bcrypt.hash(req.body.password, salt);
+        const hashedPassword = await bcrypt.hash(req.body.password, 8);
+        user.password = hashedPassword;
         user.resetPasswordToken = null;
         user.resetPasswordExpire = null;
         await user.save();

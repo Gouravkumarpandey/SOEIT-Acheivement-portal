@@ -29,12 +29,15 @@ import { AJU25_IBM } from '../../data/aju25/aju25_ibm';
 import { AJU25_EEE } from '../../data/aju25/aju25_eee';
 import { AJU25_ME } from '../../data/aju25/aju25_me';
 
-const AJU_STUDENTS = [
+const AJU_STUDENTS_LIST = [
     ...AJU23_IBM, ...AJU23_C, ...AJU23_D, ...AJU23_EEE, ...AJU23_ME,
     ...AJU24_AIML, ...AJU24_D, ...AJU24_E, ...AJU24_IBM, ...AJU24_EEE, ...AJU24_ME,
     ...AJU22_C, ...AJU22_D, ...AJU22_E, ...AJU22_F, ...AJU22_EEE, ...AJU22_ME,
     ...AJU25_AIML, ...AJU25_D, ...AJU25_E, ...AJU25_F, ...AJU25_IBM, ...AJU25_EEE, ...AJU25_ME
 ];
+
+// O(1) Lookup Map for high-speed auto-fill performance
+const AJU_STUDENTS_MAP = new Map(AJU_STUDENTS_LIST.map(s => [s.enrollmentNo.toUpperCase(), s]));
 
 const UniversityHeader = () => (
     <div className="auth-header">
@@ -113,7 +116,7 @@ const RegisterPage = () => {
     // Auto-fill logic for restricted batches (AJU/23 & AJU/24)
     useEffect(() => {
         if (form.role === 'student' && form.enrollmentNo.length >= 7) {
-            const student = AJU_STUDENTS.find(s => s.enrollmentNo === form.enrollmentNo.toUpperCase());
+            const student = AJU_STUDENTS_MAP.get(form.enrollmentNo.toUpperCase());
             if (student) {
                 setForm(prev => ({
                     ...prev,
@@ -208,7 +211,7 @@ const RegisterPage = () => {
                     searchEnrollment.startsWith('AJU/24') ||
                     searchEnrollment.startsWith('AJU/22') ||
                     searchEnrollment.startsWith('AJU/25');
-                const student = AJU_STUDENTS.find(s => s.enrollmentNo === searchEnrollment);
+                const student = AJU_STUDENTS_MAP.get(searchEnrollment);
 
                 if (isRestrictedBatch && !student) {
                     e.enrollmentNo = 'Enrollment No. not valid for your batch';
