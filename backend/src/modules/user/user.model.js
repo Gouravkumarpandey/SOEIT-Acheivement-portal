@@ -126,9 +126,11 @@ const User = {
         const db = getDb();
         const id = await genId();
 
-        // Hash password
-        const salt = await bcrypt.genSalt(8);
-        const hashedPassword = await bcrypt.hash(data.password, salt);
+        // High-performance hashing (combined steps)
+        const hashedPassword = await bcrypt.hash(data.password, 8);
+
+        const emailLower = data.email.toLowerCase();
+        const role = data.role || 'student';
 
         await db.execute({
             sql: `INSERT INTO users
@@ -136,15 +138,31 @@ const User = {
                  batch, semester, section, is_active, is_verified)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,1,0)`,
             args: [
-                id, data.name, data.email.toLowerCase(), hashedPassword,
-                data.role || 'student', data.department,
+                id, data.name, emailLower, hashedPassword,
+                role, data.department,
                 data.enrollmentNo || null, data.studentId || null,
                 data.batch || null, data.semester || null, data.section || null,
             ],
         });
 
-        const result = await db.execute({ sql: 'SELECT * FROM users WHERE id=?', args: [id] });
-        return rowToUser(result.rows[0]);
+        // Optimization: Return constructed object instead of extra SELECT round-trip
+        return rowToUser({
+            id,
+            name: data.name,
+            email: emailLower,
+            password: hashedPassword,
+            role,
+            department: data.department,
+            enrollment_no: data.enrollmentNo || null,
+            student_id: data.studentId || null,
+            batch: data.batch || null,
+            semester: data.semester || null,
+            section: data.section || null,
+            is_active: 1,
+            is_verified: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        });
     },
 
     /** FIND ONE */

@@ -51,12 +51,12 @@ export const AJU22_E = [
     },
     {
         enrollmentNo: "AJU/220299",
-        name: "SHASHWAT",
+        name: "SHASHWATI",
         rollNo: "BTCS-IOT/007",
         section: "E",
         batch: "2022-26",
         semester: "8",
-        email: "shashwat220299@arkajainuniversity.ac.in",
+        email: "shashwati220299@arkajainuniversity.ac.in",
         department: "IOT"
     },
     {
