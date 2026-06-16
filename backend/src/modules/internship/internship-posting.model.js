@@ -24,17 +24,17 @@ const InternshipPosting = {
         const db = getDb();
         const id = await genId();
 
-        await db.execute({
-            sql: `INSERT INTO internship_postings 
+        await db.query(
+            `INSERT INTO internship_postings 
                 (id, company_name, role, location, stipend, deadline, description, requirements, apply_link, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            args: [
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            [
                 id, data.companyName, data.role, data.location || null,
                 data.stipend || null, data.deadline || null, data.description || null,
                 data.requirements || null, data.apply_link || data.applyLink || null,
                 data.createdBy
-            ],
-        });
+            ]
+        );
 
         return InternshipPosting.findById(id);
     },
@@ -42,13 +42,13 @@ const InternshipPosting = {
     /** FIND BY ID */
     findById: async (id) => {
         const db = getDb();
-        const result = await db.execute({
-            sql: `SELECT p.*, u.name as creator_name, u.role as creator_role 
-                  FROM internship_postings p
-                  JOIN users u ON p.created_by = u.id
-                  WHERE p.id = ?`,
-            args: [id]
-        });
+        const result = await db.query(
+            `SELECT p.*, u.name as creator_name, u.role as creator_role 
+              FROM internship_postings p
+              JOIN users u ON p.created_by = u.id
+              WHERE p.id = $1`,
+            [id]
+        );
         return result.rows.length ? rowToPosting(result.rows[0]) : null;
     },
 
@@ -62,16 +62,18 @@ const InternshipPosting = {
             WHERE 1=1
         `;
         const args = [];
+        let paramIdx = 1;
 
         if (filters.search) {
-            sql += ' AND (p.company_name LIKE ? OR p.role LIKE ? OR p.location LIKE ?)';
+            sql += ` AND (p.company_name ILIKE $${paramIdx} OR p.role ILIKE $${paramIdx + 1} OR p.location ILIKE $${paramIdx + 2})`;
             const searchVal = `%${filters.search}%`;
             args.push(searchVal, searchVal, searchVal);
+            paramIdx += 3;
         }
 
         sql += ' ORDER BY p.created_at DESC';
 
-        const result = await db.execute({ sql, args });
+        const result = await db.query(sql, args);
         return result.rows.map(rowToPosting);
     },
 
@@ -80,6 +82,7 @@ const InternshipPosting = {
         const db = getDb();
         const fields = [];
         const args = [];
+        let paramIdx = 1;
 
         const map = {
             companyName: 'company_name',
@@ -94,27 +97,28 @@ const InternshipPosting = {
 
         for (const [key, col] of Object.entries(map)) {
             if (data[key] !== undefined) {
-                fields.push(`${col}=?`);
+                fields.push(`${col}=$${paramIdx++}`);
                 args.push(data[key]);
             }
         }
 
         if (fields.length === 0) return InternshipPosting.findById(id);
 
-        fields.push("updated_at=datetime('now')");
+        fields.push(`updated_at=$${paramIdx++}`);
+        args.push(new Date().toISOString());
         args.push(id);
 
-        await db.execute({
-            sql: `UPDATE internship_postings SET ${fields.join(', ')} WHERE id=?`,
-            args: args,
-        });
+        await db.query(
+            `UPDATE internship_postings SET ${fields.join(', ')} WHERE id=$${paramIdx}`,
+            args
+        );
         return InternshipPosting.findById(id);
     },
 
     /** DELETE */
     delete: async (id) => {
         const db = getDb();
-        await db.execute({ sql: 'DELETE FROM internship_postings WHERE id=?', args: [id] });
+        await db.query('DELETE FROM internship_postings WHERE id=$1', [id]);
         return true;
     }
 };

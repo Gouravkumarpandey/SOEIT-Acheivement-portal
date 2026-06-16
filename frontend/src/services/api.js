@@ -40,14 +40,15 @@ API.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Handle 401 globally
+// Suppress 401 noise on the response interceptor for profile loads
 API.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+            // Silently clear stale/invalid token
             sessionStorage.removeItem('soeit_token');
             sessionStorage.removeItem('soeit_user');
-            // Remove hard redirect to allow guests on public pages
+            localStorage.removeItem('soeit_token');
         }
         return Promise.reject(error);
     }

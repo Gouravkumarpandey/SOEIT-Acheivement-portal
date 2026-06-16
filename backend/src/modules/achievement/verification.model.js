@@ -9,10 +9,10 @@ const Verification = {
     create: async (data) => {
         const db = getDb();
         const id = await genId();
-        await db.execute({
-            sql: `INSERT INTO verifications (id, achievement_id, verified_by, action, remarks, previous_status, new_status)
-                  VALUES (?,?,?,?,?,?,?)`,
-            args: [
+        await db.query(
+            `INSERT INTO verifications (id, achievement_id, verified_by, action, remarks, previous_status, new_status)
+              VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+            [
                 id,
                 data.achievementId,
                 data.verifiedBy,
@@ -20,8 +20,8 @@ const Verification = {
                 data.remarks || null,
                 data.previousStatus || null,
                 data.newStatus || null,
-            ],
-        });
+            ]
+        );
         return { _id: id, id, ...data };
     },
 };

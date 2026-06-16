@@ -9,7 +9,7 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
     const location = useLocation();
 
     const getDashboardPath = (role) => {
-        if (role === 'student') return '/dashboard';
+        if (role === 'student' || role === 'general') return '/dashboard';
         if (role === 'faculty') return '/faculty/dashboard';
         return '/admin/dashboard';
     };
@@ -25,7 +25,7 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
 export const PublicRoute = ({ children }) => {
     const { user, loading } = useAuth();
     const getDashboardPath = (role) => {
-        if (role === 'student') return '/dashboard';
+        if (role === 'student' || role === 'general') return '/dashboard';
         if (role === 'faculty') return '/faculty/dashboard';
         return '/admin/dashboard';
     };
@@ -33,5 +33,6 @@ export const PublicRoute = ({ children }) => {
     if (user) return <Navigate to={getDashboardPath(user.role)} replace />;
     return children;
 };
+
 
 export default ProtectedRoute;

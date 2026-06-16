@@ -11,12 +11,12 @@ const HackathonActivity = {
         const db = getDb();
         const id = await genId();
 
-        await db.execute({
-            sql: `INSERT INTO hackathon_activities (id, student_id, hackathon_title, action_type) VALUES (?, ?, ?, ?)`,
-            args: [id, data.studentId, data.hackathonTitle, data.actionType || 'visit'],
-        });
+        await db.query(
+            `INSERT INTO hackathon_activities (id, student_id, hackathon_title, action_type) VALUES ($1, $2, $3, $4)`,
+            [id, data.studentId, data.hackathonTitle, data.actionType || 'visit']
+        );
 
-        const result = await db.execute({ sql: 'SELECT * FROM hackathon_activities WHERE id=?', args: [id] });
+        const result = await db.query('SELECT * FROM hackathon_activities WHERE id=$1', [id]);
         return result.rows[0];
     },
 
@@ -30,38 +30,40 @@ const HackathonActivity = {
             WHERE 1=1
         `;
         const args = [];
+        let paramIdx = 1;
 
         if (filters.department) {
-            sql += ' AND u.department = ?';
+            sql += ` AND u.department = $${paramIdx++}`;
             args.push(filters.department);
         }
 
         if (filters.search) {
-            sql += ' AND (u.name LIKE ? OR u.enrollment_no LIKE ? OR h.hackathon_title LIKE ?)';
+            sql += ` AND (u.name ILIKE $${paramIdx} OR u.enrollment_no ILIKE $${paramIdx + 1} OR h.hackathon_title ILIKE $${paramIdx + 2})`;
             const searchVal = `%${filters.search}%`;
             args.push(searchVal, searchVal, searchVal);
+            paramIdx += 3;
         }
 
         sql += ' ORDER BY h.created_at DESC';
 
-        const result = await db.execute({ sql, args });
+        const result = await db.query(sql, args);
         return result.rows;
     },
 
     /** Count distinct hackathons a student has explored */
     countByStudent: async (studentId) => {
         const db = getDb();
-        const result = await db.execute({
-            sql: `SELECT COUNT(DISTINCT hackathon_title) as cnt FROM hackathon_activities WHERE student_id = ?`,
-            args: [studentId],
-        });
+        const result = await db.query(
+            `SELECT COUNT(DISTINCT hackathon_title) as cnt FROM hackathon_activities WHERE student_id = $1`,
+            [studentId]
+        );
         return Number(result.rows[0]?.cnt) || 0;
     },
 
     /** Delete an activity log */
     delete: async (id) => {
         const db = getDb();
-        await db.execute({ sql: 'DELETE FROM hackathon_activities WHERE id = ?', args: [id] });
+        await db.query('DELETE FROM hackathon_activities WHERE id = $1', [id]);
     }
 };
 

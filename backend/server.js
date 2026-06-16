@@ -121,7 +121,7 @@ app.get('/api/health', async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'SOEIT Achievements Portal API is running',
-            database: `Turso (LibSQL) - ${dbStatus}`,
+            database: `NeonDB (PostgreSQL) - ${dbStatus}`,
             cache: typeof getStats === 'function' ? getStats() : 'N/A',
             version: '2.0.1',
             timestamp: new Date().toISOString(),
@@ -168,13 +168,17 @@ const startServer = async () => {
         const server = app.listen(PORT, () => {
             console.log(`\n🚀 SOEIT Achievements Portal API`);
             console.log(`📡 Server running on: http://localhost:${PORT}`);
-            console.log(`🗄️  Database: Turso (LibSQL)`);
+            console.log(`🗄️  Database: NeonDB (PostgreSQL)`);
             console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
             console.log(`📁 Uploads: http://localhost:${PORT}/uploads\n`);
         });
 
         // Initialize cron jobs
         initCronJobs();
+
+        // Warm up SMTP so first OTP email is instant
+        const { warmUpEmailTransporter } = require('./src/utils/sendEmail');
+        warmUpEmailTransporter();
 
         process.on('unhandledRejection', (err) => {
             console.error('Unhandled Rejection:', err.message);

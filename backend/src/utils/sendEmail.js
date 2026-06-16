@@ -1,67 +1,69 @@
 /**
- * High-Performance Email Service using Brevo (Sendinblue) Direct API
- * Replaces SMTP for better reliability and performance.
+ * Fast Email Service using Gmail SMTP via Nodemailer
+ * Persistent pooled transporter — created once, reused for all emails.
  */
-const sendEmail = async (options) => {
-    try {
-        const apiKey = process.env.BREVO_API_KEY;
-        if (!apiKey) {
-            console.warn('❌ [BREVO] API Key missing. Skipping email send.');
-            console.log('--- MAIL SIMULATION ---');
-            console.log('To:', options.to);
-            console.log('Subject:', options.subject);
-            return;
+const nodemailer = require('nodemailer');
+
+let transporter = null;
+
+const getTransporter = () => {
+    if (transporter) return transporter;
+
+    transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
         }
+    });
 
-        const url = 'https://api.brevo.com/v3/smtp/email';
+    return transporter;
+};
 
-        // Handle multiple recipients (comma-separated string)
-        const recipientList = options.to ? options.to.split(',').map(email => ({ email: email.trim() })) : [];
-        if (recipientList.length === 0) return;
+// Warm up the SMTP connection at startup so first OTP email is instant
+const warmUpEmailTransporter = () => {
+    try {
+        const t = getTransporter();
+        t.verify((err) => {
+            if (err) {
+                console.warn('⚠️ [EMAIL] Gmail SMTP check failed:', err.message);
+                console.warn('   → Make sure EMAIL_USER and EMAIL_PASS are set in .env');
+                console.warn('   → EMAIL_PASS must be a Gmail App Password (not your regular password)');
+            } else {
+                console.log('✅ [EMAIL] Gmail SMTP ready');
+            }
+        });
+    } catch (err) {
+        console.warn('⚠️ [EMAIL] Transporter warmup error:', err.message);
+    }
+};
 
-        const isMulti = recipientList.length > 1;
+const sendEmail = async (options) => {
+    const user = process.env.EMAIL_USER;
+    const pass = process.env.EMAIL_PASS;
 
-        const body = {
-            sender: {
-                name: process.env.FROM_NAME || 'SOEIT Portal',
-                email: process.env.FROM_EMAIL || 'ritesh221403@arkajainuniversity.ac.in'
-            },
+    if (!user || !pass) {
+        console.warn('⚠️ [EMAIL] EMAIL_USER / EMAIL_PASS not set in .env — email not sent');
+        console.log('   To:', options.to, '| Subject:', options.subject);
+        return;
+    }
+
+    try {
+        const mailOptions = {
+            from: `SOEIT Portal <${user}>`,
+            to: options.to,
             subject: options.subject,
-            htmlContent: options.html,
-            textContent: options.message || 'Please view this email in an HTML-capable viewer.'
+            html: options.html,
+            text: options.message || 'Please view this email in an HTML-capable viewer.',
         };
 
-        // If multi-recipient (events/notices), use BCC for privacy and deliverability
-        if (isMulti) {
-            body.to = [{ email: process.env.FROM_EMAIL || 'ritesh221403@arkajainuniversity.ac.in' }]; // Send to self as primary
-            body.bcc = recipientList;
-        } else {
-            body.to = recipientList;
-        }
-
-        console.log(`🚀 [BREVO] Dispatching: "${options.subject}" to ${recipientList.length} recipients...`);
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'api-key': apiKey,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(body)
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            console.log('✅ [BREVO] Successfully sent. Message ID:', data.messageId);
-        } else {
-            console.error('❌ [BREVO] Dispatch Failed:', data.code || 'Unknown Error');
-            console.error('🔍 [BREVO] API Response:', JSON.stringify(data, null, 2));
-        }
+        const t = getTransporter();
+        const info = await t.sendMail(mailOptions);
+        console.log(`✅ [EMAIL] Sent → ${options.to} | ID: ${info.messageId}`);
     } catch (error) {
-        console.error('❌ [BREVO] Fatal API Error:', error.message);
+        console.error(`❌ [EMAIL] Failed to send to ${options.to}:`, error.message);
     }
 };
 
 module.exports = sendEmail;
+module.exports.warmUpEmailTransporter = warmUpEmailTransporter;

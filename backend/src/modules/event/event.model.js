@@ -28,7 +28,7 @@ const rowToEvent = (row) => {
 
         deleteOne: async function () {
             const db = getDb();
-            await db.execute({ sql: 'DELETE FROM events WHERE id = ?', args: [this.id] });
+            await db.query('DELETE FROM events WHERE id = $1', [this.id]);
         },
 
         toObject: function () {
@@ -56,46 +56,45 @@ const Event = {
     create: async (data) => {
         const db = getDb();
         const id = await genId();
-        await db.execute({
-            sql: `INSERT INTO events (id, title, description, category, date, venue, registration_link, created_by)
-                  VALUES (?,?,?,?,?,?,?,?)`,
-            args: [
+        await db.query(
+            `INSERT INTO events (id, title, description, category, date, venue, registration_link, created_by)
+              VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+            [
                 id, data.title, data.description, data.category,
                 data.date ? new Date(data.date).toISOString() : null,
                 data.venue,
                 data.registrationLink || null,
                 data.createdBy,
-            ],
-        });
-        const res = await db.execute({ sql: `${BASE_SELECT} WHERE e.id = ?`, args: [id] });
+            ]
+        );
+        const res = await db.query(`${BASE_SELECT} WHERE e.id = $1`, [id]);
         return rowToEvent(res.rows[0]);
     },
 
     findById: async (id) => {
         const db = getDb();
-        const res = await db.execute({ sql: `${BASE_SELECT} WHERE e.id = ?`, args: [id] });
+        const res = await db.query(`${BASE_SELECT} WHERE e.id = $1`, [id]);
         return res.rows.length ? rowToEvent(res.rows[0]) : null;
     },
 
     find: (query = {}) => {
-        let _sort = null;
-
         const buildAndExec = async () => {
             const db = getDb();
             let sql = `${BASE_SELECT} WHERE 1=1`;
             const args = [];
+            let paramIdx = 1;
 
-            if (query.category) { sql += ' AND e.category = ?'; args.push(query.category); }
+            if (query.category) { sql += ` AND e.category = $${paramIdx++}`; args.push(query.category); }
 
             sql += ' ORDER BY e.date DESC';
-            const res = await db.execute({ sql, args });
+            const res = await db.query(sql, args);
             return res.rows.map(rowToEvent);
         };
 
         const chain = {
             select: () => chain,
             populate: () => chain,
-            sort: (s) => { _sort = s; return chain; },
+            sort: () => chain,
             then: (resolve, reject) => buildAndExec().then(resolve, reject),
         };
         return chain;
@@ -110,18 +109,19 @@ const Event = {
 
         const setParts = [];
         const args = [];
+        let paramIdx = 1;
 
         for (const [key, val] of Object.entries(updates)) {
             const col = colMap[key];
             if (!col) continue;
-            setParts.push(`${col} = ?`);
+            setParts.push(`${col} = $${paramIdx++}`);
             if (col === 'date') args.push(val ? new Date(val).toISOString() : null);
             else args.push(val ?? null);
         }
 
         if (setParts.length) {
             args.push(id);
-            await db.execute({ sql: `UPDATE events SET ${setParts.join(', ')} WHERE id = ?`, args });
+            await db.query(`UPDATE events SET ${setParts.join(', ')} WHERE id = $${paramIdx}`, args);
         }
 
         if (options.new !== false) return Event.findById(id);

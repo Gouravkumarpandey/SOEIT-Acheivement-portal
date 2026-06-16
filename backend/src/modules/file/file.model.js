@@ -19,10 +19,10 @@ const File = {
         // Compress buffer before saving
         const compressedData = await gzip(buffer);
 
-        await db.execute({
-            sql: `INSERT INTO files (id, filename, mimetype, data) VALUES (?, ?, ?, ?)`,
-            args: [id, filename, mimetype, compressedData],
-        });
+        await db.query(
+            `INSERT INTO files (id, filename, mimetype, data) VALUES ($1, $2, $3, $4)`,
+            [id, filename, mimetype, compressedData]
+        );
 
         return id;
     },
@@ -30,20 +30,19 @@ const File = {
     /** GET FILE FROM DB (Decompressed) */
     findById: async (id) => {
         const db = getDb();
-        const res = await db.execute({
-            sql: `SELECT * FROM files WHERE id = ?`,
-            args: [id],
-        });
+        const res = await db.query(
+            `SELECT * FROM files WHERE id = $1`,
+            [id]
+        );
 
         if (res.rows.length === 0) return null;
-        
+
         const file = res.rows[0];
-        
+
         // Try to decompress data (handle potential old uncompressed files)
         try {
             file.data = await gunzip(Buffer.from(file.data));
         } catch (err) {
-            // If decompression fails, assume it was not compressed (legacy file)
             file.data = Buffer.from(file.data);
         }
 
@@ -53,10 +52,10 @@ const File = {
     /** DELETE FILE FROM DB */
     delete: async (id) => {
         const db = getDb();
-        await db.execute({
-            sql: `DELETE FROM files WHERE id = ?`,
-            args: [id],
-        });
+        await db.query(
+            `DELETE FROM files WHERE id = $1`,
+            [id]
+        );
     }
 };
 

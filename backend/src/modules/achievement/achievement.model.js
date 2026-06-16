@@ -7,11 +7,6 @@ const genId = async () => {
 
 const { calculatePoints } = require('../../utils/scoring');
 
-const pointsMap = {
-    International: 100, National: 75, State: 50,
-    University: 30, College: 20, Department: 10,
-};
-
 const rowToAchievement = (row) => {
     if (!row) return null;
     return {
@@ -36,7 +31,6 @@ const rowToAchievement = (row) => {
         createdAt: row.created_at ? new Date(row.created_at) : null,
         updatedAt: row.updated_at ? new Date(row.updated_at) : null,
 
-        // ── populated sub-docs (joined via SQL) ──
         student: row.student_name ? {
             _id: row.student_id,
             id: row.student_id,
@@ -54,28 +48,34 @@ const rowToAchievement = (row) => {
             role: row.verifier_role,
         } : undefined,
 
-        // mimic Mongoose .populate() — no-op here since we always join
         populate: async function () { return this; },
 
         deleteOne: async function () {
             const db = getDb();
-            const statements = [
-                { sql: 'DELETE FROM verifications WHERE achievement_id = ?', args: [this.id] },
-                { sql: 'DELETE FROM achievements WHERE id = ?', args: [this.id] }
-            ];
-            await db.batch(statements, 'write');
+            const client = await db.connect();
+            try {
+                await client.query('BEGIN');
+                await client.query('DELETE FROM verifications WHERE achievement_id = $1', [this.id]);
+                await client.query('DELETE FROM achievements WHERE id = $1', [this.id]);
+                await client.query('COMMIT');
+            } catch (err) {
+                await client.query('ROLLBACK');
+                throw err;
+            } finally {
+                client.release();
+            }
         },
 
         save: async function () {
             const db = getDb();
-            await db.execute({
-                sql: `UPDATE achievements SET
-                        student_id=?, title=?, category=?, description=?, level=?, date=?,
-                        institution=?, certificate_url=?, proof_files=?, status=?, remarks=?,
-                        verified_by=?, verified_at=?, is_public=?, tags=?, points=?,
-                        updated_at=datetime('now')
-                      WHERE id=?`,
-                args: [
+            await db.query(
+                `UPDATE achievements SET
+                    student_id=$1, title=$2, category=$3, description=$4, level=$5, date=$6,
+                    institution=$7, certificate_url=$8, proof_files=$9, status=$10, remarks=$11,
+                    verified_by=$12, verified_at=$13, is_public=$14, tags=$15, points=$16,
+                    updated_at=$17
+                  WHERE id=$18`,
+                [
                     this.studentId, this.title, this.category, this.description,
                     this.level, this.date ? new Date(this.date).toISOString() : null,
                     this.institution || null,
@@ -88,17 +88,15 @@ const rowToAchievement = (row) => {
                     this.isPublic ? 1 : 0,
                     JSON.stringify(this.tags || []),
                     this.points || 0,
+                    new Date().toISOString(),
                     this.id,
-                ],
-            });
+                ]
+            );
             return this;
         },
     };
 };
 
-// ────────────────────────────────────────────────────────────
-// BASE SELECT with optional JOINs
-// ────────────────────────────────────────────────────────────
 const BASE_SELECT = `
     SELECT
         a.*,
@@ -121,12 +119,12 @@ const Achievement = {
         const id = await genId();
         const pts = calculatePoints(data);
 
-        await db.execute({
-            sql: `INSERT INTO achievements
-                    (id, student_id, title, category, description, level, date,
-                     institution, certificate_url, proof_files, status, is_public, tags, points)
-                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-            args: [
+        await db.query(
+            `INSERT INTO achievements
+                (id, student_id, title, category, description, level, date,
+                 institution, certificate_url, proof_files, status, is_public, tags, points)
+              VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+            [
                 id,
                 data.studentId,
                 data.title,
@@ -141,17 +139,17 @@ const Achievement = {
                 data.isPublic !== undefined ? (data.isPublic ? 1 : 0) : 1,
                 JSON.stringify(data.tags || []),
                 pts,
-            ],
-        });
+            ]
+        );
 
-        const res = await db.execute({ sql: `${BASE_SELECT} WHERE a.id = ?`, args: [id] });
+        const res = await db.query(`${BASE_SELECT} WHERE a.id = $1`, [id]);
         return rowToAchievement(res.rows[0]);
     },
 
     /** FIND BY ID */
     findById: async (id) => {
         const db = getDb();
-        const res = await db.execute({ sql: `${BASE_SELECT} WHERE a.id = ?`, args: [id] });
+        const res = await db.query(`${BASE_SELECT} WHERE a.id = $1`, [id]);
         return res.rows.length ? rowToAchievement(res.rows[0]) : null;
     },
 
@@ -165,26 +163,28 @@ const Achievement = {
             const db = getDb();
             let sql = `${BASE_SELECT} WHERE 1=1`;
             const args = [];
+            let paramIdx = 1;
 
             if (query.studentId) {
                 if (typeof query.studentId === 'object' && query.studentId.$in) {
                     const ids = query.studentId.$in;
                     if (ids.length > 0) {
-                        const placeholders = ids.map(() => '?').join(',');
+                        const placeholders = ids.map((_, i) => `$${paramIdx + i}`).join(',');
                         sql += ` AND a.student_id IN (${placeholders})`;
                         args.push(...ids);
+                        paramIdx += ids.length;
                     } else {
-                        sql += ' AND 1=0'; // Empty list means no matches
+                        sql += ' AND 1=0';
                     }
                 } else {
-                    sql += ' AND a.student_id = ?';
+                    sql += ` AND a.student_id = $${paramIdx++}`;
                     args.push(query.studentId);
                 }
             }
-            if (query.status) { sql += ' AND a.status = ?'; args.push(query.status); }
-            if (query.category) { sql += ' AND a.category = ?'; args.push(query.category); }
-            if (query.level) { sql += ' AND a.level = ?'; args.push(query.level); }
-            if (query.isPublic !== undefined) { sql += ' AND a.is_public = ?'; args.push(query.isPublic ? 1 : 0); }
+            if (query.status) { sql += ` AND a.status = $${paramIdx++}`; args.push(query.status); }
+            if (query.category) { sql += ` AND a.category = $${paramIdx++}`; args.push(query.category); }
+            if (query.level) { sql += ` AND a.level = $${paramIdx++}`; args.push(query.level); }
+            if (query.isPublic !== undefined) { sql += ` AND a.is_public = $${paramIdx++}`; args.push(query.isPublic ? 1 : 0); }
 
             if (_sort) {
                 const [field, dir] = Object.entries(_sort)[0];
@@ -195,9 +195,9 @@ const Achievement = {
             }
             if (_limit && _skip) sql += ` LIMIT ${_limit} OFFSET ${_skip}`;
             else if (_limit) sql += ` LIMIT ${_limit}`;
-            else if (_skip) sql += ` LIMIT -1 OFFSET ${_skip}`;
+            else if (_skip) sql += ` OFFSET ${_skip}`;
 
-            const res = await db.execute({ sql, args });
+            const res = await db.query(sql, args);
             return res.rows.map(rowToAchievement);
         };
 
@@ -217,13 +217,14 @@ const Achievement = {
         const db = getDb();
         let sql = 'SELECT COUNT(*) as cnt FROM achievements WHERE 1=1';
         const args = [];
+        let paramIdx = 1;
 
-        if (query.studentId) { sql += ' AND student_id = ?'; args.push(query.studentId); }
-        if (query.status) { sql += ' AND status = ?'; args.push(query.status); }
-        if (query.category) { sql += ' AND category = ?'; args.push(query.category); }
-        if (query.level) { sql += ' AND level = ?'; args.push(query.level); }
+        if (query.studentId) { sql += ` AND student_id = $${paramIdx++}`; args.push(query.studentId); }
+        if (query.status) { sql += ` AND status = $${paramIdx++}`; args.push(query.status); }
+        if (query.category) { sql += ` AND category = $${paramIdx++}`; args.push(query.category); }
+        if (query.level) { sql += ` AND level = $${paramIdx++}`; args.push(query.level); }
 
-        const res = await db.execute({ sql, args });
+        const res = await db.query(sql, args);
         return Number(res.rows[0].cnt);
     },
 
@@ -241,11 +242,12 @@ const Achievement = {
 
         const setParts = [];
         const args = [];
+        let paramIdx = 1;
 
         for (const [key, val] of Object.entries(updates)) {
             const col = colMap[key];
             if (!col) continue;
-            setParts.push(`${col} = ?`);
+            setParts.push(`${col} = $${paramIdx++}`);
             if (col === 'is_public') args.push(val ? 1 : 0);
             else if (col === 'proof_files' || col === 'tags') args.push(JSON.stringify(val));
             else if (col === 'date' || col === 'verified_at') args.push(val ? new Date(val).toISOString() : null);
@@ -253,42 +255,36 @@ const Achievement = {
         }
 
         if (setParts.length) {
-            // Recalculate points if category or level updated
             if (updates.category || updates.level || updates.title || updates.description) {
                 const current = await Achievement.findById(id);
                 if (current) {
                     const newData = { ...current, ...updates };
                     const newPoints = calculatePoints(newData);
-                    setParts.push(`points = ?`);
+                    setParts.push(`points = $${paramIdx++}`);
                     args.push(newPoints);
                 }
             }
-            
-            setParts.push(`updated_at = datetime('now')`);
+
+            setParts.push(`updated_at = $${paramIdx++}`);
+            args.push(new Date().toISOString());
             args.push(id);
-            await db.execute({ sql: `UPDATE achievements SET ${setParts.join(', ')} WHERE id = ?`, args });
+            await db.query(`UPDATE achievements SET ${setParts.join(', ')} WHERE id = $${paramIdx}`, args);
         }
 
         if (options.new !== false) return Achievement.findById(id);
         return null;
     },
 
-    /** AGGREGATE — translated to SQL equivalents */
+    /** AGGREGATE */
     aggregate: async (pipeline) => {
         const db = getDb();
 
-        // ── byCategory / byLevel / topPerformers / monthly ──
-        // We detect pipeline intent by $group _id field
-
-        // Detect first $match
         let matchStudentId = null;
         let matchStatus = null;
 
         for (const stage of pipeline) {
             if (stage.$match) {
-                if (stage.$match.studentId || stage.$match['studentId']) {
-                    matchStudentId = stage.$match.studentId;
-                }
+                if (stage.$match.studentId) matchStudentId = stage.$match.studentId;
                 if (stage.$match.status) matchStatus = stage.$match.status;
             }
         }
@@ -298,50 +294,53 @@ const Achievement = {
 
         const groupId = groupStage.$group?._id;
 
-        // ── GROUP BY category ──
+        // GROUP BY category
         if (typeof groupId === 'string' && groupId === '$category') {
             let sql = `SELECT category AS _id, COUNT(*) as count`;
             const args = [];
+            let paramIdx = 1;
             if (groupStage.$group?.approved) sql += `, SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) as approved`;
             if (groupStage.$group?.points) sql += `, SUM(points) as points`;
             sql += ' FROM achievements WHERE 1=1';
-            if (matchStatus) { sql += ' AND status=?'; args.push(matchStatus); }
-            if (matchStudentId) { sql += ' AND student_id=?'; args.push(matchStudentId); }
+            if (matchStatus) { sql += ` AND status=$${paramIdx++}`; args.push(matchStatus); }
+            if (matchStudentId) { sql += ` AND student_id=$${paramIdx++}`; args.push(matchStudentId); }
             sql += ' GROUP BY category ORDER BY count DESC';
-            const res = await db.execute({ sql, args });
+            const res = await db.query(sql, args);
             return res.rows.map(r => ({ _id: r._id, count: Number(r.count), approved: Number(r.approved || 0), points: Number(r.points || 0) }));
         }
 
-        // ── GROUP BY level ──
+        // GROUP BY level
         if (typeof groupId === 'string' && groupId === '$level') {
             let sql = `SELECT level AS _id, COUNT(*) as count FROM achievements WHERE 1=1`;
             const args = [];
-            if (matchStatus) { sql += ' AND status=?'; args.push(matchStatus); }
-            if (matchStudentId) { sql += ' AND student_id=?'; args.push(matchStudentId); }
+            let paramIdx = 1;
+            if (matchStatus) { sql += ` AND status=$${paramIdx++}`; args.push(matchStatus); }
+            if (matchStudentId) { sql += ` AND student_id=$${paramIdx++}`; args.push(matchStudentId); }
             sql += ' GROUP BY level ORDER BY count DESC';
-            const res = await db.execute({ sql, args });
+            const res = await db.query(sql, args);
             return res.rows.map(r => ({ _id: r._id, count: Number(r.count) }));
         }
 
-        // ── SUM points (null group) ──
+        // SUM points (null group)
         if (groupId === null) {
             let sql = `SELECT SUM(points) as total FROM achievements WHERE 1=1`;
             const args = [];
-            if (matchStatus) { sql += ' AND status=?'; args.push(matchStatus); }
-            if (matchStudentId) { sql += ' AND student_id=?'; args.push(matchStudentId); }
-            const res = await db.execute({ sql, args });
+            let paramIdx = 1;
+            if (matchStatus) { sql += ` AND status=$${paramIdx++}`; args.push(matchStatus); }
+            if (matchStudentId) { sql += ` AND student_id=$${paramIdx++}`; args.push(matchStudentId); }
+            const res = await db.query(sql, args);
             return res.rows[0]?.total ? [{ _id: null, total: Number(res.rows[0].total) }] : [];
         }
 
-        // ── GROUP BY student (top performers) ──
+        // GROUP BY student (top performers)
         if (typeof groupId === 'string' && groupId === '$studentId') {
             const limitStage = pipeline.find(s => s.$limit);
             const lim = limitStage?.$limit || 10;
-            const sql = `
-                SELECT
+            const res = await db.query(
+                `SELECT
                     a.student_id AS _id,
-                    SUM(a.points) AS totalPoints,
-                    COUNT(*) AS achievementCount,
+                    SUM(a.points) AS totalpoints,
+                    COUNT(*) AS achievementcount,
                     u.name AS student_name,
                     u.department AS student_department,
                     u.profile_image AS student_profile_image,
@@ -349,14 +348,15 @@ const Achievement = {
                 FROM achievements a
                 LEFT JOIN users u ON a.student_id = u.id
                 WHERE a.status = 'approved'
-                GROUP BY a.student_id
-                ORDER BY totalPoints DESC
-                LIMIT ?`;
-            const res = await db.execute({ sql, args: [lim] });
+                GROUP BY a.student_id, u.name, u.department, u.profile_image, u.student_id
+                ORDER BY totalpoints DESC
+                LIMIT $1`,
+                [lim]
+            );
             return res.rows.map(r => ({
                 _id: r._id,
-                totalPoints: Number(r.totalPoints || 0),
-                achievementCount: Number(r.achievementCount || 0),
+                totalPoints: Number(r.totalpoints || 0),
+                achievementCount: Number(r.achievementcount || 0),
                 student: {
                     name: r.student_name,
                     department: r.student_department,
@@ -366,7 +366,7 @@ const Achievement = {
             }));
         }
 
-        // ── GROUP BY department (via join) ──
+        // GROUP BY department
         if (typeof groupId === 'string' && groupId === '$student.department') {
             let sql = `
                 SELECT u.department AS _id, COUNT(*) AS count,
@@ -376,26 +376,28 @@ const Achievement = {
                 LEFT JOIN users u ON a.student_id = u.id
                 WHERE 1=1`;
             const args = [];
-            if (matchStatus) { sql += ' AND a.status=?'; args.push(matchStatus); }
+            let paramIdx = 1;
+            if (matchStatus) { sql += ` AND a.status=$${paramIdx++}`; args.push(matchStatus); }
             sql += ' GROUP BY u.department ORDER BY count DESC';
-            const res = await db.execute({ sql, args });
+            const res = await db.query(sql, args);
             return res.rows.map(r => ({ _id: r._id, count: Number(r.count), approved: Number(r.approved || 0), points: Number(r.points || 0) }));
         }
 
-        // ── Monthly trend ──
+        // Monthly trend
         if (groupId && typeof groupId === 'object' && groupId.year) {
             const hasSubmitted = !!groupStage.$group?.submitted;
-            const sql = `
-                SELECT
-                    strftime('%Y', created_at) AS year,
-                    strftime('%m', created_at) AS month,
+            const res = await db.query(
+                `SELECT
+                    EXTRACT(YEAR FROM created_at::timestamp)::int AS year,
+                    EXTRACT(MONTH FROM created_at::timestamp)::int AS month,
                     COUNT(*) AS ${hasSubmitted ? 'submitted' : 'count'},
                     SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) AS approved
                 FROM achievements
-                GROUP BY strftime('%Y-%m', created_at)
+                GROUP BY EXTRACT(YEAR FROM created_at::timestamp), EXTRACT(MONTH FROM created_at::timestamp)
                 ORDER BY year ASC, month ASC
-                LIMIT 12`;
-            const res = await db.execute({ sql, args: [] });
+                LIMIT 12`,
+                []
+            );
             return res.rows.map(r => ({
                 _id: { year: Number(r.year), month: Number(r.month) },
                 count: Number(r.count || r.submitted || 0),

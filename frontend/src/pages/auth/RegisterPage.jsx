@@ -2,7 +2,7 @@ import '../../styles/pages/auth/RegisterPage.css';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Eye, EyeOff, ArrowLeft, GraduationCap, User as UserIcon } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, GraduationCap, User as UserIcon, Globe } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AJU23_IBM } from '../../data/aju23/aju23_ibm';
 import { AJU23_C } from '../../data/aju23/aju23_c';
@@ -97,7 +97,8 @@ const RegisterPage = () => {
         enrollmentNo: '',
         batch: '',
         semester: '',
-        section: ''
+        section: '',
+        occupation: '' // for general users
     });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -170,6 +171,24 @@ const RegisterPage = () => {
         }
     }, [form.enrollmentNo, form.role]);
 
+    // Reset form when switching roles
+    const handleRoleSwitch = (newRole) => {
+        setForm(p => ({
+            ...p,
+            role: newRole,
+            enrollmentNo: '',
+            name: '',
+            email: '',
+            department: '',
+            batch: '',
+            semester: '',
+            section: '',
+            occupation: ''
+        }));
+        setErrors({});
+        setIsPreFilled(false);
+    };
+
     const validate = () => {
         const e = {};
         if (!form.name.trim()) e.name = 'Name is required';
@@ -190,32 +209,34 @@ const RegisterPage = () => {
         if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
 
         // Role-specific validation
-        if (!form.department) e.department = 'Department is required';
+        if (form.role !== 'general' && !form.department) e.department = 'Department is required';
 
         if (form.role === 'student') {
             if (!form.batch) e.batch = 'Batch is required';
             else if (!/^\d{4}-(\d{2}|\d{4})$/.test(form.batch)) e.batch = 'Invalid format (e.g. 2022-26 or 2022-2026)';
         }
 
-        if (!form.enrollmentNo) {
-            e.enrollmentNo = 'Enrollment No. is required';
-        } else if (form.role === 'student') {
-            if (!/^AJU\//i.test(form.enrollmentNo)) {
-                e.enrollmentNo = 'Student Enrollment No. must start with AJU/';
-            } else {
-                const searchEnrollment = form.enrollmentNo.toUpperCase();
-                const isRestrictedBatch = searchEnrollment.startsWith('AJU/23') ||
-                    searchEnrollment.startsWith('AJU/24') ||
-                    searchEnrollment.startsWith('AJU/22') ||
-                    searchEnrollment.startsWith('AJU/25');
-                const student = AJU_STUDENTS.find(s => s.enrollmentNo === searchEnrollment);
+        if (form.role === 'student' || form.role === 'faculty') {
+            if (!form.enrollmentNo) {
+                e.enrollmentNo = 'Enrollment No. is required';
+            } else if (form.role === 'student') {
+                if (!/^AJU\//i.test(form.enrollmentNo)) {
+                    e.enrollmentNo = 'Student Enrollment No. must start with AJU/';
+                } else {
+                    const searchEnrollment = form.enrollmentNo.toUpperCase();
+                    const isRestrictedBatch = searchEnrollment.startsWith('AJU/23') ||
+                        searchEnrollment.startsWith('AJU/24') ||
+                        searchEnrollment.startsWith('AJU/22') ||
+                        searchEnrollment.startsWith('AJU/25');
+                    const student = AJU_STUDENTS.find(s => s.enrollmentNo === searchEnrollment);
 
-                if (isRestrictedBatch && !student) {
-                    e.enrollmentNo = 'Enrollment No. not valid for your batch';
+                    if (isRestrictedBatch && !student) {
+                        e.enrollmentNo = 'Enrollment No. not valid for your batch';
+                    }
                 }
+            } else if (form.role === 'faculty' && !/^ARKA\/AJU\//i.test(form.enrollmentNo)) {
+                e.enrollmentNo = 'Faculty ID must start with ARKA/AJU/';
             }
-        } else if (form.role === 'faculty' && !/^ARKA\/AJU\//i.test(form.enrollmentNo)) {
-            e.enrollmentNo = 'Faculty ID must start with ARKA/AJU/';
         }
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -313,7 +334,7 @@ const RegisterPage = () => {
                 <UniversityHeader />
 
                 <h1 className="register-heading">
-                    {form.role === 'student' ? 'Student Registration' : 'Faculty Registration'}
+                    {form.role === 'student' ? 'Student Registration' : form.role === 'faculty' ? 'Faculty Registration' : 'General Registration'}
                 </h1>
 
                 <div className="register-card">
@@ -321,50 +342,54 @@ const RegisterPage = () => {
                         <button
                             type="button"
                             className={`role-btn ${form.role === 'student' ? 'active' : ''}`}
-                            onClick={() => {
-                                setForm(p => ({ ...p, role: 'student' }));
-                                setErrors({});
-                            }}
+                            onClick={() => handleRoleSwitch('student')}
                         >
                             <UserIcon size={18} /> Student
                         </button>
                         <button
                             type="button"
                             className={`role-btn ${form.role === 'faculty' ? 'active' : ''}`}
-                            onClick={() => {
-                                setForm(p => ({ ...p, role: 'faculty' }));
-                                setErrors({});
-                            }}
+                            onClick={() => handleRoleSwitch('faculty')}
                         >
                             <GraduationCap size={18} /> Faculty
+                        </button>
+                        <button
+                            type="button"
+                            className={`role-btn ${form.role === 'general' ? 'active' : ''}`}
+                            onClick={() => handleRoleSwitch('general')}
+                        >
+                            <Globe size={18} /> General
                         </button>
                     </div>
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-row">
-                            <Field
-                                name="enrollmentNo"
-                                label="Enrollment No."
-                                placeholder={form.role === 'student' ? "AJU/221403" : "ARKA/AJU/FACULTY"}
-                                required
-                                form={form}
-                                setForm={setForm}
-                                errors={errors}
-                                onChange={e => {
-                                    let val = e.target.value.toUpperCase();
-                                    // Auto-format AJU/ for students
-                                    if (form.role === 'student') {
-                                        if (val.startsWith('AJU') && val.length > 3 && val[3] !== '/') {
-                                            val = 'AJU/' + val.substring(3);
+                            {(form.role === 'student' || form.role === 'faculty') && (
+                                <Field
+                                    name="enrollmentNo"
+                                    label={form.role === 'student' ? 'Enrollment No.' : 'Faculty ID'}
+                                    placeholder={form.role === 'student' ? 'AJU/221403' : 'ARKA/AJU/FACULTY'}
+                                    required
+                                    form={form}
+                                    setForm={setForm}
+                                    errors={errors}
+                                    onChange={e => {
+                                        let val = e.target.value.toUpperCase();
+                                        if (form.role === 'student') {
+                                            if (val.startsWith('AJU') && val.length > 3 && val[3] !== '/') {
+                                                val = 'AJU/' + val.substring(3);
+                                            }
                                         }
-                                    }
-                                    setForm(p => ({ ...p, enrollmentNo: val }));
-                                }}
-                            />
+                                        setForm(p => ({ ...p, enrollmentNo: val }));
+                                    }}
+                                />
+                            )}
                             <Field name="name" label="Full Name" placeholder="Full name" required form={form} setForm={setForm} errors={errors} disabled={isPreFilled} />
                         </div>
 
-                        <Field name="email" label="Email Address" type="email" placeholder="example@arkajainuniversity.ac.in" required form={form} setForm={setForm} errors={errors} disabled={isPreFilled} />
+                        <Field name="email" label="Email Address" type="email"
+                            placeholder={form.role === 'general' ? 'your@email.com' : 'example@arkajainuniversity.ac.in'}
+                            required form={form} setForm={setForm} errors={errors} disabled={isPreFilled} />
 
                         {form.role === 'student' && (
                             <>
@@ -436,6 +461,27 @@ const RegisterPage = () => {
                                 setForm={setForm}
                                 errors={errors}
                             />
+                        )}
+
+                        {form.role === 'general' && (
+                            <>
+                                <Field
+                                    name="occupation"
+                                    label="Occupation / Role (Optional)"
+                                    placeholder="e.g. Software Engineer, Student, Freelancer"
+                                    form={form}
+                                    setForm={setForm}
+                                    errors={errors}
+                                />
+                                <Field
+                                    name="department"
+                                    label="Field / Domain (Optional)"
+                                    placeholder="e.g. Technology, Healthcare, Finance"
+                                    form={form}
+                                    setForm={setForm}
+                                    errors={errors}
+                                />
+                            </>
                         )}
 
                         <div className="form-row">

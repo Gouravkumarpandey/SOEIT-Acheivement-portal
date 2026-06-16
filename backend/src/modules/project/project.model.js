@@ -32,23 +32,23 @@ const Project = {
     create: async (data) => {
         const db = getDb();
         const id = await genId();
-        await db.execute({
-            sql: `INSERT INTO projects (id, student_id, title, description, github_link, live_link, tech_stack, status)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            args: [id, data.studentId, data.title, data.description, data.githubLink || null, data.liveLink || null, data.techStack || null, data.status || 'Completed']
-        });
+        await db.query(
+            `INSERT INTO projects (id, student_id, title, description, github_link, live_link, tech_stack, status)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [id, data.studentId, data.title, data.description, data.githubLink || null, data.liveLink || null, data.techStack || null, data.status || 'Completed']
+        );
         return Project.findById(id);
     },
 
     findById: async (id) => {
         const db = getDb();
-        const res = await db.execute({
-            sql: `SELECT p.*, u.name as student_name, u.email as student_email, u.department as student_department, u.profile_image as student_profile_image
-                  FROM projects p
-                  LEFT JOIN users u ON p.student_id = u.id
-                  WHERE p.id = ?`,
-            args: [id]
-        });
+        const res = await db.query(
+            `SELECT p.*, u.name as student_name, u.email as student_email, u.department as student_department, u.profile_image as student_profile_image
+              FROM projects p
+              LEFT JOIN users u ON p.student_id = u.id
+              WHERE p.id = $1`,
+            [id]
+        );
         return res.rows.length ? rowToProject(res.rows[0]) : null;
     },
 
@@ -59,34 +59,36 @@ const Project = {
                    LEFT JOIN users u ON p.student_id = u.id
                    WHERE 1=1`;
         const args = [];
+        let paramIdx = 1;
 
         if (params.studentId) {
-            sql += ` AND p.student_id = ?`;
+            sql += ` AND p.student_id = $${paramIdx++}`;
             args.push(params.studentId);
         }
 
         if (params.department) {
-            sql += ` AND u.department = ?`;
+            sql += ` AND u.department = $${paramIdx++}`;
             args.push(params.department);
         }
 
         if (params.search) {
-            sql += ` AND (p.title LIKE ? OR p.tech_stack LIKE ? OR u.name LIKE ?)`;
+            sql += ` AND (p.title ILIKE $${paramIdx} OR p.tech_stack ILIKE $${paramIdx + 1} OR u.name ILIKE $${paramIdx + 2})`;
             args.push(`%${params.search}%`, `%${params.search}%`, `%${params.search}%`);
+            paramIdx += 3;
         }
 
         sql += ` ORDER BY p.created_at DESC`;
 
-        const res = await db.execute({ sql, args });
+        const res = await db.query(sql, args);
         return res.rows.map(rowToProject);
     },
 
     delete: async (id, studentId) => {
         const db = getDb();
-        await db.execute({
-            sql: `DELETE FROM projects WHERE id = ? AND student_id = ?`,
-            args: [id, studentId]
-        });
+        await db.query(
+            `DELETE FROM projects WHERE id = $1 AND student_id = $2`,
+            [id, studentId]
+        );
     }
 };
 

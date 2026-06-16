@@ -4,6 +4,11 @@ import { authAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
+// Clear any stale token from localStorage (only sessionStorage should be used)
+if (typeof window !== 'undefined') {
+    localStorage.removeItem('soeit_token');
+}
+
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [user, setUser] = useState(() => {
@@ -30,8 +35,10 @@ export const AuthProvider = ({ children }) => {
             const { data } = await authAPI.getProfile();
             setUser(data.user);
         } catch {
+            // Stale or invalid token (e.g. from a different server/JWT secret) — clear silently
             sessionStorage.removeItem('soeit_token');
             sessionStorage.removeItem('soeit_user');
+            localStorage.removeItem('soeit_token');
             setUser(null);
         } finally {
             setLoading(false);
@@ -89,10 +96,11 @@ export const AuthProvider = ({ children }) => {
     const isAdmin = user?.role === 'admin';
     const isFaculty = user?.role === 'faculty';
     const isStudent = user?.role === 'student';
+    const isGeneral = user?.role === 'general';
     const isStaff = isAdmin || isFaculty;
 
     return (
-        <AuthContext.Provider value={{ user, loading, error, login, register, verifyOTP, resendOTP, logout, updateUser, isAdmin, isFaculty, isStudent, isStaff, loadUser }}>
+        <AuthContext.Provider value={{ user, loading, error, login, register, verifyOTP, resendOTP, logout, updateUser, isAdmin, isFaculty, isStudent, isGeneral, isStaff, loadUser }}>
             {children}
         </AuthContext.Provider>
     );
@@ -100,7 +108,16 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
     const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+    if (!ctx) {
+        // During HMR or if used outside provider, return safe no-op defaults
+        return {
+            user: null, loading: true, error: null,
+            login: async () => {}, register: async () => {}, verifyOTP: async () => {},
+            resendOTP: async () => {}, logout: async () => {}, updateUser: () => {},
+            isAdmin: false, isFaculty: false, isStudent: false, isGeneral: false, isStaff: false,
+            loadUser: async () => {}
+        };
+    }
     return ctx;
 };
 

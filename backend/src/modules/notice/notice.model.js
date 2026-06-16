@@ -26,7 +26,7 @@ const rowToNotice = (row) => {
 
         deleteOne: async function () {
             const db = getDb();
-            await db.execute({ sql: 'DELETE FROM notices WHERE id = ?', args: [this.id] });
+            await db.query('DELETE FROM notices WHERE id = $1', [this.id]);
         },
 
         toObject: function () {
@@ -53,18 +53,18 @@ const Notice = {
     create: async (data) => {
         const db = getDb();
         const id = await genId();
-        await db.execute({
-            sql: `INSERT INTO notices (id, title, content, priority, created_by, target_semester, target_branch)
-                  VALUES (?,?,?,?,?,?,?)`,
-            args: [id, data.title, data.content, data.priority || 'Medium', data.createdBy, data.targetSemester || 'all', data.targetBranch || 'all'],
-        });
-        const res = await db.execute({ sql: `${BASE_SELECT} WHERE n.id = ?`, args: [id] });
+        await db.query(
+            `INSERT INTO notices (id, title, content, priority, created_by, target_semester, target_branch)
+              VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+            [id, data.title, data.content, data.priority || 'Medium', data.createdBy, data.targetSemester || 'all', data.targetBranch || 'all']
+        );
+        const res = await db.query(`${BASE_SELECT} WHERE n.id = $1`, [id]);
         return rowToNotice(res.rows[0]);
     },
 
     findById: async (id) => {
         const db = getDb();
-        const res = await db.execute({ sql: `${BASE_SELECT} WHERE n.id = ?`, args: [id] });
+        const res = await db.query(`${BASE_SELECT} WHERE n.id = $1`, [id]);
         return res.rows.length ? rowToNotice(res.rows[0]) : null;
     },
 
@@ -72,7 +72,7 @@ const Notice = {
         const buildAndExec = async () => {
             const db = getDb();
             const sql = `${BASE_SELECT} ORDER BY n.created_at DESC`;
-            const res = await db.execute({ sql, args: [] });
+            const res = await db.query(sql, []);
             return res.rows.map(rowToNotice);
         };
 

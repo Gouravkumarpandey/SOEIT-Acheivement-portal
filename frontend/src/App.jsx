@@ -113,13 +113,13 @@ function App() {
           <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
 
           {/* Shared Authenticated Routes (All Roles) */}
-          <Route element={<ProtectedRoute allowedRoles={['student', 'admin', 'faculty']}><DashboardLayout /></ProtectedRoute>}>
+          <Route element={<ProtectedRoute allowedRoles={['student', 'admin', 'faculty', 'general']}><DashboardLayout /></ProtectedRoute>}>
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/events" element={<EventsPage />} />
           </Route>
 
-          {/* Student Specific Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['student']}><DashboardLayout /></ProtectedRoute>}>
+          {/* Student / General User Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['student', 'general']}><DashboardLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<StudentDashboard />} />
             <Route path="/achievements" element={<MyAchievementsPage />} />
             <Route path="/achievements/upload" element={<UploadAchievementPage />} />

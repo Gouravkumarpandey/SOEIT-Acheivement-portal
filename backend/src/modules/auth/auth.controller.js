@@ -51,10 +51,16 @@ exports.register = async (req, res, next) => {
         if (role === 'admin') {
             role = 'student'; // Fallback to student for safety
         }
+        // Allow: 'student', 'faculty', 'general'
+        const allowedRoles = ['student', 'faculty', 'general'];
+        if (!allowedRoles.includes(role)) role = 'student';
 
         // Store registration data in cache
         const registrationData = {
-            name, email: emailLower, password, department,
+            name,
+            email: emailLower,
+            password,
+            department: department?.trim() || null,
             enrollmentNo: enrollmentNo?.trim() || undefined,
             batch: batch?.trim() || undefined,
             semester: semester ? parseInt(semester, 10) : undefined,
@@ -66,31 +72,37 @@ exports.register = async (req, res, next) => {
 
         cache.set(`signup_${emailLower}`, registrationData, 600); // 10 mins
 
-        // Send OTP Email
-        const html = getEmailTemplate({
-            title: 'Verify Your Email',
-            content: `
-                <h1 class="h1">Hello ${name},</h1>
-                <p class="p">Thank you for registering on the SOEIT Achievement Portal.</p>
-                <p class="p">Please use the following 6-digit OTP to verify your email address:</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1e293b; background: #f1f5f9; padding: 10px 20px; border-radius: 8px; border: 1px solid #e2e8f0;">${otp}</span>
-                </div>
-                <p class="p" style="color: #64748b; font-size: 14px;">This OTP is valid for 10 minutes. Do not share this code with anyone.</p>
-            `,
-            footerText: 'If you did not initiate this registration, please ignore this email.'
-        });
-
-        await sendEmail({
-            to: emailLower,
-            subject: 'SOEIT Portal - Email Verification OTP',
-            html
-        });
-
+        // Respond IMMEDIATELY — send email in background (non-blocking)
         res.status(200).json({
             success: true,
             message: 'OTP sent to your email. Please verify to complete registration.',
             email: emailLower
+        });
+
+        // Fire-and-forget email (does not delay the response)
+        setImmediate(async () => {
+            try {
+                const html = getEmailTemplate({
+                    title: 'Verify Your Email',
+                    content: `
+                        <h1 class="h1">Hello ${name},</h1>
+                        <p class="p">Thank you for registering on the SOEIT Achievement Portal.</p>
+                        <p class="p">Please use the following 6-digit OTP to verify your email address:</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1e293b; background: #f1f5f9; padding: 10px 20px; border-radius: 8px; border: 1px solid #e2e8f0;">${otp}</span>
+                        </div>
+                        <p class="p" style="color: #64748b; font-size: 14px;">This OTP is valid for 10 minutes. Do not share this code with anyone.</p>
+                    `,
+                    footerText: 'If you did not initiate this registration, please ignore this email.'
+                });
+                await sendEmail({
+                    to: emailLower,
+                    subject: 'SOEIT Portal - Email Verification OTP',
+                    html
+                });
+            } catch (emailErr) {
+                console.error('[OTP Email Error]', emailErr.message);
+            }
         });
     } catch (error) {
         console.error('[Register Error]', error.message);
@@ -157,26 +169,32 @@ exports.resendOTP = async (req, res, next) => {
 
         cache.set(`signup_${emailLower}`, registrationData, 600);
 
-        // Send Email
-        const html = getEmailTemplate({
-            title: 'Resent Verification OTP',
-            content: `
-                <h1 class="h1">Hello ${registrationData.name},</h1>
-                <p class="p">Here is your new 6-digit OTP to verify your email address:</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1e293b; background: #f1f5f9; padding: 10px 20px; border-radius: 8px; border: 1px solid #e2e8f0;">${otp}</span>
-                </div>
-            `,
-            footerText: 'This OTP is valid for 10 minutes.'
-        });
-
-        await sendEmail({
-            to: emailLower,
-            subject: 'SOEIT Portal - Resent Verification OTP',
-            html
-        });
-
+        // Respond immediately
         res.status(200).json({ success: true, message: 'A new OTP has been sent to your email.' });
+
+        // Fire-and-forget email (non-blocking)
+        setImmediate(async () => {
+            try {
+                const html = getEmailTemplate({
+                    title: 'Resent Verification OTP',
+                    content: `
+                        <h1 class="h1">Hello ${registrationData.name},</h1>
+                        <p class="p">Here is your new 6-digit OTP to verify your email address:</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1e293b; background: #f1f5f9; padding: 10px 20px; border-radius: 8px; border: 1px solid #e2e8f0;">${otp}</span>
+                        </div>
+                    `,
+                    footerText: 'This OTP is valid for 10 minutes.'
+                });
+                await sendEmail({
+                    to: emailLower,
+                    subject: 'SOEIT Portal - Resent Verification OTP',
+                    html
+                });
+            } catch (emailErr) {
+                console.error('[Resend OTP Email Error]', emailErr.message);
+            }
+        });
     } catch (error) {
         next(error);
     }
